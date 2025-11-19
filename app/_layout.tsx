@@ -55,43 +55,55 @@ export default function RootLayout() {
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <AuthenticationProvider>
           <AppInitializer>
-            <Stack>
+            <Stack
+              screenOptions={{
+                headerStyle: {
+                  backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+                },
+                headerTitleStyle: {
+                  fontWeight: "600",
+                },
+                contentStyle: {
+                  backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+                },
+              }}
+            >
               <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
               <Stack.Screen
                 name="expenses/add"
-                options={{ presentation: "modal", title: "Thêm Chi Phí" }}
+                options={{ presentation: "modal", headerShown: false }}
               />
               <Stack.Screen
                 name="expenses/edit/[id]"
-                options={{ presentation: "modal", title: "Sửa Chi Phí" }}
+                options={{ presentation: "modal", headerShown: false }}
               />
               <Stack.Screen
                 name="expenses/report"
-                options={{ title: "Báo Cáo Tháng", headerShown: false }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="notes/add"
-                options={{ presentation: "modal", title: "Thêm Ghi Chú" }}
+                options={{ presentation: "modal", headerShown: false }}
               />
               <Stack.Screen
                 name="notes/edit/[id]"
-                options={{ presentation: "modal", title: "Sửa Ghi Chú" }}
+                options={{ presentation: "modal", headerShown: false }}
               />
               <Stack.Screen
                 name="notes/[id]"
-                options={{ title: "Chi Tiết Ghi Chú" }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="events/add"
-                options={{ presentation: "modal", title: "Thêm Sự Kiện" }}
+                options={{ presentation: "modal", headerShown: false }}
               />
               <Stack.Screen
                 name="events/edit/[id]"
-                options={{ presentation: "modal", title: "Sửa Sự Kiện" }}
+                options={{ presentation: "modal", headerShown: false }}
               />
               <Stack.Screen
                 name="events/[id]"
-                options={{ title: "Chi Tiết Sự Kiện" }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="settings/family-members"

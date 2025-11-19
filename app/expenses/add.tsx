@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { Alert } from "react-native";
+import { Alert, View } from "react-native";
 import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { addExpense, loadFamilyMembers } from "@/src/redux";
 import { Expense } from "@/src/types";
 import { useExpenseForm } from "@/src/hooks/useExpenseForm";
 import ExpenseForm from "@/src/components/ExpenseForm";
+import CustomHeader from "@/src/components/CustomHeader";
 
 export default function AddExpenseScreen() {
   const dispatch = useAppDispatch();
@@ -59,24 +60,27 @@ export default function AddExpenseScreen() {
   };
 
   return (
-    <ExpenseForm
-      amount={amount}
-      setAmount={setAmount}
-      category={category}
-      setCategory={setCategory}
-      spender={spender}
-      setSpender={setSpender}
-      date={date}
-      setDate={setDate}
-      note={note}
-      setNote={setNote}
-      showDatePicker={showDatePicker}
-      setShowDatePicker={setShowDatePicker}
-      errors={errors}
-      clearError={clearError}
-      familyMembers={familyMembers}
-      onCancel={() => router.back()}
-      onSave={handleSave}
-    />
+    <View style={{ flex: 1 }}>
+      <CustomHeader title="Thêm Chi Phí" />
+      <ExpenseForm
+        amount={amount}
+        setAmount={setAmount}
+        category={category}
+        setCategory={setCategory}
+        spender={spender}
+        setSpender={setSpender}
+        date={date}
+        setDate={setDate}
+        note={note}
+        setNote={setNote}
+        showDatePicker={showDatePicker}
+        setShowDatePicker={setShowDatePicker}
+        errors={errors}
+        clearError={clearError}
+        familyMembers={familyMembers}
+        onCancel={() => router.back()}
+        onSave={handleSave}
+      />
+    </View>
   );
 }

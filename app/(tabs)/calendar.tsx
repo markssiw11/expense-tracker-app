@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
+  Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -25,7 +26,6 @@ import {
   selectViewMode,
   selectSelectedCategory,
   selectTodayEvents,
-  selectEventsByDate,
   selectFilteredEvents,
   selectEventsLoading,
   selectEventsError,
@@ -141,6 +141,10 @@ export default function CalendarTab() {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
+  // Refs for auto-scrolling
+  const scrollViewRef = React.useRef<ScrollView>(null);
+  const categoryRefs = React.useRef<{ [key: string]: View | null }>({});
+
   // Redux state
   const markedDates = useAppSelector(selectMarkedDates);
   const selectedDate = useAppSelector(selectSelectedDate);
@@ -208,10 +212,31 @@ export default function CalendarTab() {
     router.push("/events/add" as any);
   };
 
-  // Handle category filter
+  // Handle category filter with auto-scroll
   const handleCategoryFilter = (category: EventCategory | null) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     dispatch(setSelectedCategory(category));
+
+    // Auto-scroll to center the selected tab
+    setTimeout(() => {
+      const key = category || "all";
+      const targetRef = categoryRefs.current[key];
+
+      if (targetRef && scrollViewRef.current) {
+        targetRef.measureLayout(
+          scrollViewRef.current as any,
+          (x, y, width, height) => {
+            const screenWidth = Dimensions.get("window").width;
+            const scrollToX = x - screenWidth / 2 + width / 2;
+            scrollViewRef.current?.scrollTo({
+              x: Math.max(0, scrollToX),
+              animated: true,
+            });
+          },
+          () => {}
+        );
+      }
+    }, 50);
   };
 
   // Format selected date for display
@@ -307,15 +332,20 @@ export default function CalendarTab() {
 
         {/* Category Filter Chips */}
         <ScrollView
+          ref={scrollViewRef}
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.categoryFilterContainer}
           contentContainerStyle={styles.categoryFilterContent}
         >
           <TouchableOpacity
+            ref={(ref) => {
+              categoryRefs.current["all"] = ref;
+            }}
             style={[
               styles.categoryChip,
               !selectedCategory && styles.categoryChipActive,
+              !selectedCategory && { backgroundColor: "#667eea" },
             ]}
             onPress={() => handleCategoryFilter(null)}
           >
@@ -338,6 +368,9 @@ export default function CalendarTab() {
             return (
               <TouchableOpacity
                 key={category}
+                ref={(ref) => {
+                  categoryRefs.current[category] = ref;
+                }}
                 style={[
                   styles.categoryChip,
                   isActive && styles.categoryChipActive,

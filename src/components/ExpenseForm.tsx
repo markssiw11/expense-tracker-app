@@ -14,6 +14,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { ExpenseCategory } from "@/src/types";
 import { EXPENSE_CATEGORIES } from "@/src/constants/ExpenseCategories";
 import { FamilyMember } from "@/src/redux";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface FormErrors {
   amount?: string;
@@ -64,6 +65,7 @@ export default function ExpenseForm({
   onDelete,
   saveButtonText = "Lưu",
 }: ExpenseFormProps) {
+  const insets = useSafeAreaInsets();
   const handleDateChange = (_: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
     if (selectedDate) {
@@ -232,7 +234,9 @@ export default function ExpenseForm({
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={styles.footer}>
+      <View
+        style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}
+      >
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
           <Text style={styles.cancelButtonText}>Hủy</Text>
         </TouchableOpacity>
