@@ -16,6 +16,7 @@ import { EventCategory } from "@/src/types/event.types";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
+import { cancelNotification } from "@/src/services/notificationService";
 
 // Category colors matching design document
 const CATEGORY_COLORS: Record<EventCategory, string> = {
@@ -42,6 +43,20 @@ const CATEGORY_ICONS: Record<EventCategory, keyof typeof Ionicons.glyphMap> = {
   Health: "fitness",
   Family: "people",
   Other: "ellipsis-horizontal-circle",
+};
+
+// Helper function to format reminder time
+const formatReminderTime = (minutes: number): string => {
+  if (minutes < 60) {
+    return `Nhắc trước ${minutes} phút`;
+  } else if (minutes === 60) {
+    return "Nhắc trước 1 giờ";
+  } else if (minutes === 1440) {
+    return "Nhắc trước 1 ngày";
+  } else {
+    const hours = Math.floor(minutes / 60);
+    return `Nhắc trước ${hours} giờ`;
+  }
 };
 
 export default function EventDetailScreen() {
@@ -82,6 +97,12 @@ export default function EventDetailScreen() {
           if (!event) return;
           setIsDeleting(true);
           try {
+            // Cancel notification if it exists
+            if (event.notificationId) {
+              await cancelNotification(event.notificationId);
+            }
+
+            // Proceed with normal delete flow
             await dispatch(deleteEvent(event.id)).unwrap();
             Alert.alert("Thành công", "Đã xóa sự kiện", [
               { text: "OK", onPress: () => router.back() },
@@ -216,6 +237,34 @@ export default function EventDetailScreen() {
                 </View>
               </View>
             )}
+
+            {/* Reminder Info */}
+            <View style={styles.detailRow}>
+              <View
+                style={[
+                  styles.detailIcon,
+                  event.reminderEnabled && styles.detailIconActive,
+                ]}
+              >
+                <Ionicons
+                  name={
+                    event.reminderEnabled
+                      ? "notifications"
+                      : "notifications-off"
+                  }
+                  size={20}
+                  color={event.reminderEnabled ? "#F59E0B" : "#999"}
+                />
+              </View>
+              <View style={styles.detailContent}>
+                <Text style={styles.detailLabel}>Nhắc nhở</Text>
+                <Text style={styles.detailValue}>
+                  {event.reminderEnabled
+                    ? formatReminderTime(event.reminderMinutes)
+                    : "Không có nhắc nhở"}
+                </Text>
+              </View>
+            </View>
           </View>
 
           {/* Description */}
@@ -331,6 +380,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F0F9FF",
     justifyContent: "center",
     alignItems: "center",
+  },
+  detailIconActive: {
+    backgroundColor: "#FEF3C7",
   },
   detailContent: {
     flex: 1,

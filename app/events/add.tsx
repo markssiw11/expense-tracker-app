@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Alert, View, ActivityIndicator, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { useAppDispatch } from "@/src/redux/store";
-import { addEvent } from "@/src/redux/reducers/eventSlice";
+import { addEvent, updateEvent } from "@/src/redux/reducers/eventSlice";
 import { Event, EventFormData } from "@/src/types/event.types";
 import EventForm from "@/src/components/EventForm";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
+import { scheduleEventReminder } from "@/src/services/notificationService";
 
 export default function AddEventScreen() {
   const dispatch = useAppDispatch();
@@ -31,12 +32,62 @@ export default function AddEventScreen() {
       time: timeStr,
       location: formData.location || undefined,
       category: formData.category,
+      reminderEnabled: formData.reminderEnabled,
+      reminderMinutes: formData.reminderMinutes,
+      notificationId: undefined,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     try {
+      // First, save the event to Redux and AsyncStorage
       await dispatch(addEvent(newEvent)).unwrap();
+
+      // If reminder is enabled, schedule the notification
+      if (newEvent.reminderEnabled) {
+        try {
+          const notificationId = await scheduleEventReminder(newEvent);
+
+          // If notification was scheduled successfully, update the event with notificationId
+          if (notificationId) {
+            await dispatch(
+              updateEvent({
+                id: newEvent.id,
+                data: { notificationId },
+              })
+            ).unwrap();
+          } else {
+            // Notification scheduling failed (permissions denied, past event, or invalid data)
+            // Determine the likely reason based on event timing
+            const eventDateTime = new Date(
+              `${newEvent.date}T${newEvent.time}:00`
+            );
+            const reminderTime = new Date(
+              eventDateTime.getTime() - newEvent.reminderMinutes * 60 * 1000
+            );
+            const isPastEvent = reminderTime.getTime() <= Date.now();
+
+            const message = isPastEvent
+              ? "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở vì thời gian nhắc nhở đã qua. Vui lòng chọn thời gian sự kiện trong tương lai."
+              : "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở. Vui lòng kiểm tra quyền thông báo trong cài đặt thiết bị.";
+
+            Alert.alert("Cảnh báo", message, [{ text: "OK" }]);
+          }
+        } catch (notificationError) {
+          // Notification scheduling error - event is still saved
+          console.error("Notification scheduling error:", notificationError);
+          Alert.alert(
+            "Cảnh báo",
+            "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở. Lỗi: " +
+              (notificationError instanceof Error
+                ? notificationError.message
+                : "Không xác định"),
+            [{ text: "OK" }]
+          );
+        }
+      }
+
+      // Success - navigate back
       Alert.alert("Thành công", "Đã thêm sự kiện mới", [
         { text: "OK", onPress: () => router.back() },
       ]);

@@ -102,8 +102,6 @@ function CalendarContent({
             onDateSelect={handleDateSelect}
           />
         </View>
-
-        {/* Selected Date Events */}
         {selectedDate && (
           <View style={styles.selectedDateSection}>
             <Text style={[styles.selectedDateTitle, { color: colors.text }]}>
@@ -113,6 +111,7 @@ function CalendarContent({
               events={selectedDateEvents}
               onEventPress={handleEventPress}
               emptyMessage="Không có sự kiện nào trong ngày này."
+              scrollEnabled={false}
             />
           </View>
         )}
@@ -130,6 +129,7 @@ function CalendarContent({
         events={upcomingEvents}
         onEventPress={handleEventPress}
         emptyMessage="Chưa có lịch hẹn nào. Nhấn + để thêm sự kiện mới."
+        scrollEnabled={false}
       />
     </Animated.View>
   );
@@ -410,36 +410,6 @@ export default function CalendarTab() {
             contentContainerStyle={styles.contentContainer}
             showsVerticalScrollIndicator={false}
           >
-            {/* Today's Events Section */}
-            <View style={styles.todaySection}>
-              <View style={styles.todaySectionHeader}>
-                <Ionicons name="today" size={20} color={colors.tint} />
-                <Text
-                  style={[styles.todaySectionTitle, { color: colors.text }]}
-                >
-                  Hôm nay {todayEvents.length > 0 && `(${todayEvents.length})`}
-                </Text>
-              </View>
-              {todayEvents.length > 0 ? (
-                <EventList
-                  events={todayEvents}
-                  onEventPress={handleEventPress}
-                  emptyMessage="Hôm nay không có lịch hẹn."
-                />
-              ) : (
-                <View style={styles.todayEmptyState}>
-                  <Ionicons
-                    name="checkmark-circle-outline"
-                    size={48}
-                    color={colors.icon}
-                  />
-                  <Text style={[styles.todayEmptyText, { color: colors.icon }]}>
-                    Hôm nay không có lịch hẹn
-                  </Text>
-                </View>
-              )}
-            </View>
-
             {/* Calendar or List View */}
             <CalendarContent
               viewMode={viewMode}

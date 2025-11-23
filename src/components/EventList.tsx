@@ -15,6 +15,7 @@ interface EventListProps {
   events: Event[];
   onEventPress: (eventId: string) => void;
   emptyMessage?: string;
+  scrollEnabled?: boolean;
 }
 
 interface EventSection {
@@ -75,6 +76,7 @@ export const EventList: React.FC<EventListProps> = ({
   events,
   onEventPress,
   emptyMessage = "Không có sự kiện nào.",
+  scrollEnabled = true,
 }) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
@@ -141,6 +143,8 @@ export const EventList: React.FC<EventListProps> = ({
       contentContainerStyle={styles.listContent}
       stickySectionHeadersEnabled={true}
       showsVerticalScrollIndicator={false}
+      scrollEnabled={scrollEnabled}
+      nestedScrollEnabled={true}
     />
   );
 };

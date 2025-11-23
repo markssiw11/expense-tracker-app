@@ -49,6 +49,8 @@ class EventStorageService {
       typeof event.date === "string" &&
       typeof event.time === "string" &&
       typeof event.category === "string" &&
+      typeof event.reminderEnabled === "boolean" &&
+      typeof event.reminderMinutes === "number" &&
       typeof event.createdAt === "string" &&
       typeof event.updatedAt === "string"
     );

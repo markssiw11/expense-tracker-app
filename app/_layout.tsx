@@ -10,10 +10,11 @@ import "react-native-reanimated";
 import { useEffect } from "react";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { store, useAppDispatch } from "@/src/redux/store";
+import { store, useAppDispatch, useAppSelector } from "@/src/redux/store";
 import AuthenticationProvider from "@/src/components/AuthenticationProvider";
-import { loadEvents } from "@/src/redux/reducers/eventSlice";
+import { loadEvents, updateEvent } from "@/src/redux/reducers/eventSlice";
 import { loadExpenses } from "@/src/redux/reducers/expenseSlice";
+import { rescheduleAllNotifications } from "@/src/services/notificationService";
 
 export const unstable_settings = {
   anchor: "(tabs)",
@@ -21,6 +22,7 @@ export const unstable_settings = {
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
+  const events = useAppSelector((state) => state.events.events);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -43,6 +45,46 @@ function AppInitializer({ children }: { children: React.ReactNode }) {
 
     initializeApp();
   }, [dispatch]);
+
+  // Reschedule notifications after events are loaded
+  // This handles edge cases like app reinstall or timezone changes
+  useEffect(() => {
+    const rescheduleNotifications = async () => {
+      if (events.length === 0) {
+        return; // No events to reschedule
+      }
+
+      try {
+        console.log("Rescheduling notifications for loaded events...");
+        const notificationMap = await rescheduleAllNotifications(events);
+
+        // Update events with new notification IDs
+        for (const [eventId, notificationId] of notificationMap.entries()) {
+          const event = events.find((e) => e.id === eventId);
+          if (event && event.notificationId !== notificationId) {
+            await dispatch(
+              updateEvent({
+                id: eventId,
+                data: { notificationId },
+              })
+            ).unwrap();
+          }
+        }
+
+        console.log(
+          `Successfully rescheduled ${notificationMap.size} notifications`
+        );
+      } catch (error) {
+        console.error("Failed to reschedule notifications:", error);
+        // Don't block app initialization if rescheduling fails
+      }
+    };
+
+    // Only reschedule if we have events loaded
+    if (events.length > 0) {
+      rescheduleNotifications();
+    }
+  }, [events.length]); // Only run when events are first loaded
 
   return <>{children}</>;
 }

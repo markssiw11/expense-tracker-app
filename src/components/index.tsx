@@ -13,4 +13,5 @@ export { EventCard } from "./EventCard";
 export { EventList } from "./EventList";
 export { default as CategoryPicker } from "./CategoryPicker";
 export { default as EventForm } from "./EventForm";
+export { default as ReminderPicker } from "./ReminderPicker";
 export { default as ErrorBoundary } from "./ErrorBoundary";

@@ -11,8 +11,13 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { EventFormData, EventCategory } from "@/src/types/event.types";
+import {
+  EventFormData,
+  EventCategory,
+  ReminderTime,
+} from "@/src/types/event.types";
 import CategoryPicker from "./CategoryPicker";
+import ReminderPicker from "./ReminderPicker";
 
 interface FormErrors {
   title?: string;
@@ -42,6 +47,12 @@ export default function EventForm({
   );
   const [date, setDate] = useState(initialData?.date || new Date());
   const [time, setTime] = useState(initialData?.time || new Date());
+  const [reminderEnabled, setReminderEnabled] = useState(
+    initialData?.reminderEnabled ?? false
+  );
+  const [reminderMinutes, setReminderMinutes] = useState<ReminderTime>(
+    initialData?.reminderMinutes || 5
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -75,6 +86,8 @@ export default function EventForm({
         time,
         location: location.trim(),
         category,
+        reminderEnabled,
+        reminderMinutes,
       };
       onSubmit(formData);
     }
@@ -200,6 +213,16 @@ export default function EventForm({
         <View style={styles.section}>
           <Text style={styles.label}>Danh mục</Text>
           <CategoryPicker selectedCategory={category} onSelect={setCategory} />
+        </View>
+
+        {/* Reminder Picker */}
+        <View style={styles.section}>
+          <ReminderPicker
+            enabled={reminderEnabled}
+            reminderMinutes={reminderMinutes}
+            onToggle={setReminderEnabled}
+            onSelectTime={setReminderMinutes}
+          />
         </View>
       </ScrollView>
 

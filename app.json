@@ -15,6 +15,13 @@
         "ITSAppUsesNonExemptEncryption": false
       }
     },
+    "notification": {
+      "icon": "./assets/images/icon.png",
+      "color": "#667eea",
+      "iosDisplayInForeground": true,
+      "androidMode": "default",
+      "androidCollapsedTitle": "Nhắc nhở lịch hẹn"
+    },
     "android": {
       "package": "com.family.expensetracker",
       "adaptiveIcon": {
@@ -45,6 +52,15 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#667eea"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#667eea",
+          "sounds": [],
+          "mode": "default"
         }
       ]
     ],

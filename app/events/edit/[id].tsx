@@ -6,6 +6,7 @@ import { updateEvent } from "@/src/redux/reducers/eventSlice";
 import { EventFormData } from "@/src/types/event.types";
 import EventForm from "@/src/components/EventForm";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
+import { updateEventReminder } from "@/src/services/notificationService";
 
 export default function EditEventScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,6 +37,11 @@ export default function EditEventScreen() {
     const minutes = formData.time.getMinutes().toString().padStart(2, "0");
     const timeStr = `${hours}:${minutes}`;
 
+    // Check if reminder settings changed
+    const reminderChanged =
+      event.reminderEnabled !== formData.reminderEnabled ||
+      event.reminderMinutes !== formData.reminderMinutes;
+
     const updatedData = {
       title: formData.title,
       description: formData.description || undefined,
@@ -43,15 +49,85 @@ export default function EditEventScreen() {
       time: timeStr,
       location: formData.location || undefined,
       category: formData.category,
+      reminderEnabled: formData.reminderEnabled,
+      reminderMinutes: formData.reminderMinutes,
       // Preserve original createdAt timestamp
       createdAt: event.createdAt,
     };
 
     try {
+      // First, update the event in Redux and AsyncStorage
       await dispatch(updateEvent({ id: event.id, data: updatedData })).unwrap();
-      Alert.alert("Thành công", "Đã cập nhật sự kiện", [
-        { text: "OK", onPress: () => router.back() },
-      ]);
+
+      // Handle notification management if reminder settings changed
+      if (reminderChanged) {
+        try {
+          // Create a temporary event object with updated data for notification scheduling
+          const updatedEvent = {
+            ...event,
+            ...updatedData,
+          };
+
+          // Update the notification (cancel old, schedule new if enabled)
+          const newNotificationId = await updateEventReminder(
+            updatedEvent,
+            event.notificationId
+          );
+
+          // Update the event with new notificationId (or clear it if reminder disabled)
+          await dispatch(
+            updateEvent({
+              id: event.id,
+              data: { notificationId: newNotificationId || undefined },
+            })
+          ).unwrap();
+
+          // Show appropriate message based on reminder state
+          if (!formData.reminderEnabled && event.reminderEnabled) {
+            // Reminder was disabled
+            Alert.alert("Thành công", "Đã cập nhật sự kiện và tắt nhắc nhở", [
+              { text: "OK", onPress: () => router.back() },
+            ]);
+          } else if (formData.reminderEnabled && !newNotificationId) {
+            // Reminder enabled but scheduling failed
+            // Determine the likely reason based on event timing
+            const eventDateTime = new Date(`${dateStr}T${timeStr}:00`);
+            const reminderTime = new Date(
+              eventDateTime.getTime() - formData.reminderMinutes * 60 * 1000
+            );
+            const isPastEvent = reminderTime.getTime() <= Date.now();
+
+            const message = isPastEvent
+              ? "Sự kiện đã được cập nhật nhưng không thể đặt nhắc nhở vì thời gian nhắc nhở đã qua. Vui lòng chọn thời gian sự kiện trong tương lai."
+              : "Sự kiện đã được cập nhật nhưng không thể đặt nhắc nhở. Vui lòng kiểm tra quyền thông báo trong cài đặt thiết bị.";
+
+            Alert.alert("Cảnh báo", message, [
+              { text: "OK", onPress: () => router.back() },
+            ]);
+          } else {
+            // Success
+            Alert.alert("Thành công", "Đã cập nhật sự kiện", [
+              { text: "OK", onPress: () => router.back() },
+            ]);
+          }
+        } catch (notificationError) {
+          // Notification update error - event is still saved
+          console.error("Notification update error:", notificationError);
+          Alert.alert(
+            "Cảnh báo",
+            "Sự kiện đã được cập nhật nhưng không thể cập nhật nhắc nhở. Lỗi: " +
+              (notificationError instanceof Error
+                ? notificationError.message
+                : "Không xác định"),
+            [{ text: "OK", onPress: () => router.back() }]
+          );
+        }
+      } else {
+        // No reminder changes, just show success
+        Alert.alert("Thành công", "Đã cập nhật sự kiện", [
+          { text: "OK", onPress: () => router.back() },
+        ]);
+      }
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Không thể cập nhật sự kiện";
@@ -114,6 +190,8 @@ export default function EditEventScreen() {
     time: parseEventTime(event.time),
     location: event.location || "",
     category: event.category,
+    reminderEnabled: event.reminderEnabled,
+    reminderMinutes: event.reminderMinutes,
   };
 
   return (

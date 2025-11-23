@@ -46,6 +46,8 @@ export const addEvent = createAsyncThunk(
   async (event: Event, { getState, rejectWithValue }) => {
     try {
       const state = getState() as RootState;
+      // Add event with all fields including reminder data
+      // (reminderEnabled, reminderMinutes, notificationId)
       const updatedEvents = [...state.events.events, event];
       await eventStorage.saveEvents(updatedEvents);
       return event;
@@ -71,6 +73,8 @@ export const updateEvent = createAsyncThunk(
         return rejectWithValue("Event not found");
       }
 
+      // Merge existing event with updates, including reminder fields
+      // (reminderEnabled, reminderMinutes, notificationId)
       const updatedEvent: Event = {
         ...existingEvent,
         ...data,

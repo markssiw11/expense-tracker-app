@@ -114,12 +114,14 @@ const styles = StyleSheet.create({
   },
   categoryIndicator: {
     width: 4,
-    height: "100%",
+    height: "auto",
     borderRadius: 2,
     position: "absolute",
     left: 0,
     top: 0,
     bottom: 0,
+    borderTopLeftRadius: 12,
+    borderBottomLeftRadius: 12,
   },
   content: {
     flex: 1,

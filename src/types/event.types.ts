@@ -2,6 +2,8 @@
 
 export type EventCategory = "Work" | "Personal" | "Health" | "Family" | "Other";
 
+export type ReminderTime = 5 | 10 | 15 | 30 | 60 | 1440; // minutes before event
+
 export interface Event {
   id: string;
   title: string;
@@ -10,6 +12,9 @@ export interface Event {
   time: string; // HH:mm format
   location?: string;
   category: EventCategory;
+  reminderEnabled: boolean;
+  reminderMinutes: ReminderTime;
+  notificationId?: string; // ID of scheduled notification
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
 }
@@ -21,6 +26,8 @@ export interface EventFormData {
   time: Date;
   location: string;
   category: EventCategory;
+  reminderEnabled: boolean;
+  reminderMinutes: ReminderTime;
 }
 
 export interface MarkedDates {
