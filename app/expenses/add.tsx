@@ -2,7 +2,12 @@ import React, { useEffect } from "react";
 import { Alert, View } from "react-native";
 import { router } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { addExpense, loadFamilyMembers } from "@/src/redux";
+import {
+  addExpense,
+  loadFamilyMembers,
+  selectWeeklyBudgetStatus,
+  selectMonthlyBudgetStatus,
+} from "@/src/redux";
 import { Expense } from "@/src/types";
 import { useExpenseForm } from "@/src/hooks/useExpenseForm";
 import ExpenseForm from "@/src/components/ExpenseForm";
@@ -11,6 +16,8 @@ import CustomHeader from "@/src/components/CustomHeader";
 export default function AddExpenseScreen() {
   const dispatch = useAppDispatch();
   const familyMembers = useAppSelector((state) => state.family.members);
+  const weeklyBudgetStatus = useAppSelector(selectWeeklyBudgetStatus);
+  const monthlyBudgetStatus = useAppSelector(selectMonthlyBudgetStatus);
 
   const {
     amount,
@@ -80,6 +87,9 @@ export default function AddExpenseScreen() {
         familyMembers={familyMembers}
         onCancel={() => router.back()}
         onSave={handleSave}
+        weeklyBudgetStatus={weeklyBudgetStatus}
+        monthlyBudgetStatus={monthlyBudgetStatus}
+        existingExpenseAmount={0}
       />
     </View>
   );

@@ -5,12 +5,17 @@ import {
   isWithinInterval,
   parseISO,
 } from "date-fns";
+import { vi } from "date-fns/locale";
 import {
   Expense,
   ExpenseCategory,
   CategoryBreakdown,
   MonthlySummary,
 } from "../types";
+import {
+  formatCurrency as formatCurrencyUtil,
+  formatDate as formatDateUtil,
+} from "./formatUtils";
 
 /**
  * Filter expenses by month
@@ -121,12 +126,7 @@ export const generateMonthlySummary = (
  * @param amount - Amount to format
  * @returns Formatted currency string
  */
-export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: "VND",
-  }).format(amount);
-};
+export const formatCurrency = formatCurrencyUtil;
 
 /**
  * Format date to display format
@@ -134,25 +134,14 @@ export const formatCurrency = (amount: number): string => {
  * @param formatString - Format pattern (default: 'dd/MM/yyyy')
  * @returns Formatted date string
  */
-export const formatDate = (
-  dateString: string,
-  formatString: string = "dd/MM/yyyy"
-): string => {
-  try {
-    const date = parseISO(dateString);
-    return format(date, formatString);
-  } catch (error) {
-    console.error("Error formatting date:", error);
-    return dateString;
-  }
-};
+export const formatDate = formatDateUtil;
 
 /**
  * Get current month in YYYY-MM format
  * @returns Current month string
  */
 export const getCurrentMonth = (): string => {
-  return format(new Date(), "yyyy-MM");
+  return format(new Date(), "yyyy-MM", { locale: vi });
 };
 
 /**
@@ -164,7 +153,7 @@ export const getPreviousMonth = (month: string): string => {
   const [year, monthNum] = month.split("-").map(Number);
   const date = new Date(year, monthNum - 1, 1);
   date.setMonth(date.getMonth() - 1);
-  return format(date, "yyyy-MM");
+  return format(date, "yyyy-MM", { locale: vi });
 };
 
 /**
@@ -176,5 +165,5 @@ export const getNextMonth = (month: string): string => {
   const [year, monthNum] = month.split("-").map(Number);
   const date = new Date(year, monthNum - 1, 1);
   date.setMonth(date.getMonth() + 1);
-  return format(date, "yyyy-MM");
+  return format(date, "yyyy-MM", { locale: vi });
 };

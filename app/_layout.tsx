@@ -159,6 +159,10 @@ export default function RootLayout() {
                 name="settings/authentication"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="settings/spending-limits"
+                options={{ headerShown: false }}
+              />
             </Stack>
             <StatusBar style="auto" />
           </AppInitializer>

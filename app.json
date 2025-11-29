@@ -3,6 +3,9 @@
     "name": "Quản Lý Chi Tiêu",
     "slug": "ExpenseTrackerApp",
     "version": "1.0.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "expensetrackerapp",
@@ -12,7 +15,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.family.expensetracker",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSFaceIDUsageDescription": "Sử dụng Face ID để mở khóa ứng dụng nhanh chóng và bảo mật"
       }
     },
     "notification": {
@@ -60,7 +64,13 @@
           "icon": "./assets/images/icon.png",
           "color": "#667eea",
           "sounds": [],
-          "mode": "default"
+          "mode": "production"
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Sử dụng Face ID để mở khóa ứng dụng nhanh chóng và bảo mật"
         }
       ]
     ],

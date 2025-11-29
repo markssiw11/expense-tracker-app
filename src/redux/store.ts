@@ -5,6 +5,7 @@ import noteReducer from "./reducers/noteSlice";
 import familyReducer from "./reducers/familySlice";
 import authReducer from "./reducers/authSlice";
 import eventReducer from "./reducers/eventSlice";
+import spendingLimitReducer from "./reducers/spendingLimitSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     family: familyReducer,
     auth: authReducer,
     events: eventReducer,
+    spendingLimit: spendingLimitReducer,
   },
 });
 

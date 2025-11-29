@@ -17,6 +17,7 @@ import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
 import { cancelNotification } from "@/src/services/notificationService";
+import CustomHeader from "@/src/components/CustomHeader";
 
 // Category colors matching design document
 const CATEGORY_COLORS: Record<EventCategory, string> = {
@@ -154,158 +155,125 @@ export default function EventDetailScreen() {
   const categoryIcon = CATEGORY_ICONS[event.category];
 
   return (
-    <ErrorBoundary>
-      <View style={styles.container}>
-        {/* Header with Actions */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            disabled={isDeleting}
-          >
-            <Ionicons name="arrow-back" size={24} color="#007AFF" />
-          </TouchableOpacity>
-          <View style={styles.headerActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={handleEdit}
-              disabled={isDeleting}
-            >
-              <Ionicons name="create-outline" size={24} color="#007AFF" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <ActivityIndicator size="small" color="#FF3B30" />
-              ) : (
-                <Ionicons name="trash-outline" size={24} color="#FF3B30" />
-              )}
-            </TouchableOpacity>
-          </View>
+    <View style={styles.container}>
+      <CustomHeader title="" />
+
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
+        {/* Category Badge */}
+        <View
+          style={[styles.categoryBadge, { backgroundColor: categoryColor }]}
+        >
+          <Ionicons name={categoryIcon} size={20} color="#fff" />
+          <Text style={styles.categoryBadgeText}>{categoryLabel}</Text>
         </View>
 
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.content}
-        >
-          {/* Category Badge */}
-          <View
-            style={[styles.categoryBadge, { backgroundColor: categoryColor }]}
-          >
-            <Ionicons name={categoryIcon} size={20} color="#fff" />
-            <Text style={styles.categoryBadgeText}>{categoryLabel}</Text>
-          </View>
+        {/* Title */}
+        <Text style={styles.title}>{event.title}</Text>
 
-          {/* Title */}
-          <Text style={styles.title}>{event.title}</Text>
-
-          {/* Date and Time */}
-          <View style={styles.detailsCard}>
-            <View style={styles.detailRow}>
-              <View style={styles.detailIcon}>
-                <Ionicons name="calendar" size={20} color="#007AFF" />
-              </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Ngày</Text>
-                <Text style={styles.detailValue}>
-                  {formatEventDate(event.date)}
-                </Text>
-              </View>
+        {/* Date and Time */}
+        <View style={styles.detailsCard}>
+          <View style={styles.detailRow}>
+            <View style={styles.detailIcon}>
+              <Ionicons name="calendar" size={20} color="#007AFF" />
             </View>
-
-            <View style={styles.detailRow}>
-              <View style={styles.detailIcon}>
-                <Ionicons name="time" size={20} color="#007AFF" />
-              </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Thời gian</Text>
-                <Text style={styles.detailValue}>{event.time}</Text>
-              </View>
-            </View>
-
-            {event.location && (
-              <View style={styles.detailRow}>
-                <View style={styles.detailIcon}>
-                  <Ionicons name="location" size={20} color="#007AFF" />
-                </View>
-                <View style={styles.detailContent}>
-                  <Text style={styles.detailLabel}>Địa điểm</Text>
-                  <Text style={styles.detailValue}>{event.location}</Text>
-                </View>
-              </View>
-            )}
-
-            {/* Reminder Info */}
-            <View style={styles.detailRow}>
-              <View
-                style={[
-                  styles.detailIcon,
-                  event.reminderEnabled && styles.detailIconActive,
-                ]}
-              >
-                <Ionicons
-                  name={
-                    event.reminderEnabled
-                      ? "notifications"
-                      : "notifications-off"
-                  }
-                  size={20}
-                  color={event.reminderEnabled ? "#F59E0B" : "#999"}
-                />
-              </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Nhắc nhở</Text>
-                <Text style={styles.detailValue}>
-                  {event.reminderEnabled
-                    ? formatReminderTime(event.reminderMinutes)
-                    : "Không có nhắc nhở"}
-                </Text>
-              </View>
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Ngày</Text>
+              <Text style={styles.detailValue}>
+                {formatEventDate(event.date)}
+              </Text>
             </View>
           </View>
 
-          {/* Description */}
-          {event.description && (
-            <View style={styles.descriptionCard}>
-              <View style={styles.descriptionHeader}>
-                <Ionicons name="document-text" size={20} color="#666" />
-                <Text style={styles.descriptionLabel}>Mô tả</Text>
+          <View style={styles.detailRow}>
+            <View style={styles.detailIcon}>
+              <Ionicons name="time" size={20} color="#007AFF" />
+            </View>
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Thời gian</Text>
+              <Text style={styles.detailValue}>{event.time}</Text>
+            </View>
+          </View>
+
+          {event.location && (
+            <View style={styles.detailRow}>
+              <View style={styles.detailIcon}>
+                <Ionicons name="location" size={20} color="#007AFF" />
               </View>
-              <Text style={styles.descriptionText}>{event.description}</Text>
+              <View style={styles.detailContent}>
+                <Text style={styles.detailLabel}>Địa điểm</Text>
+                <Text style={styles.detailValue}>{event.location}</Text>
+              </View>
             </View>
           )}
 
-          {/* Timestamps */}
-          <View style={styles.timestampsSection}>
-            <View style={styles.timestampRow}>
-              <Text style={styles.timestampLabel}>Tạo lúc:</Text>
-              <Text style={styles.timestampValue}>
-                {formatTimestamp(event.createdAt)}
-              </Text>
+          {/* Reminder Info */}
+          <View style={styles.detailRow}>
+            <View
+              style={[
+                styles.detailIcon,
+                event.reminderEnabled && styles.detailIconActive,
+              ]}
+            >
+              <Ionicons
+                name={
+                  event.reminderEnabled ? "notifications" : "notifications-off"
+                }
+                size={20}
+                color={event.reminderEnabled ? "#F59E0B" : "#999"}
+              />
             </View>
-            <View style={styles.timestampRow}>
-              <Text style={styles.timestampLabel}>Cập nhật:</Text>
-              <Text style={styles.timestampValue}>
-                {formatTimestamp(event.updatedAt)}
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Nhắc nhở</Text>
+              <Text style={styles.detailValue}>
+                {event.reminderEnabled
+                  ? formatReminderTime(event.reminderMinutes)
+                  : "Không có nhắc nhở"}
               </Text>
             </View>
           </View>
-        </ScrollView>
+        </View>
 
-        {/* Deleting Overlay */}
-        {isDeleting && (
-          <View style={styles.loadingOverlay}>
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#667eea" />
-              <Text style={styles.loadingText}>Đang xóa...</Text>
+        {/* Description */}
+        {event.description && (
+          <View style={styles.descriptionCard}>
+            <View style={styles.descriptionHeader}>
+              <Ionicons name="document-text" size={20} color="#666" />
+              <Text style={styles.descriptionLabel}>Mô tả</Text>
             </View>
+            <Text style={styles.descriptionText}>{event.description}</Text>
           </View>
         )}
-      </View>
-    </ErrorBoundary>
+
+        {/* Timestamps */}
+        <View style={styles.timestampsSection}>
+          <View style={styles.timestampRow}>
+            <Text style={styles.timestampLabel}>Tạo lúc:</Text>
+            <Text style={styles.timestampValue}>
+              {formatTimestamp(event.createdAt)}
+            </Text>
+          </View>
+          <View style={styles.timestampRow}>
+            <Text style={styles.timestampLabel}>Cập nhật:</Text>
+            <Text style={styles.timestampValue}>
+              {formatTimestamp(event.updatedAt)}
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+
+      {/* Deleting Overlay */}
+      {isDeleting && (
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#667eea" />
+            <Text style={styles.loadingText}>Đang xóa...</Text>
+          </View>
+        </View>
+      )}
+    </View>
   );
 }
 

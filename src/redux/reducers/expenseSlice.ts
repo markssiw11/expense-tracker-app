@@ -2,6 +2,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Expense, ExpenseCategory } from "../../types";
 import expenseStorage from "../../services/storage/expenseStorage";
 import { getCurrentMonth } from "../../utils/expenseUtils";
+import { updateBudgetStatus } from "./spendingLimitSlice";
+import { calculateBudgetStatus } from "../../utils/budgetCalculator";
+import { BudgetPeriodType } from "../../types";
 
 interface ExpenseState {
   expenses: Expense[];
@@ -26,9 +29,36 @@ const initialState: ExpenseState = {
 // Async thunks
 export const loadExpenses = createAsyncThunk(
   "expenses/loadExpenses",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
       const expenses = await expenseStorage.loadExpenses();
+
+      // Trigger budget recalculation after loading expenses
+      const state = getState() as any;
+      const spendingLimitConfig = state.spendingLimit?.config;
+
+      if (spendingLimitConfig) {
+        const weeklyStatus = spendingLimitConfig.weekly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.weekly,
+              BudgetPeriodType.WEEKLY
+            )
+          : null;
+
+        const monthlyStatus = spendingLimitConfig.monthly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.monthly,
+              BudgetPeriodType.MONTHLY
+            )
+          : null;
+
+        dispatch(
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+        );
+      }
+
       return expenses;
     } catch (error) {
       return rejectWithValue(
@@ -40,9 +70,37 @@ export const loadExpenses = createAsyncThunk(
 
 export const addExpense = createAsyncThunk(
   "expenses/addExpense",
-  async (expense: Expense, { rejectWithValue }) => {
+  async (expense: Expense, { rejectWithValue, dispatch, getState }) => {
     try {
       await expenseStorage.addExpense(expense);
+
+      // Trigger budget recalculation after adding expense
+      const state = getState() as any;
+      const expenses = [...state.expenses.expenses, expense];
+      const spendingLimitConfig = state.spendingLimit?.config;
+
+      if (spendingLimitConfig) {
+        const weeklyStatus = spendingLimitConfig.weekly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.weekly,
+              BudgetPeriodType.WEEKLY
+            )
+          : null;
+
+        const monthlyStatus = spendingLimitConfig.monthly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.monthly,
+              BudgetPeriodType.MONTHLY
+            )
+          : null;
+
+        dispatch(
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+        );
+      }
+
       return expense;
     } catch (error) {
       return rejectWithValue(
@@ -56,10 +114,40 @@ export const updateExpense = createAsyncThunk(
   "expenses/updateExpense",
   async (
     { id, data }: { id: string; data: Partial<Expense> },
-    { rejectWithValue }
+    { rejectWithValue, dispatch, getState }
   ) => {
     try {
       await expenseStorage.updateExpense(id, data);
+
+      // Trigger budget recalculation after updating expense
+      const state = getState() as any;
+      const expenses = state.expenses.expenses.map((e: Expense) =>
+        e.id === id ? { ...e, ...data, updatedAt: new Date().toISOString() } : e
+      );
+      const spendingLimitConfig = state.spendingLimit?.config;
+
+      if (spendingLimitConfig) {
+        const weeklyStatus = spendingLimitConfig.weekly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.weekly,
+              BudgetPeriodType.WEEKLY
+            )
+          : null;
+
+        const monthlyStatus = spendingLimitConfig.monthly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.monthly,
+              BudgetPeriodType.MONTHLY
+            )
+          : null;
+
+        dispatch(
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+        );
+      }
+
       return { id, data };
     } catch (error) {
       return rejectWithValue(
@@ -71,9 +159,39 @@ export const updateExpense = createAsyncThunk(
 
 export const deleteExpense = createAsyncThunk(
   "expenses/deleteExpense",
-  async (id: string, { rejectWithValue }) => {
+  async (id: string, { rejectWithValue, dispatch, getState }) => {
     try {
       await expenseStorage.deleteExpense(id);
+
+      // Trigger budget recalculation after deleting expense
+      const state = getState() as any;
+      const expenses = state.expenses.expenses.filter(
+        (e: Expense) => e.id !== id
+      );
+      const spendingLimitConfig = state.spendingLimit?.config;
+
+      if (spendingLimitConfig) {
+        const weeklyStatus = spendingLimitConfig.weekly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.weekly,
+              BudgetPeriodType.WEEKLY
+            )
+          : null;
+
+        const monthlyStatus = spendingLimitConfig.monthly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.monthly,
+              BudgetPeriodType.MONTHLY
+            )
+          : null;
+
+        dispatch(
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+        );
+      }
+
       return id;
     } catch (error) {
       return rejectWithValue(

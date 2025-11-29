@@ -2,7 +2,13 @@ import React, { useEffect } from "react";
 import { Alert } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { updateExpense, deleteExpense, loadFamilyMembers } from "@/src/redux";
+import {
+  updateExpense,
+  deleteExpense,
+  loadFamilyMembers,
+  selectWeeklyBudgetStatus,
+  selectMonthlyBudgetStatus,
+} from "@/src/redux";
 import { Expense } from "@/src/types/expense.types";
 import { useExpenseForm } from "@/src/hooks/useExpenseForm";
 import ExpenseForm from "@/src/components/ExpenseForm";
@@ -14,6 +20,8 @@ export default function EditExpenseScreen() {
     state.expenses.expenses.find((exp) => exp.id === id)
   );
   const familyMembers = useAppSelector((state) => state.family.members);
+  const weeklyBudgetStatus = useAppSelector(selectWeeklyBudgetStatus);
+  const monthlyBudgetStatus = useAppSelector(selectMonthlyBudgetStatus);
 
   const {
     amount,
@@ -128,6 +136,9 @@ export default function EditExpenseScreen() {
       onCancel={() => router.back()}
       onSave={handleSave}
       onDelete={handleDelete}
+      weeklyBudgetStatus={weeklyBudgetStatus}
+      monthlyBudgetStatus={monthlyBudgetStatus}
+      existingExpenseAmount={expense?.amount || 0}
     />
   );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useRef } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,16 @@ import {
   ScrollView,
   Platform,
   KeyboardAvoidingView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { ExpenseCategory } from "@/src/types";
+import { ExpenseCategory, BudgetStatus } from "@/src/types";
 import { EXPENSE_CATEGORIES } from "@/src/constants/ExpenseCategories";
 import { FamilyMember } from "@/src/redux";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BudgetWarningBanner from "./BudgetWarningBanner";
+import { formatDateObject } from "@/src/utils/formatUtils";
 
 interface FormErrors {
   amount?: string;
@@ -42,6 +45,9 @@ interface ExpenseFormProps {
   onSave: () => void;
   onDelete?: () => void;
   saveButtonText?: string;
+  weeklyBudgetStatus?: BudgetStatus | null;
+  monthlyBudgetStatus?: BudgetStatus | null;
+  existingExpenseAmount?: number;
 }
 
 export default function ExpenseForm({
@@ -64,12 +70,124 @@ export default function ExpenseForm({
   onSave,
   onDelete,
   saveButtonText = "Lưu",
+  weeklyBudgetStatus,
+  monthlyBudgetStatus,
+  existingExpenseAmount = 0,
 }: ExpenseFormProps) {
   const insets = useSafeAreaInsets();
+  const scrollViewRef = useRef<ScrollView>(null);
+
   const handleDateChange = (_: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
     if (selectedDate) {
       setDate(selectedDate);
+    }
+  };
+
+  const handleNoteFocus = () => {
+    // Scroll to bottom when note field is focused
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  };
+
+  // Calculate predictive budget status
+  const predictiveBudgetStatus = useMemo(() => {
+    const newAmount = parseFloat(amount) || 0;
+    const amountDelta = newAmount - existingExpenseAmount;
+
+    if (amountDelta === 0 || (!weeklyBudgetStatus && !monthlyBudgetStatus)) {
+      return {
+        weekly: weeklyBudgetStatus || null,
+        monthly: monthlyBudgetStatus || null,
+      };
+    }
+
+    const predictWeekly = weeklyBudgetStatus
+      ? {
+          ...weeklyBudgetStatus,
+          spent: weeklyBudgetStatus.spent + amountDelta,
+          remaining: weeklyBudgetStatus.remaining - amountDelta,
+          percentage:
+            ((weeklyBudgetStatus.spent + amountDelta) /
+              weeklyBudgetStatus.limit) *
+            100,
+          isWarning:
+            ((weeklyBudgetStatus.spent + amountDelta) /
+              weeklyBudgetStatus.limit) *
+              100 >=
+            80,
+          isExceeded:
+            weeklyBudgetStatus.spent + amountDelta > weeklyBudgetStatus.limit,
+        }
+      : null;
+
+    const predictMonthly = monthlyBudgetStatus
+      ? {
+          ...monthlyBudgetStatus,
+          spent: monthlyBudgetStatus.spent + amountDelta,
+          remaining: monthlyBudgetStatus.remaining - amountDelta,
+          percentage:
+            ((monthlyBudgetStatus.spent + amountDelta) /
+              monthlyBudgetStatus.limit) *
+            100,
+          isWarning:
+            ((monthlyBudgetStatus.spent + amountDelta) /
+              monthlyBudgetStatus.limit) *
+              100 >=
+            80,
+          isExceeded:
+            monthlyBudgetStatus.spent + amountDelta > monthlyBudgetStatus.limit,
+        }
+      : null;
+
+    return { weekly: predictWeekly, monthly: predictMonthly };
+  }, [amount, existingExpenseAmount, weeklyBudgetStatus, monthlyBudgetStatus]);
+
+  // Check if saving would exceed any limits
+  const wouldExceedLimit = useMemo(() => {
+    return (
+      (predictiveBudgetStatus.weekly?.isExceeded &&
+        !weeklyBudgetStatus?.isExceeded) ||
+      (predictiveBudgetStatus.monthly?.isExceeded &&
+        !monthlyBudgetStatus?.isExceeded)
+    );
+  }, [predictiveBudgetStatus, weeklyBudgetStatus, monthlyBudgetStatus]);
+
+  const handleSaveWithConfirmation = () => {
+    if (wouldExceedLimit) {
+      const exceededPeriods: string[] = [];
+      if (
+        predictiveBudgetStatus.weekly?.isExceeded &&
+        !weeklyBudgetStatus?.isExceeded
+      ) {
+        exceededPeriods.push("tuần");
+      }
+      if (
+        predictiveBudgetStatus.monthly?.isExceeded &&
+        !monthlyBudgetStatus?.isExceeded
+      ) {
+        exceededPeriods.push("tháng");
+      }
+
+      Alert.alert(
+        "Vượt hạn mức",
+        `Chi phí này sẽ vượt hạn mức ${exceededPeriods.join(
+          " và "
+        )} của bạn. Bạn có muốn tiếp tục?`,
+        [
+          {
+            text: "Hủy",
+            style: "cancel",
+          },
+          {
+            text: "Tiếp tục",
+            onPress: onSave,
+          },
+        ]
+      );
+    } else {
+      onSave();
     }
   };
 
@@ -80,11 +198,22 @@ export default function ExpenseForm({
       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
     >
       <ScrollView
+        ref={scrollViewRef}
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {/* Budget Warning Banner */}
+        {(predictiveBudgetStatus.weekly || predictiveBudgetStatus.monthly) && (
+          <View style={styles.warningSection}>
+            <BudgetWarningBanner
+              weeklyStatus={predictiveBudgetStatus.weekly}
+              monthlyStatus={predictiveBudgetStatus.monthly}
+            />
+          </View>
+        )}
+
         {/* Amount Input */}
         <View style={styles.section}>
           <Text style={styles.label}>Số tiền *</Text>
@@ -98,6 +227,13 @@ export default function ExpenseForm({
               if (errors.amount) clearError("amount");
             }}
           />
+          {amount && !errors.amount && parseFloat(amount) > 0 && (
+            <View style={styles.formattedAmountContainer}>
+              <Text style={styles.formattedAmountText}>
+                {parseFloat(amount).toLocaleString("vi-VN")} ₫
+              </Text>
+            </View>
+          )}
           {errors.amount && (
             <Text style={styles.errorText}>{errors.amount}</Text>
           )}
@@ -185,9 +321,7 @@ export default function ExpenseForm({
             onPress={() => setShowDatePicker(true)}
           >
             <Ionicons name="calendar-outline" size={20} color="#666" />
-            <Text style={styles.dateText}>
-              {date.toLocaleDateString("vi-VN")}
-            </Text>
+            <Text style={styles.dateText}>{formatDateObject(date)}</Text>
           </TouchableOpacity>
           {showDatePicker && (
             <DateTimePicker
@@ -215,6 +349,7 @@ export default function ExpenseForm({
             value={note}
             autoComplete="off"
             autoCorrect={false}
+            onFocus={handleNoteFocus}
             onChangeText={(text) => {
               setNote(text);
               if (errors.note) clearError("note");
@@ -240,7 +375,10 @@ export default function ExpenseForm({
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
           <Text style={styles.cancelButtonText}>Hủy</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.saveButton} onPress={onSave}>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSaveWithConfirmation}
+        >
           <Text style={styles.saveButtonText}>{saveButtonText}</Text>
         </TouchableOpacity>
       </View>
@@ -258,6 +396,9 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+  },
+  warningSection: {
+    marginBottom: 16,
   },
   section: {
     marginBottom: 24,
@@ -293,6 +434,21 @@ const styles = StyleSheet.create({
     color: "#999",
     textAlign: "right",
     marginTop: 4,
+  },
+  formattedAmountContainer: {
+    marginTop: 8,
+    padding: 12,
+    backgroundColor: "#E8F5E9",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#81C784",
+  },
+  formattedAmountText: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#2E7D32",
+    textAlign: "center",
+    letterSpacing: 0.5,
   },
   categoryGrid: {
     flexDirection: "row",

@@ -52,6 +52,16 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Cài đặt",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
+          ),
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

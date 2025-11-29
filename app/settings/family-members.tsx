@@ -65,12 +65,19 @@ export default function FamilyMembersScreen() {
       return;
     }
 
+    let updatedMembers = [...members];
+
     if (editingMember) {
       dispatch(
         updateMember({
           id: editingMember.id,
           data: { name, icon: selectedIcon, color: selectedColor },
         })
+      );
+      updatedMembers = members.map((m) =>
+        m.id === editingMember.id
+          ? { ...m, name, icon: selectedIcon, color: selectedColor }
+          : m
       );
     } else {
       const newMember: FamilyMember = {
@@ -80,9 +87,10 @@ export default function FamilyMembersScreen() {
         color: selectedColor,
       };
       dispatch(addMember(newMember));
+      updatedMembers = [...members, newMember];
     }
 
-    await dispatch(saveFamilyMembers([...members]));
+    await dispatch(saveFamilyMembers(updatedMembers));
     closeModal();
   };
 

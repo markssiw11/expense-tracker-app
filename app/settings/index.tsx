@@ -38,6 +38,14 @@ const SETTINGS_ITEMS: SettingItem[] = [
     iconColor: "#FF6B9D",
     route: "/settings/family-members",
   },
+  {
+    id: "spending-limits",
+    title: "Giới hạn chi tiêu",
+    subtitle: "Thiết lập ngân sách hàng tuần và hàng tháng",
+    icon: "wallet",
+    iconColor: "#10b981",
+    route: "/settings/spending-limits",
+  },
 ];
 
 export default function SettingsScreen() {

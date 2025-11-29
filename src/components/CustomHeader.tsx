@@ -1,5 +1,11 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -30,7 +36,7 @@ export default function CustomHeader({
       style={[
         styles.container,
         {
-          paddingTop: insets.top + 20,
+          paddingTop: insets.top + Platform.OS === "android" ? 20 : 10,
         },
       ]}
     >

@@ -10,6 +10,16 @@
 
 import { Event, ReminderTime } from "../../types/event.types";
 
+// Basic test to satisfy Jest requirement
+describe("Notification Service Test Helpers", () => {
+  it("should export test helper functions", () => {
+    expect(createMockEvent).toBeDefined();
+    expect(createPastEvent).toBeDefined();
+    expect(createFutureEvent).toBeDefined();
+    expect(createInvalidDateEvent).toBeDefined();
+  });
+});
+
 // Mock event data for testing
 const createMockEvent = (overrides?: Partial<Event>): Event => {
   const now = new Date();

@@ -8,14 +8,19 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "test": "jest",
     "lint": "expo lint",
+    "postinstall": "patch-package",
     "build:dev": "eas build --profile development --platform all",
     "build:preview": "eas build --profile preview --platform all",
     "build:preview:android": "eas build --profile preview --platform android",
     "build:preview:ios": "eas build --profile preview --platform ios",
     "build:prod": "eas build --profile production --platform all",
     "build:prod:android": "eas build --profile production --platform android",
-    "build:prod:ios": "eas build --profile production --platform ios"
+    "build:prod:ios": "eas build --profile production --platform ios",
+    "update:preview": "eas update --branch preview --message",
+    "update:prod": "eas update --branch production --message",
+    "build:prod:ios:submit": "eas build --profile production --platform ios --auto-submit"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -42,6 +47,7 @@
     "expo-status-bar": "~3.0.8",
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.8",
+    "expo-updates": "~29.0.13",
     "expo-web-browser": "~15.0.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -57,9 +63,15 @@
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "fast-check": "^4.3.0",
+    "jest": "^30.2.0",
+    "patch-package": "^8.0.1",
+    "postinstall-postinstall": "^2.1.0",
+    "ts-jest": "^29.4.5",
     "typescript": "~5.9.2"
   },
   "private": true

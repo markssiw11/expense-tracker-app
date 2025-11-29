@@ -35,3 +35,22 @@ export {
   deleteMember,
 } from "./reducers/familySlice";
 export type { FamilyMember } from "./reducers/familySlice";
+
+// Export spending limit actions
+export {
+  loadConfig,
+  saveLimit,
+  updateLimit,
+  deleteLimit,
+  toggleLimit,
+  clearError as clearSpendingLimitError,
+  updateBudgetStatus,
+  selectSpendingLimitConfig,
+  selectWeeklyLimit,
+  selectMonthlyLimit,
+  selectSpendingLimitLoading,
+  selectSpendingLimitError,
+  selectBudgetStatus,
+  selectWeeklyBudgetStatus,
+  selectMonthlyBudgetStatus,
+} from "./reducers/spendingLimitSlice";

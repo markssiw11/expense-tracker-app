@@ -104,9 +104,6 @@ function CalendarContent({
         </View>
         {selectedDate && (
           <View style={styles.selectedDateSection}>
-            <Text style={[styles.selectedDateTitle, { color: colors.text }]}>
-              {formatSelectedDate(selectedDate)}
-            </Text>
             <EventList
               events={selectedDateEvents}
               onEventPress={handleEventPress}

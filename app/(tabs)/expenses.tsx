@@ -17,6 +17,9 @@ import {
   deleteExpense,
   setSelectedMonth,
   setFilters,
+  loadConfig,
+  selectWeeklyBudgetStatus,
+  selectMonthlyBudgetStatus,
 } from "@/src/redux";
 import {
   filterExpensesByMonth,
@@ -32,6 +35,8 @@ import {
 } from "@/src/constants/ExpenseCategories";
 import { Expense, ExpenseCategory } from "@/src/types";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BudgetStatusCard from "@/src/components/BudgetStatusCard";
+import BudgetWarningBanner from "@/src/components/BudgetWarningBanner";
 
 export default function ExpensesTab() {
   const dispatch = useAppDispatch();
@@ -40,8 +45,44 @@ export default function ExpensesTab() {
     (state) => state.expenses
   );
 
+  // Get budget status from Redux
+  const weeklyBudgetStatus = useAppSelector(selectWeeklyBudgetStatus);
+  const monthlyBudgetStatus = useAppSelector(selectMonthlyBudgetStatus);
+
+  // State for collapsible budget section
+  const [isBudgetExpanded, setIsBudgetExpanded] = React.useState(true);
+
+  // State for view mode: 'list' or 'grid'
+  const [viewMode, setViewMode] = React.useState<"list" | "grid">("list");
+
+  // Format month display with Vietnamese month names
+  const getFormattedMonth = (monthStr: string) => {
+    const [year, month] = monthStr.split("-");
+    const monthNames = [
+      "Tháng 1",
+      "Tháng 2",
+      "Tháng 3",
+      "Tháng 4",
+      "Tháng 5",
+      "Tháng 6",
+      "Tháng 7",
+      "Tháng 8",
+      "Tháng 9",
+      "Tháng 10",
+      "Tháng 11",
+      "Tháng 12",
+    ];
+    return {
+      month: monthNames[parseInt(month) - 1],
+      year: year,
+    };
+  };
+
+  const formattedMonth = getFormattedMonth(selectedMonth);
+
   useEffect(() => {
     dispatch(loadExpenses());
+    dispatch(loadConfig());
   }, [dispatch]);
 
   const monthlyExpenses = useMemo(() => {
@@ -103,6 +144,39 @@ export default function ExpensesTab() {
   const renderExpenseItem = ({ item }: { item: Expense }) => {
     const categoryConfig = getCategoryConfig(item.category);
 
+    if (viewMode === "grid") {
+      // Grid view - compact card
+      return (
+        <TouchableOpacity
+          style={styles.gridItem}
+          onPress={() => handleEditExpense(item.id)}
+          activeOpacity={0.7}
+        >
+          <View
+            style={[styles.gridIcon, { backgroundColor: categoryConfig.color }]}
+          >
+            <Ionicons
+              name={categoryConfig.icon as any}
+              size={20}
+              color="#fff"
+            />
+          </View>
+          <Text style={styles.gridCategory} numberOfLines={1}>
+            {categoryConfig.label}
+          </Text>
+          <Text style={styles.gridAmount} numberOfLines={1}>
+            {formatCurrency(item.amount)}
+          </Text>
+          {item.note && (
+            <Text style={styles.gridNote} numberOfLines={1}>
+              {item.note}
+            </Text>
+          )}
+        </TouchableOpacity>
+      );
+    }
+
+    // List view - default
     return (
       <TouchableOpacity
         style={styles.expenseItem}
@@ -152,107 +226,200 @@ export default function ExpensesTab() {
 
   return (
     <View style={[styles.container]}>
-      {/* Compact Header */}
+      {/* Single Row Modern Header */}
       <LinearGradient
         colors={["#667eea", "#764ba2"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={[styles.compactHeader, { paddingTop: insets.top + 20 }]}
+        style={[styles.modernHeader, { paddingTop: insets.top + 8 }]}
       >
-        <View style={styles.headerTop}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.monthText}>{selectedMonth}</Text>
-          </View>
-          <View style={styles.headerActions}>
+        <View style={styles.singleRowHeader}>
+          {/* Month Selector */}
+          <View style={styles.monthSelector}>
             <TouchableOpacity
-              onPress={() => router.push("/settings")}
-              style={styles.settingsButton}
+              onPress={handlePreviousMonth}
+              style={styles.monthNavButton}
+              activeOpacity={0.7}
             >
-              <Ionicons name="settings" size={18} color="#fff" />
+              <Ionicons name="chevron-back" size={18} color="#fff" />
             </TouchableOpacity>
-            <View style={styles.monthNavigation}>
-              <TouchableOpacity
-                onPress={handlePreviousMonth}
-                style={styles.monthButton}
-              >
-                <Ionicons name="chevron-back" size={18} color="#fff" />
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleNextMonth}
-                style={styles.monthButton}
-              >
-                <Ionicons name="chevron-forward" size={18} color="#fff" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
 
-        <View style={styles.summaryRow}>
-          <View style={styles.totalBox}>
+            <View style={styles.monthInfo}>
+              <Text style={styles.monthName}>{formattedMonth.month}</Text>
+              <Text style={styles.yearText}>{formattedMonth.year}</Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleNextMonth}
+              style={styles.monthNavButton}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-forward" size={18} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Total Amount */}
+          <View style={styles.totalSection}>
             <Text style={styles.totalAmount}>
               {formatCurrency(totalAmount)}
             </Text>
-            <Text style={styles.totalLabel}>
+            <Text style={styles.transactionCount}>
               {monthlyExpenses.length} giao dịch
             </Text>
           </View>
+
+          {/* Report Button */}
           <TouchableOpacity
             style={styles.reportButton}
             onPress={() => router.push("/expenses/report")}
+            activeOpacity={0.8}
           >
-            <Ionicons name="stats-chart" size={20} color="#fff" />
+            <Ionicons name="stats-chart-outline" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
       </LinearGradient>
 
-      {/* Category Filters */}
+      {/* Category Filters with View Toggle */}
       <View style={styles.filterContainer}>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterScrollContent}
-        >
-          {filters.categories.length > 0 && (
-            <TouchableOpacity
-              style={styles.clearFilterChip}
-              onPress={clearFilters}
-            >
-              <Ionicons name="close-circle" size={16} color="#FF3B30" />
-              <Text style={styles.clearFilterText}>Xóa bộ lọc</Text>
-            </TouchableOpacity>
-          )}
-          {EXPENSE_CATEGORIES.map((category) => {
-            const isSelected = filters.categories.includes(category.key);
-            return (
+        <View style={styles.filterHeader}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterScrollContent}
+            style={{ flex: 1 }}
+          >
+            {filters.categories.length > 0 && (
               <TouchableOpacity
-                key={category.key}
-                style={[
-                  styles.filterChip,
-                  isSelected && {
-                    backgroundColor: category.color,
-                    borderColor: category.color,
-                  },
-                ]}
-                onPress={() => toggleCategoryFilter(category.key)}
+                style={styles.clearFilterChip}
+                onPress={clearFilters}
               >
-                <Ionicons
-                  name={category.icon as any}
-                  size={16}
-                  color={isSelected ? "#fff" : "#666"}
-                />
-                <Text
-                  style={[
-                    styles.filterChipText,
-                    isSelected && styles.filterChipTextSelected,
-                  ]}
-                >
-                  {category.label}
-                </Text>
+                <Ionicons name="close-circle" size={16} color="#FF3B30" />
+                <Text style={styles.clearFilterText}>Xóa bộ lọc</Text>
               </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
+            )}
+            {EXPENSE_CATEGORIES.map((category) => {
+              const isSelected = filters.categories.includes(category.key);
+              return (
+                <TouchableOpacity
+                  key={category.key}
+                  style={[
+                    styles.filterChip,
+                    isSelected && {
+                      backgroundColor: category.color,
+                      borderColor: category.color,
+                    },
+                  ]}
+                  onPress={() => toggleCategoryFilter(category.key)}
+                >
+                  <Ionicons
+                    name={category.icon as any}
+                    size={16}
+                    color={isSelected ? "#fff" : "#666"}
+                  />
+                  <Text
+                    style={[
+                      styles.filterChipText,
+                      isSelected && styles.filterChipTextSelected,
+                    ]}
+                  >
+                    {category.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
+          {/* View Mode Toggle */}
+          <View style={styles.viewToggle}>
+            <TouchableOpacity
+              style={[
+                styles.viewButton,
+                viewMode === "list" && styles.viewButtonActive,
+              ]}
+              onPress={() => setViewMode("list")}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="list"
+                size={18}
+                color={viewMode === "list" ? "#667eea" : "#999"}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.viewButton,
+                viewMode === "grid" && styles.viewButtonActive,
+              ]}
+              onPress={() => setViewMode("grid")}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="grid"
+                size={18}
+                color={viewMode === "grid" ? "#667eea" : "#999"}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
+
+      {/* Collapsible Budget Section */}
+      {(weeklyBudgetStatus || monthlyBudgetStatus) && (
+        <View style={styles.budgetSection}>
+          <TouchableOpacity
+            style={styles.budgetHeader}
+            onPress={() => setIsBudgetExpanded(!isBudgetExpanded)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.budgetHeaderLeft}>
+              <Ionicons
+                name="wallet-outline"
+                size={20}
+                color="#667eea"
+                style={{ marginRight: 8 }}
+              />
+              <Text style={styles.budgetHeaderText}>Giới hạn chi tiêu</Text>
+            </View>
+            <Ionicons
+              name={isBudgetExpanded ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="#667eea"
+            />
+          </TouchableOpacity>
+
+          {isBudgetExpanded && (
+            <>
+              {/* Budget Warning Banner */}
+              <View style={styles.warningContainer}>
+                <BudgetWarningBanner
+                  weeklyStatus={weeklyBudgetStatus}
+                  monthlyStatus={monthlyBudgetStatus}
+                />
+              </View>
+
+              {/* Budget Status Cards */}
+              <View style={styles.budgetCardsContainer}>
+                {weeklyBudgetStatus && (
+                  <BudgetStatusCard
+                    budgetStatus={weeklyBudgetStatus}
+                    onPress={() =>
+                      router.push("/settings/spending-limits" as any)
+                    }
+                  />
+                )}
+                {monthlyBudgetStatus && (
+                  <BudgetStatusCard
+                    budgetStatus={monthlyBudgetStatus}
+                    onPress={() =>
+                      router.push("/settings/spending-limits" as any)
+                    }
+                  />
+                )}
+              </View>
+            </>
+          )}
+        </View>
+      )}
 
       {/* Expense List */}
       <FlatList
@@ -263,6 +430,9 @@ export default function ExpensesTab() {
         ListEmptyComponent={renderEmptyState}
         refreshing={loading}
         onRefresh={() => dispatch(loadExpenses())}
+        numColumns={viewMode === "grid" ? 3 : 1}
+        key={viewMode}
+        columnWrapperStyle={viewMode === "grid" ? styles.gridRow : undefined}
       />
 
       {/* Add Button */}
@@ -278,96 +448,87 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f5f6fa",
   },
-  compactHeader: {
-    paddingTop: 12,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+  modernHeader: {
+    paddingTop: 8,
+    paddingBottom: 12,
+    paddingHorizontal: 16,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
-  headerTop: {
+  singleRowHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 16,
+    justifyContent: "space-between",
+    gap: 12,
   },
-  greetingText: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#fff",
-    opacity: 0.95,
-    marginBottom: 4,
+  monthSelector: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+    gap: 8,
   },
-  monthText: {
+  monthNavButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  monthInfo: {
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 75,
+  },
+  monthName: {
     fontSize: 15,
     fontWeight: "700",
     color: "#fff",
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
-  headerActions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+  yearText: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: "#fff",
+    opacity: 0.8,
+    marginTop: 1,
   },
-  settingsButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  monthNavigation: {
-    flexDirection: "row",
-    gap: 8,
-  },
-  monthButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  summaryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  totalBox: {
+  totalSection: {
     flex: 1,
+    alignItems: "center",
   },
   totalAmount: {
-    fontSize: 32,
+    fontSize: 20,
     fontWeight: "800",
     color: "#fff",
-    letterSpacing: -0.5,
-    marginBottom: 4,
+    letterSpacing: -0.3,
   },
-  totalLabel: {
-    fontSize: 12,
+  transactionCount: {
+    fontSize: 10,
     color: "#fff",
-    opacity: 0.9,
+    opacity: 0.85,
     fontWeight: "600",
+    marginTop: 2,
   },
   reportButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.3)",
+    borderColor: "rgba(255, 255, 255, 0.25)",
   },
   filterContainer: {
     backgroundColor: "#fff",
-    marginTop: 16,
+    marginTop: 12,
     marginHorizontal: 16,
     borderRadius: 16,
     shadowColor: "#000",
@@ -375,6 +536,73 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 4,
+  },
+  filterHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  viewToggle: {
+    flexDirection: "row",
+    backgroundColor: "#F5F5F5",
+    borderRadius: 10,
+    padding: 4,
+    marginRight: 12,
+  },
+  viewButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  viewButtonActive: {
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  budgetSection: {
+    marginTop: 12,
+    marginHorizontal: 16,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+    overflow: "hidden",
+  },
+  budgetHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: "#F8F9FF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E8EAFF",
+  },
+  budgetHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  budgetHeaderText: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#667eea",
+  },
+  warningContainer: {
+    marginTop: 12,
+    marginHorizontal: 12,
+  },
+  budgetCardsContainer: {
+    marginTop: 8,
+    marginHorizontal: 12,
+    marginBottom: 12,
   },
   filterScrollContent: {
     paddingHorizontal: 12,
@@ -416,7 +644,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   listContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 12,
     flexGrow: 1,
     paddingBottom: 100,
   },
@@ -425,14 +654,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 10,
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   expenseLeft: {
     flexDirection: "row",
@@ -440,30 +669,30 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   categoryIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 12,
+    marginRight: 10,
   },
   expenseInfo: {
     flex: 1,
   },
   categoryLabel: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "700",
-    marginBottom: 4,
+    marginBottom: 2,
     color: "#1A1A1A",
   },
   noteText: {
-    fontSize: 14,
+    fontSize: 13,
     color: "#666",
-    marginBottom: 4,
-    lineHeight: 18,
+    marginBottom: 2,
+    lineHeight: 16,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#999",
     fontWeight: "500",
   },
@@ -471,16 +700,61 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   amountText: {
-    fontSize: 19,
+    fontSize: 16,
     fontWeight: "800",
     color: "#FF3B30",
-    marginBottom: 6,
-    letterSpacing: -0.5,
+    marginBottom: 4,
+    letterSpacing: -0.3,
   },
   deleteButton: {
-    padding: 6,
+    padding: 4,
     backgroundColor: "#FFF0F0",
-    borderRadius: 8,
+    borderRadius: 6,
+  },
+  // Grid view styles
+  gridRow: {
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  gridItem: {
+    width: "31%",
+    backgroundColor: "#fff",
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+    alignItems: "center",
+  },
+  gridIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  gridCategory: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  gridAmount: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#FF3B30",
+    textAlign: "center",
+    marginBottom: 2,
+  },
+  gridNote: {
+    fontSize: 10,
+    color: "#999",
+    textAlign: "center",
   },
   emptyState: {
     flex: 1,
