@@ -5,15 +5,15 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Provider } from "react-redux";
-import "react-native-reanimated";
 import { useEffect } from "react";
+import "react-native-reanimated";
+import { Provider } from "react-redux";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { store, useAppDispatch, useAppSelector } from "@/src/redux/store";
 import AuthenticationProvider from "@/src/components/AuthenticationProvider";
 import { loadEvents, updateEvent } from "@/src/redux/reducers/eventSlice";
 import { loadExpenses } from "@/src/redux/reducers/expenseSlice";
+import { store, useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { rescheduleAllNotifications } from "@/src/services/notificationService";
 
 export const unstable_settings = {

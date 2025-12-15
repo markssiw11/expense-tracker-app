@@ -1,42 +1,42 @@
+import { Colors } from "@/constants/theme";
+import { CalendarView } from "@/src/components/CalendarView";
+import ErrorBoundary from "@/src/components/ErrorBoundary";
+import { EventList } from "@/src/components/EventList";
+import {
+  clearError,
+  loadEvents,
+  selectEventsError,
+  selectEventsLoading,
+  selectFilteredEvents,
+  selectMarkedDates,
+  selectSelectedCategory,
+  selectSelectedDate,
+  selectTodayEvents,
+  selectViewMode,
+  setSelectedCategory,
+  setSelectedDate,
+  setViewMode,
+} from "@/src/redux/reducers/eventSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import { Event, EventCategory } from "@/src/types/event.types";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import React, { useEffect } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  useColorScheme,
   ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import {
-  setSelectedDate,
-  setViewMode,
-  setSelectedCategory,
-  selectMarkedDates,
-  selectSelectedDate,
-  selectViewMode,
-  selectSelectedCategory,
-  selectTodayEvents,
-  selectFilteredEvents,
-  selectEventsLoading,
-  selectEventsError,
-  clearError,
-  loadEvents,
-} from "@/src/redux/reducers/eventSlice";
-import { Event, EventCategory } from "@/src/types/event.types";
-import { CalendarView } from "@/src/components/CalendarView";
-import { EventList } from "@/src/components/EventList";
-import { Colors } from "@/constants/theme";
-import ErrorBoundary from "@/src/components/ErrorBoundary";
 
 // Separate component to avoid conditional hook calls
 interface CalendarContentProps {
@@ -573,6 +573,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f5f5",
     borderWidth: 1,
     borderColor: "#e0e0e0",
+    height: 40,
   },
   categoryChipActive: {
     borderColor: "transparent",

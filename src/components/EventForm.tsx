@@ -1,21 +1,22 @@
-import React, { useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  KeyboardAvoidingView,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  EventFormData,
   EventCategory,
+  EventFormData,
   ReminderTime,
 } from "@/src/types/event.types";
+import { Ionicons } from "@expo/vector-icons";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CategoryPicker from "./CategoryPicker";
 import ReminderPicker from "./ReminderPicker";
 
@@ -94,6 +95,7 @@ export default function EventForm({
   };
 
   const isFormValid = title.trim().length > 0;
+  const insets = useSafeAreaInsets();
 
   return (
     <KeyboardAvoidingView
@@ -108,7 +110,7 @@ export default function EventForm({
         showsVerticalScrollIndicator={false}
       >
         {/* Title Input */}
-        <View style={styles.section}>
+        <View style={[styles.section, { marginTop: insets?.top }]}>
           <Text style={styles.label}>Tiêu đề *</Text>
           <TextInput
             style={[styles.input, errors.title && styles.inputError]}
@@ -227,7 +229,7 @@ export default function EventForm({
       </ScrollView>
 
       {/* Action Buttons */}
-      <View style={styles.footer}>
+      <View style={[styles.footer, { marginBottom: insets.bottom }]}>
         <TouchableOpacity
           style={styles.cancelButton}
           onPress={onCancel}

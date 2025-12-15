@@ -42,7 +42,7 @@ export default function CustomSplashScreen() {
         <View style={styles.iconContainer}>
           <Ionicons name="wallet" size={80} color="#fff" />
         </View>
-        <Text style={styles.title}>Quản Lý Chi Tiêu</Text>
+        <Text style={styles.title}>Sổ Tay Gia Đình</Text>
         <Text style={styles.subtitle}>Gia đình nhà mình 💝</Text>
       </Animated.View>
     </LinearGradient>

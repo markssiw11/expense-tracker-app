@@ -1,42 +1,42 @@
-import React, { useEffect, useMemo } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  ScrollView,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import {
-  loadExpenses,
-  deleteExpense,
-  setSelectedMonth,
-  setFilters,
-  loadConfig,
-  selectWeeklyBudgetStatus,
-  selectMonthlyBudgetStatus,
-} from "@/src/redux";
-import {
-  filterExpensesByMonth,
-  calculateMonthlyTotal,
-  formatCurrency,
-  formatDate,
-  getPreviousMonth,
-  getNextMonth,
-} from "@/src/utils/expenseUtils";
-import {
-  getCategoryConfig,
-  EXPENSE_CATEGORIES,
-} from "@/src/constants/ExpenseCategories";
-import { Expense, ExpenseCategory } from "@/src/types";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BudgetStatusCard from "@/src/components/BudgetStatusCard";
 import BudgetWarningBanner from "@/src/components/BudgetWarningBanner";
+import {
+  EXPENSE_CATEGORIES,
+  getCategoryConfig,
+} from "@/src/constants/ExpenseCategories";
+import {
+  deleteExpense,
+  loadConfig,
+  loadExpenses,
+  selectMonthlyBudgetStatus,
+  selectWeeklyBudgetStatus,
+  setFilters,
+  setSelectedMonth,
+} from "@/src/redux";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import { Expense, ExpenseCategory } from "@/src/types";
+import {
+  calculateMonthlyTotal,
+  filterExpensesByMonth,
+  formatCurrency,
+  formatDate,
+  getNextMonth,
+  getPreviousMonth,
+} from "@/src/utils/expenseUtils";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import React, { useEffect, useMemo } from "react";
+import {
+  Alert,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ExpensesTab() {
   const dispatch = useAppDispatch();

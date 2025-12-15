@@ -164,7 +164,7 @@ export default function LockScreen({ onAuthenticated }: LockScreenProps) {
           resizeMode="contain"
         />
         <Text style={[styles.appTitle, { color: colors.text }]}>
-          Quản Lý Chi Tiêu
+          Sổ Tay Gia Đình
         </Text>
         <Text style={[styles.subtitle, { color: colors.icon }]}>
           Enter your password to continue
