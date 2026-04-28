@@ -49,6 +49,7 @@
     "plugins": [
       "expo-router",
       "expo-system-ui",
+      "./plugins/withAppNameLocalization",
       [
         "expo-splash-screen",
         {

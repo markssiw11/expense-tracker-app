@@ -69,13 +69,13 @@ function AppInitializer({ children }: { children: React.ReactNode }) {
               updateEvent({
                 id: eventId,
                 data: { notificationId },
-              })
+              }),
             ).unwrap();
           }
         }
 
         console.log(
-          `Successfully rescheduled ${notificationMap.size} notifications`
+          `Successfully rescheduled ${notificationMap.size} notifications`,
         );
       } catch (error) {
         console.error("Failed to reschedule notifications:", error);
@@ -164,6 +164,10 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="settings/spending-limits"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="settings/backup"
                 options={{ headerShown: false }}
               />
             </Stack>

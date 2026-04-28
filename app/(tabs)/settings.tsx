@@ -79,6 +79,14 @@ export default function SettingsTab() {
       iconColor: "#10b981",
       route: "/settings/spending-limits",
     },
+    {
+      id: "backup",
+      title: t("settings.backup"),
+      subtitle: t("backup.headerSubtitle"),
+      icon: "cloud-upload",
+      iconColor: "#8B5CF6",
+      route: "/settings/backup",
+    },
   ];
 
   const handleNavigate = (route: string) => {
