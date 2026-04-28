@@ -1,38 +1,40 @@
-import React, { useState, useEffect } from "react";
+import { GoBackButton } from "@/src/components";
+import useTranslation from "@/src/hooks/useTranslation";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  Switch,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+  clearError,
+  loadConfig,
+  saveLimit,
+  selectMonthlyLimit,
+  selectSpendingLimitError,
+  selectSpendingLimitLoading,
+  selectWeeklyLimit,
+  updateLimit,
+} from "@/src/redux/reducers/spendingLimitSlice";
+import { AppDispatch } from "@/src/redux/store";
+import { BudgetPeriodType } from "@/src/types";
+import { formatCurrency } from "@/src/utils/formatUtils";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
-import { GoBackButton } from "@/src/components";
-import {
-  selectWeeklyLimit,
-  selectMonthlyLimit,
-  selectSpendingLimitLoading,
-  selectSpendingLimitError,
-  saveLimit,
-  updateLimit,
-  loadConfig,
-  clearError,
-} from "@/src/redux/reducers/spendingLimitSlice";
-import { BudgetPeriodType } from "@/src/types";
-import { AppDispatch } from "@/src/redux/store";
-import { formatCurrency } from "@/src/utils/formatUtils";
 
 export default function SpendingLimitSettingsScreen() {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch<AppDispatch>();
+  const { t } = useTranslation();
 
   const weeklyLimit = useSelector(selectWeeklyLimit);
   const monthlyLimit = useSelector(selectMonthlyLimit);
@@ -72,9 +74,9 @@ export default function SpendingLimitSettingsScreen() {
   // Show error alert if there's an error
   useEffect(() => {
     if (error) {
-      Alert.alert("Lỗi", error, [
+      Alert.alert(t("common.error"), error, [
         {
-          text: "OK",
+          text: t("common.ok"),
           onPress: () => dispatch(clearError()),
         },
       ]);
@@ -92,7 +94,7 @@ export default function SpendingLimitSettingsScreen() {
   const handleWeeklyAmountChange = (text: string) => {
     setWeeklyAmount(text);
     if (text.trim() !== "" && !validateAmount(text)) {
-      setWeeklyError("Giới hạn chi tiêu phải là số dương");
+      setWeeklyError(t("budget.positiveNumberRequired"));
     } else {
       setWeeklyError("");
     }
@@ -101,7 +103,7 @@ export default function SpendingLimitSettingsScreen() {
   const handleMonthlyAmountChange = (text: string) => {
     setMonthlyAmount(text);
     if (text.trim() !== "" && !validateAmount(text)) {
-      setMonthlyError("Giới hạn chi tiêu phải là số dương");
+      setMonthlyError(t("budget.positiveNumberRequired"));
     } else {
       setMonthlyError("");
     }
@@ -112,12 +114,12 @@ export default function SpendingLimitSettingsScreen() {
     let hasError = false;
 
     if (weeklyAmount.trim() !== "" && !validateAmount(weeklyAmount)) {
-      setWeeklyError("Giới hạn chi tiêu phải là số dương");
+      setWeeklyError(t("budget.positiveNumberRequired"));
       hasError = true;
     }
 
     if (monthlyAmount.trim() !== "" && !validateAmount(monthlyAmount)) {
-      setMonthlyError("Giới hạn chi tiêu phải là số dương");
+      setMonthlyError(t("budget.positiveNumberRequired"));
       hasError = true;
     }
 
@@ -135,14 +137,14 @@ export default function SpendingLimitSettingsScreen() {
               periodType: BudgetPeriodType.WEEKLY,
               amount,
               enabled: weeklyEnabled,
-            })
+            }),
           ).unwrap();
         } else {
           await dispatch(
             saveLimit({
               periodType: BudgetPeriodType.WEEKLY,
               amount,
-            })
+            }),
           ).unwrap();
           // Update enabled state after creation
           if (!weeklyEnabled) {
@@ -150,7 +152,7 @@ export default function SpendingLimitSettingsScreen() {
               updateLimit({
                 periodType: BudgetPeriodType.WEEKLY,
                 enabled: weeklyEnabled,
-              })
+              }),
             ).unwrap();
           }
         }
@@ -165,14 +167,14 @@ export default function SpendingLimitSettingsScreen() {
               periodType: BudgetPeriodType.MONTHLY,
               amount,
               enabled: monthlyEnabled,
-            })
+            }),
           ).unwrap();
         } else {
           await dispatch(
             saveLimit({
               periodType: BudgetPeriodType.MONTHLY,
               amount,
-            })
+            }),
           ).unwrap();
           // Update enabled state after creation
           if (!monthlyEnabled) {
@@ -180,15 +182,15 @@ export default function SpendingLimitSettingsScreen() {
               updateLimit({
                 periodType: BudgetPeriodType.MONTHLY,
                 enabled: monthlyEnabled,
-              })
+              }),
             ).unwrap();
           }
         }
       }
 
-      Alert.alert("Thành công", "Đã lưu cài đặt giới hạn chi tiêu", [
+      Alert.alert(t("common.success"), t("budget.saveSuccess"), [
         {
-          text: "OK",
+          text: t("common.ok"),
           onPress: () => router.back(),
         },
       ]);
@@ -215,9 +217,9 @@ export default function SpendingLimitSettingsScreen() {
       >
         <GoBackButton />
         <View>
-          <Text style={styles.headerTitle}>Giới hạn chi tiêu 💰</Text>
+          <Text style={styles.headerTitle}>{t("budget.headerTitle")}</Text>
           <Text style={styles.headerSubtitle}>
-            Thiết lập ngân sách hàng tuần và hàng tháng
+            {t("budget.headerSubtitle")}
           </Text>
         </View>
       </LinearGradient>
@@ -231,7 +233,9 @@ export default function SpendingLimitSettingsScreen() {
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
               <Ionicons name="calendar-outline" size={20} color="#667eea" />
-              <Text style={styles.sectionTitle}>Giới hạn hàng tuần</Text>
+              <Text style={styles.sectionTitle}>
+                {t("budget.weeklySection")}
+              </Text>
             </View>
             <Switch
               value={weeklyEnabled}
@@ -242,12 +246,12 @@ export default function SpendingLimitSettingsScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.label}>Số tiền giới hạn (₫)</Text>
+            <Text style={styles.label}>{t("budget.limitAmount")}</Text>
             <TextInput
               style={[styles.input, weeklyError ? styles.inputError : null]}
               value={weeklyAmount}
               onChangeText={handleWeeklyAmountChange}
-              placeholder="Nhập số tiền"
+              placeholder={t("budget.enterAmount")}
               placeholderTextColor="#999"
               keyboardType="numeric"
               editable={!loading}
@@ -260,9 +264,7 @@ export default function SpendingLimitSettingsScreen() {
                 {formatCurrencyDisplay(weeklyAmount)}
               </Text>
             ) : null}
-            <Text style={styles.helperText}>
-              Giới hạn chi tiêu sẽ được tính từ đầu tuần (Thứ Hai) đến hiện tại
-            </Text>
+            <Text style={styles.helperText}>{t("budget.weeklyHelper")}</Text>
           </View>
         </View>
 
@@ -271,7 +273,9 @@ export default function SpendingLimitSettingsScreen() {
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
               <Ionicons name="calendar" size={20} color="#FF6B9D" />
-              <Text style={styles.sectionTitle}>Giới hạn hàng tháng</Text>
+              <Text style={styles.sectionTitle}>
+                {t("budget.monthlySection")}
+              </Text>
             </View>
             <Switch
               value={monthlyEnabled}
@@ -282,12 +286,12 @@ export default function SpendingLimitSettingsScreen() {
           </View>
 
           <View style={styles.card}>
-            <Text style={styles.label}>Số tiền giới hạn (₫)</Text>
+            <Text style={styles.label}>{t("budget.limitAmount")}</Text>
             <TextInput
               style={[styles.input, monthlyError ? styles.inputError : null]}
               value={monthlyAmount}
               onChangeText={handleMonthlyAmountChange}
-              placeholder="Nhập số tiền"
+              placeholder={t("budget.enterAmount")}
               placeholderTextColor="#999"
               keyboardType="numeric"
               editable={!loading}
@@ -300,9 +304,7 @@ export default function SpendingLimitSettingsScreen() {
                 {formatCurrencyDisplay(monthlyAmount)}
               </Text>
             ) : null}
-            <Text style={styles.helperText}>
-              Giới hạn chi tiêu sẽ được tính từ ngày 1 của tháng đến hiện tại
-            </Text>
+            <Text style={styles.helperText}>{t("budget.monthlyHelper")}</Text>
           </View>
         </View>
 
@@ -310,13 +312,8 @@ export default function SpendingLimitSettingsScreen() {
         <View style={styles.infoCard}>
           <Ionicons name="information-circle" size={24} color="#667eea" />
           <View style={styles.infoContent}>
-            <Text style={styles.infoTitle}>Lưu ý</Text>
-            <Text style={styles.infoText}>
-              • Bạn có thể bật/tắt giới hạn bất kỳ lúc nào{"\n"}• Khi tắt giới
-              hạn, cài đặt sẽ được giữ lại{"\n"}• Cảnh báo sẽ hiển thị khi chi
-              tiêu đạt 80% giới hạn{"\n"}• Bạn vẫn có thể thêm chi tiêu khi vượt
-              giới hạn
-            </Text>
+            <Text style={styles.infoTitle}>{t("budget.noteTitle")}</Text>
+            <Text style={styles.infoText}>{t("budget.noteText")}</Text>
           </View>
         </View>
 
@@ -331,7 +328,9 @@ export default function SpendingLimitSettingsScreen() {
           ) : (
             <>
               <Ionicons name="checkmark-circle" size={24} color="#fff" />
-              <Text style={styles.saveButtonText}>Lưu cài đặt</Text>
+              <Text style={styles.saveButtonText}>
+                {t("budget.saveSettings")}
+              </Text>
             </>
           )}
         </TouchableOpacity>

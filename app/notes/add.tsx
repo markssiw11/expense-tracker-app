@@ -1,26 +1,28 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Platform,
-  Switch,
-} from "react-native";
-import { router } from "expo-router";
+import { getNoteCategories } from "@/src/constants";
+import { useTranslation } from "@/src/hooks/useTranslation";
+import { addNote } from "@/src/redux/reducers/noteSlice";
+import { useAppDispatch } from "@/src/redux/store";
+import { Note, NoteCategory } from "@/src/types/note.types";
+import { parseTagsString, validateNoteData } from "@/src/utils/noteUtils";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useAppDispatch } from "@/src/redux/store";
-import { addNote } from "@/src/redux/reducers/noteSlice";
-import { NoteCategory, Note } from "@/src/types/note.types";
-import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
-import { validateNoteData, parseTagsString } from "@/src/utils/noteUtils";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function AddNoteScreen() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState<NoteCategory | null>(null);
@@ -36,6 +38,9 @@ export default function AddNoteScreen() {
     amount?: string;
     tags?: string;
   }>({});
+
+  // Get note categories with translations
+  const NOTE_CATEGORIES = getNoteCategories(t);
 
   const validateForm = () => {
     const tags = parseTagsString(tagsInput);
@@ -87,10 +92,10 @@ export default function AddNoteScreen() {
 
     try {
       await dispatch(addNote(newNote)).unwrap();
-      Alert.alert("Thành công", "Đã thêm ghi chú mới");
+      Alert.alert(t("common.success"), t("notes.addNote"));
       router.back();
     } catch {
-      Alert.alert("Lỗi", "Không thể thêm ghi chú. Vui lòng thử lại.");
+      Alert.alert(t("common.error"), t("notes.addNoteFailed"));
     }
   };
 
@@ -109,10 +114,12 @@ export default function AddNoteScreen() {
       >
         {/* Title Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Tiêu đề *</Text>
+          <Text style={styles.label}>{t("notes.noteTitle")} *</Text>
           <TextInput
             style={[styles.input, errors.title && styles.inputError]}
-            placeholder="Nhập tiêu đề..."
+            placeholder={`${t("common.add")} ${t(
+              "notes.noteTitle",
+            ).toLowerCase()}...`}
             maxLength={100}
             value={title}
             onChangeText={(text) => {
@@ -126,7 +133,7 @@ export default function AddNoteScreen() {
 
         {/* Category Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Danh mục *</Text>
+          <Text style={styles.label}>{t("expenses.category")} *</Text>
           <View style={styles.categoryGrid}>
             {NOTE_CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -169,14 +176,16 @@ export default function AddNoteScreen() {
 
         {/* Content Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Nội dung *</Text>
+          <Text style={styles.label}>{t("notes.content")} *</Text>
           <TextInput
             style={[
               styles.input,
               styles.textArea,
               errors.content && styles.inputError,
             ]}
-            placeholder="Nhập nội dung..."
+            placeholder={`${t("common.add")} ${t(
+              "notes.content",
+            ).toLowerCase()}...`}
             multiline
             numberOfLines={6}
             maxLength={2000}
@@ -194,7 +203,7 @@ export default function AddNoteScreen() {
 
         {/* Date Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Ngày</Text>
+          <Text style={styles.label}>{t("expenses.date")}</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
@@ -216,7 +225,9 @@ export default function AddNoteScreen() {
 
         {/* Amount Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Số tiền (tùy chọn)</Text>
+          <Text style={styles.label}>
+            {t("expenses.amount")} ({t("expenses.optional") || "Optional"})
+          </Text>
           <TextInput
             style={[styles.input, errors.amount && styles.inputError]}
             placeholder="0"
@@ -255,7 +266,9 @@ export default function AddNoteScreen() {
           <View style={styles.switchRow}>
             <View style={styles.switchLabel}>
               <Ionicons name="pin" size={20} color="#FF9500" />
-              <Text style={styles.label}>Ghim ghi chú</Text>
+              <Text style={styles.label}>
+                {t("notes.pinned") || "Pin Note"}
+              </Text>
             </View>
             <Switch
               value={isPinned}
@@ -273,10 +286,10 @@ export default function AddNoteScreen() {
           style={styles.cancelButton}
           onPress={() => router.back()}
         >
-          <Text style={styles.cancelButtonText}>Hủy</Text>
+          <Text style={styles.cancelButtonText}>{t("common.cancel")}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Lưu</Text>
+          <Text style={styles.saveButtonText}>{t("common.save")}</Text>
         </TouchableOpacity>
       </View>
     </View>

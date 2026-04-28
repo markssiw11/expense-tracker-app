@@ -1,41 +1,46 @@
-import React, { useEffect, useMemo, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  ScrollView,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+  getNoteCategories,
+  getNoteCategoryConfig,
+} from "@/src/constants/NoteCategories";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   loadNotes,
+  setNoteFilters,
   setSearchQuery,
   togglePinNote,
-  setNoteFilters,
 } from "@/src/redux/reducers/noteSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Note, NoteCategory } from "@/src/types/note.types";
+import { formatCurrency, formatDate } from "@/src/utils/expenseUtils";
 import {
-  filterNotesByQuery,
   filterNotesByCategories,
+  filterNotesByQuery,
   filterNotesByTags,
+  getAllTags,
   separatePinnedNotes,
   sortNotes,
-  getAllTags,
 } from "@/src/utils/noteUtils";
-import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
-import { formatDate, formatCurrency } from "@/src/utils/expenseUtils";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function NotesTab() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { notes, loading, searchQuery, sortBy, filters } = useAppSelector(
-    (state) => state.notes
+    (state) => state.notes,
   );
   const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
   const insets = useSafeAreaInsets();
@@ -100,6 +105,9 @@ export default function NotesTab() {
 
   const availableTags = useMemo(() => getAllTags(notes), [notes]);
 
+  // Get note categories with translations
+  const NOTE_CATEGORIES = useMemo(() => getNoteCategories(t), [t]);
+
   const renderNoteItem = ({
     item,
     isPinned,
@@ -107,9 +115,7 @@ export default function NotesTab() {
     item: Note;
     isPinned?: boolean;
   }) => {
-    const categoryConfig = NOTE_CATEGORIES.find(
-      (cat) => cat.key === item.category
-    );
+    const categoryConfig = getNoteCategoryConfig(item.category, t);
 
     return (
       <TouchableOpacity
@@ -182,16 +188,16 @@ export default function NotesTab() {
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Ionicons name="document-text-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyTitle}>Chưa có ghi chú</Text>
-      <Text style={styles.emptyText}>Nhấn nút + để thêm ghi chú đầu tiên</Text>
+      <Text style={styles.emptyTitle}>{t("notes.noNotes")}</Text>
+      <Text style={styles.emptyText}>{t("notes.addFirstNote")}</Text>
     </View>
   );
 
   const renderSearchEmptyState = () => (
     <View style={styles.emptyState}>
       <Ionicons name="search-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyTitle}>Không tìm thấy kết quả</Text>
-      <Text style={styles.emptyText}>Thử tìm kiếm với từ khóa khác</Text>
+      <Text style={styles.emptyTitle}>{t("common.noData")}</Text>
+      <Text style={styles.emptyText}>{t("notes.searchNotes")}</Text>
     </View>
   );
 
@@ -209,17 +215,24 @@ export default function NotesTab() {
     filteredAndSortedNotes.unpinned.length > 0;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Ghi Chú</Text>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => router.push("/notes/add")}
-        >
-          <Ionicons name="add" size={24} color="#007AFF" />
-        </TouchableOpacity>
-      </View>
+      <LinearGradient
+        colors={["#667eea", "#764ba2"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.header, { paddingTop: insets.top + 20 }]}
+      >
+        <View style={styles.headerTop}>
+          <Text style={styles.headerTitle}>{t("notes.title")}</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push("/notes/add")}
+          >
+            <Ionicons name="add" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -231,7 +244,7 @@ export default function NotesTab() {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder="Tìm kiếm ghi chú..."
+          placeholder={t("notes.searchNotes")}
           value={localSearchQuery}
           onChangeText={setLocalSearchQuery}
         />
@@ -245,7 +258,7 @@ export default function NotesTab() {
       {/* Category Filters */}
       {NOTE_CATEGORIES.length > 0 && (
         <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>Danh mục</Text>
+          <Text style={styles.filterLabel}>{t("expenses.category")}</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -257,7 +270,9 @@ export default function NotesTab() {
                 onPress={clearFilters}
               >
                 <Ionicons name="close-circle" size={16} color="#FF3B30" />
-                <Text style={styles.clearFilterText}>Xóa bộ lọc</Text>
+                <Text style={styles.clearFilterText}>
+                  {t("common.clearFilters")}
+                </Text>
               </TouchableOpacity>
             )}
             {NOTE_CATEGORIES.map((category) => {
@@ -352,7 +367,9 @@ export default function NotesTab() {
             filteredAndSortedNotes.pinned.length > 0 ? (
               <View style={styles.sectionHeader}>
                 <Ionicons name="pin" size={16} color="#FF9500" />
-                <Text style={styles.sectionTitle}>Đã ghim</Text>
+                <Text style={styles.sectionTitle}>
+                  {t("notes.pinned") || "Pinned"}
+                </Text>
               </View>
             ) : null
           }
@@ -374,29 +391,32 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F9FA",
   },
   header: {
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    shadowColor: "#667eea",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  headerTop: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#1A1A1A",
+    color: "#fff",
     letterSpacing: -0.5,
   },
   addButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#F0F7FF",
+    backgroundColor: "rgba(255,255,255,0.2)",
     justifyContent: "center",
     alignItems: "center",
   },

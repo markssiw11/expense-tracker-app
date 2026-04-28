@@ -1,9 +1,10 @@
 import BudgetStatusCard from "@/src/components/BudgetStatusCard";
 import BudgetWarningBanner from "@/src/components/BudgetWarningBanner";
 import {
-  EXPENSE_CATEGORIES,
   getCategoryConfig,
+  getExpenseCategories,
 } from "@/src/constants/ExpenseCategories";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   deleteExpense,
   loadConfig,
@@ -15,6 +16,7 @@ import {
 } from "@/src/redux";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Expense, ExpenseCategory } from "@/src/types";
+import { formatMonthYear } from "@/src/utils/dateUtils";
 import {
   calculateMonthlyTotal,
   filterExpensesByMonth,
@@ -41,6 +43,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function ExpensesTab() {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { expenses, loading, selectedMonth, filters } = useAppSelector(
     (state) => state.expenses
   );
@@ -55,30 +58,11 @@ export default function ExpensesTab() {
   // State for view mode: 'list' or 'grid'
   const [viewMode, setViewMode] = React.useState<"list" | "grid">("list");
 
-  // Format month display with Vietnamese month names
-  const getFormattedMonth = (monthStr: string) => {
-    const [year, month] = monthStr.split("-");
-    const monthNames = [
-      "Tháng 1",
-      "Tháng 2",
-      "Tháng 3",
-      "Tháng 4",
-      "Tháng 5",
-      "Tháng 6",
-      "Tháng 7",
-      "Tháng 8",
-      "Tháng 9",
-      "Tháng 10",
-      "Tháng 11",
-      "Tháng 12",
-    ];
-    return {
-      month: monthNames[parseInt(month) - 1],
-      year: year,
-    };
-  };
+  // Get expense categories with translations
+  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
 
-  const formattedMonth = getFormattedMonth(selectedMonth);
+  // Format month display with translated month names
+  const formattedMonth = formatMonthYear(selectedMonth, t);
 
   useEffect(() => {
     dispatch(loadExpenses());
@@ -119,10 +103,10 @@ export default function ExpensesTab() {
   };
 
   const handleDeleteExpense = (id: string) => {
-    Alert.alert("Xóa chi phí", "Bạn có chắc chắn muốn xóa chi phí này?", [
-      { text: "Hủy", style: "cancel" },
+    Alert.alert(t("expenses.deleteExpense"), t("expenses.deleteConfirm"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: () => dispatch(deleteExpense(id)),
       },
@@ -142,7 +126,7 @@ export default function ExpensesTab() {
   };
 
   const renderExpenseItem = ({ item }: { item: Expense }) => {
-    const categoryConfig = getCategoryConfig(item.category);
+    const categoryConfig = getCategoryConfig(item.category, t);
 
     if (viewMode === "grid") {
       // Grid view - compact card
@@ -217,10 +201,8 @@ export default function ExpensesTab() {
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Ionicons name="wallet-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyText}>Chưa có chi phí nào</Text>
-      <Text style={styles.emptySubtext}>
-        Nhấn nút + để thêm chi phí đầu tiên
-      </Text>
+      <Text style={styles.emptyText}>{t("expenses.noExpenses")}</Text>
+      <Text style={styles.emptySubtext}>{t("expenses.addFirstExpense")}</Text>
     </View>
   );
 
@@ -264,7 +246,7 @@ export default function ExpensesTab() {
               {formatCurrency(totalAmount)}
             </Text>
             <Text style={styles.transactionCount}>
-              {monthlyExpenses.length} giao dịch
+              {monthlyExpenses.length} {t("expenses.transactions")}
             </Text>
           </View>
 
@@ -294,7 +276,9 @@ export default function ExpensesTab() {
                 onPress={clearFilters}
               >
                 <Ionicons name="close-circle" size={16} color="#FF3B30" />
-                <Text style={styles.clearFilterText}>Xóa bộ lọc</Text>
+                <Text style={styles.clearFilterText}>
+                  {t("common.clearFilters")}
+                </Text>
               </TouchableOpacity>
             )}
             {EXPENSE_CATEGORIES.map((category) => {
@@ -378,7 +362,9 @@ export default function ExpensesTab() {
                 color="#667eea"
                 style={{ marginRight: 8 }}
               />
-              <Text style={styles.budgetHeaderText}>Giới hạn chi tiêu</Text>
+              <Text style={styles.budgetHeaderText}>
+                {t("expenses.spendingLimits")}
+              </Text>
             </View>
             <Ionicons
               name={isBudgetExpanded ? "chevron-up" : "chevron-down"}

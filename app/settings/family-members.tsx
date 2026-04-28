@@ -1,4 +1,5 @@
 import { GoBackButton } from "@/src/components";
+import useTranslation from "@/src/hooks/useTranslation";
 import {
   addMember,
   deleteMember,
@@ -47,6 +48,7 @@ const AVAILABLE_COLORS = [
 
 export default function FamilyMembersScreen() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const members = useAppSelector((state) => state.family.members);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
@@ -61,7 +63,7 @@ export default function FamilyMembersScreen() {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert("Lỗi", "Vui lòng nhập tên");
+      Alert.alert(t("common.error"), t("familyMembers.nameRequired"));
       return;
     }
 
@@ -72,12 +74,12 @@ export default function FamilyMembersScreen() {
         updateMember({
           id: editingMember.id,
           data: { name, icon: selectedIcon, color: selectedColor },
-        })
+        }),
       );
       updatedMembers = members.map((m) =>
         m.id === editingMember.id
           ? { ...m, name, icon: selectedIcon, color: selectedColor }
-          : m
+          : m,
       );
     } else {
       const newMember: FamilyMember = {
@@ -95,10 +97,10 @@ export default function FamilyMembersScreen() {
   };
 
   const handleDelete = (id: string) => {
-    Alert.alert("Xác nhận", "Bạn có chắc muốn xóa thành viên này?", [
-      { text: "Hủy", style: "cancel" },
+    Alert.alert(t("common.confirm"), t("familyMembers.deleteConfirm"), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
           dispatch(deleteMember(id));
@@ -164,9 +166,11 @@ export default function FamilyMembersScreen() {
       >
         <GoBackButton />
         <View>
-          <Text style={styles.headerTitle}>Quản lý thành viên 👨‍👩‍👧‍👦</Text>
+          <Text style={styles.headerTitle}>
+            {t("familyMembers.headerTitle")}
+          </Text>
           <Text style={styles.headerSubtitle}>
-            Thêm hoặc chỉnh sửa người chi tiêu
+            {t("familyMembers.headerSubtitle")}
           </Text>
         </View>
       </LinearGradient>
@@ -192,21 +196,27 @@ export default function FamilyMembersScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {editingMember ? "Chỉnh sửa" : "Thêm"} thành viên
+              {editingMember
+                ? t("familyMembers.editMember")
+                : t("familyMembers.addMember")}
             </Text>
 
             <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>Tên *</Text>
+              <Text style={styles.inputLabel}>
+                {t("familyMembers.nameLabel")}
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder="Nhập tên..."
+                placeholder={t("familyMembers.namePlaceholder")}
                 value={name}
                 onChangeText={setName}
               />
             </View>
 
             <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>Chọn icon</Text>
+              <Text style={styles.inputLabel}>
+                {t("familyMembers.selectIcon")}
+              </Text>
               <View style={styles.iconGrid}>
                 {AVAILABLE_ICONS.map((icon) => (
                   <TouchableOpacity
@@ -228,7 +238,9 @@ export default function FamilyMembersScreen() {
             </View>
 
             <View style={styles.inputSection}>
-              <Text style={styles.inputLabel}>Chọn màu</Text>
+              <Text style={styles.inputLabel}>
+                {t("familyMembers.selectColor")}
+              </Text>
               <View style={styles.colorGrid}>
                 {AVAILABLE_COLORS.map((color) => (
                   <TouchableOpacity
@@ -253,13 +265,13 @@ export default function FamilyMembersScreen() {
                 style={styles.modalCancelButton}
                 onPress={closeModal}
               >
-                <Text style={styles.modalCancelText}>Hủy</Text>
+                <Text style={styles.modalCancelText}>{t("common.cancel")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalSaveButton}
                 onPress={handleSave}
               >
-                <Text style={styles.modalSaveText}>Lưu</Text>
+                <Text style={styles.modalSaveText}>{t("common.save")}</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -1,20 +1,22 @@
-import React, { useEffect } from "react";
-import { Alert, View } from "react-native";
-import { router } from "expo-router";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import CustomHeader from "@/src/components/CustomHeader";
+import ExpenseForm from "@/src/components/ExpenseForm";
+import { useExpenseForm } from "@/src/hooks/useExpenseForm";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   addExpense,
   loadFamilyMembers,
-  selectWeeklyBudgetStatus,
   selectMonthlyBudgetStatus,
+  selectWeeklyBudgetStatus,
 } from "@/src/redux";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Expense } from "@/src/types";
-import { useExpenseForm } from "@/src/hooks/useExpenseForm";
-import ExpenseForm from "@/src/components/ExpenseForm";
-import CustomHeader from "@/src/components/CustomHeader";
+import { router } from "expo-router";
+import React, { useEffect } from "react";
+import { Alert, View } from "react-native";
 
 export default function AddExpenseScreen() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const familyMembers = useAppSelector((state) => state.family.members);
   const weeklyBudgetStatus = useAppSelector(selectWeeklyBudgetStatus);
   const monthlyBudgetStatus = useAppSelector(selectMonthlyBudgetStatus);
@@ -59,10 +61,10 @@ export default function AddExpenseScreen() {
 
     try {
       await dispatch(addExpense(newExpense)).unwrap();
-      Alert.alert("Thành công", "Đã thêm chi phí mới");
+      Alert.alert(t("common.success"), t("expenses.addExpenseSuccess"));
       router.back();
     } catch {
-      Alert.alert("Lỗi", "Không thể thêm chi phí. Vui lòng thử lại.");
+      Alert.alert(t("common.error"), t("expenses.addExpenseFailed"));
     }
   };
 

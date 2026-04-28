@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { Alert, View, ActivityIndicator, StyleSheet } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { updateEvent } from "@/src/redux/reducers/eventSlice";
-import { EventFormData } from "@/src/types/event.types";
-import EventForm from "@/src/components/EventForm";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
+import EventForm from "@/src/components/EventForm";
+import { updateEvent } from "@/src/redux/reducers/eventSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { updateEventReminder } from "@/src/services/notificationService";
+import { EventFormData } from "@/src/types/event.types";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 
 export default function EditEventScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const event = useAppSelector((state) =>
-    state.events.events.find((e) => e.id === id)
+    state.events.events.find((e) => e.id === id),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   // If event not found, go back
   useEffect(() => {
     if (!event && id) {
-      Alert.alert("Lỗi", "Không tìm thấy sự kiện", [
-        { text: "OK", onPress: () => router.back() },
+      Alert.alert(t("common.error"), t("events.eventNotFound"), [
+        { text: t("common.ok"), onPress: () => router.back() },
       ]);
     }
   }, [event, id]);
@@ -71,7 +72,7 @@ export default function EditEventScreen() {
           // Update the notification (cancel old, schedule new if enabled)
           const newNotificationId = await updateEventReminder(
             updatedEvent,
-            event.notificationId
+            event.notificationId,
           );
 
           // Update the event with new notificationId (or clear it if reminder disabled)
@@ -79,68 +80,70 @@ export default function EditEventScreen() {
             updateEvent({
               id: event.id,
               data: { notificationId: newNotificationId || undefined },
-            })
+            }),
           ).unwrap();
 
           // Show appropriate message based on reminder state
           if (!formData.reminderEnabled && event.reminderEnabled) {
             // Reminder was disabled
-            Alert.alert("Thành công", "Đã cập nhật sự kiện và tắt nhắc nhở", [
-              { text: "OK", onPress: () => router.back() },
-            ]);
+            Alert.alert(
+              t("common.success"),
+              t("events.reminderDisabledSuccess"),
+              [{ text: t("common.ok"), onPress: () => router.back() }],
+            );
           } else if (formData.reminderEnabled && !newNotificationId) {
             // Reminder enabled but scheduling failed
             // Determine the likely reason based on event timing
             const eventDateTime = new Date(`${dateStr}T${timeStr}:00`);
             const reminderTime = new Date(
-              eventDateTime.getTime() - formData.reminderMinutes * 60 * 1000
+              eventDateTime.getTime() - formData.reminderMinutes * 60 * 1000,
             );
             const isPastEvent = reminderTime.getTime() <= Date.now();
 
             const message = isPastEvent
-              ? "Sự kiện đã được cập nhật nhưng không thể đặt nhắc nhở vì thời gian nhắc nhở đã qua. Vui lòng chọn thời gian sự kiện trong tương lai."
-              : "Sự kiện đã được cập nhật nhưng không thể đặt nhắc nhở. Vui lòng kiểm tra quyền thông báo trong cài đặt thiết bị.";
+              ? t("events.reminderWarningPast")
+              : t("events.reminderWarningPermission");
 
-            Alert.alert("Cảnh báo", message, [
-              { text: "OK", onPress: () => router.back() },
+            Alert.alert(t("common.warning"), message, [
+              { text: t("common.ok"), onPress: () => router.back() },
             ]);
           } else {
             // Success
-            Alert.alert("Thành công", "Đã cập nhật sự kiện", [
-              { text: "OK", onPress: () => router.back() },
+            Alert.alert(t("common.success"), t("events.updateEventSuccess"), [
+              { text: t("common.ok"), onPress: () => router.back() },
             ]);
           }
         } catch (notificationError) {
           // Notification update error - event is still saved
           console.error("Notification update error:", notificationError);
           Alert.alert(
-            "Cảnh báo",
-            "Sự kiện đã được cập nhật nhưng không thể cập nhật nhắc nhở. Lỗi: " +
+            t("common.warning"),
+            t("events.reminderWarningError") +
               (notificationError instanceof Error
                 ? notificationError.message
                 : "Không xác định"),
-            [{ text: "OK", onPress: () => router.back() }]
+            [{ text: t("common.ok"), onPress: () => router.back() }],
           );
         }
       } else {
         // No reminder changes, just show success
-        Alert.alert("Thành công", "Đã cập nhật sự kiện", [
-          { text: "OK", onPress: () => router.back() },
+        Alert.alert(t("common.success"), t("events.updateEventSuccess"), [
+          { text: t("common.ok"), onPress: () => router.back() },
         ]);
       }
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Không thể cập nhật sự kiện";
-      Alert.alert("Lỗi", errorMessage, [
+        error instanceof Error ? error.message : t("events.updateEventFailed");
+      Alert.alert(t("common.error"), errorMessage, [
         {
-          text: "Thử lại",
+          text: t("common.tryAgain"),
           onPress: () => {
             setIsSubmitting(false);
             handleSubmit(formData);
           },
         },
         {
-          text: "Hủy",
+          text: t("common.cancel"),
           style: "cancel",
           onPress: () => setIsSubmitting(false),
         },
@@ -150,8 +153,8 @@ export default function EditEventScreen() {
 
   const handleCancel = () => {
     if (isSubmitting) {
-      Alert.alert("Đang lưu", "Sự kiện đang được cập nhật. Vui lòng đợi.", [
-        { text: "OK" },
+      Alert.alert(t("common.saving"), t("events.eventUpdating"), [
+        { text: t("common.ok") },
       ]);
       return;
     }

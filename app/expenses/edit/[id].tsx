@@ -1,23 +1,24 @@
-import React, { useEffect } from "react";
-import { Alert } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import ExpenseForm from "@/src/components/ExpenseForm";
+import { useExpenseForm } from "@/src/hooks/useExpenseForm";
 import {
-  updateExpense,
   deleteExpense,
   loadFamilyMembers,
-  selectWeeklyBudgetStatus,
   selectMonthlyBudgetStatus,
+  selectWeeklyBudgetStatus,
+  updateExpense,
 } from "@/src/redux";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Expense } from "@/src/types/expense.types";
-import { useExpenseForm } from "@/src/hooks/useExpenseForm";
-import ExpenseForm from "@/src/components/ExpenseForm";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect } from "react";
+import { Alert } from "react-native";
 
 export default function EditExpenseScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const expense = useAppSelector((state) =>
-    state.expenses.expenses.find((exp) => exp.id === id)
+    state.expenses.expenses.find((exp) => exp.id === id),
   );
   const familyMembers = useAppSelector((state) => state.family.members);
   const weeklyBudgetStatus = useAppSelector(selectWeeklyBudgetStatus);
@@ -59,7 +60,7 @@ export default function EditExpenseScreen() {
   // If expense not found, go back
   useEffect(() => {
     if (!expense && id) {
-      Alert.alert("Lỗi", "Không tìm thấy chi phí");
+      Alert.alert(t("common.error"), t("expenses.expenseNotFound"));
       router.back();
     }
   }, [expense, id]);
@@ -80,32 +81,35 @@ export default function EditExpenseScreen() {
 
     try {
       await dispatch(
-        updateExpense({ id: expense.id, data: updatedData })
+        updateExpense({ id: expense.id, data: updatedData }),
       ).unwrap();
-      Alert.alert("Thành công", "Đã cập nhật chi phí");
+      Alert.alert(t("common.success"), t("expenses.updateExpenseSuccess"));
       router.back();
     } catch {
-      Alert.alert("Lỗi", "Không thể cập nhật chi phí. Vui lòng thử lại.");
+      Alert.alert(t("common.error"), t("expenses.updateExpenseFailed"));
     }
   };
 
   const handleDelete = () => {
-    Alert.alert("Xác nhận xóa", "Bạn có chắc chắn muốn xóa chi phí này?", [
+    Alert.alert(t("common.confirmDelete"), t("expenses.deleteConfirm"), [
       {
-        text: "Hủy",
+        text: t("common.cancel"),
         style: "cancel",
       },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
           if (!expense) return;
           try {
             await dispatch(deleteExpense(expense.id)).unwrap();
-            Alert.alert("Thành công", "Đã xóa chi phí");
+            Alert.alert(
+              t("common.success"),
+              t("expenses.deleteExpenseSuccess"),
+            );
             router.back();
           } catch {
-            Alert.alert("Lỗi", "Không thể xóa chi phí. Vui lòng thử lại.");
+            Alert.alert(t("common.error"), t("expenses.deleteExpenseFailed"));
           }
         },
       },

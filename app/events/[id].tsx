@@ -1,23 +1,21 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import CustomHeader from "@/src/components/CustomHeader";
 import { deleteEvent } from "@/src/redux/reducers/eventSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import { cancelNotification } from "@/src/services/notificationService";
 import { EventCategory } from "@/src/types/event.types";
+import { Ionicons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
-import ErrorBoundary from "@/src/components/ErrorBoundary";
-import { cancelNotification } from "@/src/services/notificationService";
-import CustomHeader from "@/src/components/CustomHeader";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 // Category colors matching design document
 const CATEGORY_COLORS: Record<EventCategory, string> = {
@@ -64,15 +62,16 @@ export default function EventDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const event = useAppSelector((state) =>
-    state.events.events.find((e) => e.id === id)
+    state.events.events.find((e) => e.id === id),
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  const { t } = useTranslation();
 
   // If event not found, go back
   useEffect(() => {
     if (!event && id) {
-      Alert.alert("Lỗi", "Không tìm thấy sự kiện", [
-        { text: "OK", onPress: () => router.back() },
+      Alert.alert(t("common.error"), t("events.eventNotFound"), [
+        { text: t("common.ok"), onPress: () => router.back() },
       ]);
     }
   }, [event, id]);
@@ -86,13 +85,13 @@ export default function EventDetailScreen() {
   const handleDelete = () => {
     if (isDeleting) return;
 
-    Alert.alert("Xác nhận xóa", "Bạn có chắc chắn muốn xóa sự kiện này?", [
+    Alert.alert(t("common.confirmDelete"), t("events.deleteConfirm"), [
       {
-        text: "Hủy",
+        text: t("common.cancel"),
         style: "cancel",
       },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
           if (!event) return;
@@ -105,20 +104,22 @@ export default function EventDetailScreen() {
 
             // Proceed with normal delete flow
             await dispatch(deleteEvent(event.id)).unwrap();
-            Alert.alert("Thành công", "Đã xóa sự kiện", [
-              { text: "OK", onPress: () => router.back() },
+            Alert.alert(t("common.success"), t("events.deleteEventSuccess"), [
+              { text: t("common.ok"), onPress: () => router.back() },
             ]);
           } catch (error) {
             setIsDeleting(false);
             const errorMessage =
-              error instanceof Error ? error.message : "Không thể xóa sự kiện";
-            Alert.alert("Lỗi", errorMessage, [
+              error instanceof Error
+                ? error.message
+                : t("events.deleteEventFailed");
+            Alert.alert(t("common.error"), errorMessage, [
               {
-                text: "Thử lại",
+                text: t("common.tryAgain"),
                 onPress: handleDelete,
               },
               {
-                text: "Hủy",
+                text: t("common.cancel"),
                 style: "cancel",
               },
             ]);

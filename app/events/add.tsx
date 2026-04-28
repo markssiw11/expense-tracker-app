@@ -1,16 +1,18 @@
-import React, { useState } from "react";
-import { Alert, View, ActivityIndicator, StyleSheet } from "react-native";
-import { router } from "expo-router";
-import { useAppDispatch } from "@/src/redux/store";
-import { addEvent, updateEvent } from "@/src/redux/reducers/eventSlice";
-import { Event, EventFormData } from "@/src/types/event.types";
-import EventForm from "@/src/components/EventForm";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
+import EventForm from "@/src/components/EventForm";
+import { useTranslation } from "@/src/hooks/useTranslation";
+import { addEvent, updateEvent } from "@/src/redux/reducers/eventSlice";
+import { useAppDispatch } from "@/src/redux/store";
 import { scheduleEventReminder } from "@/src/services/notificationService";
+import { Event, EventFormData } from "@/src/types/event.types";
+import { router } from "expo-router";
+import React, { useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 
 export default function AddEventScreen() {
   const dispatch = useAppDispatch();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useTranslation();
 
   const handleSubmit = async (formData: EventFormData) => {
     if (isSubmitting) return;
@@ -54,56 +56,58 @@ export default function AddEventScreen() {
               updateEvent({
                 id: newEvent.id,
                 data: { notificationId },
-              })
+              }),
             ).unwrap();
           } else {
             // Notification scheduling failed (permissions denied, past event, or invalid data)
             // Determine the likely reason based on event timing
             const eventDateTime = new Date(
-              `${newEvent.date}T${newEvent.time}:00`
+              `${newEvent.date}T${newEvent.time}:00`,
             );
             const reminderTime = new Date(
-              eventDateTime.getTime() - newEvent.reminderMinutes * 60 * 1000
+              eventDateTime.getTime() - newEvent.reminderMinutes * 60 * 1000,
             );
             const isPastEvent = reminderTime.getTime() <= Date.now();
 
             const message = isPastEvent
-              ? "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở vì thời gian nhắc nhở đã qua. Vui lòng chọn thời gian sự kiện trong tương lai."
-              : "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở. Vui lòng kiểm tra quyền thông báo trong cài đặt thiết bị.";
+              ? t("events.reminderWarningPast")
+              : t("events.reminderWarningPermission");
 
-            Alert.alert("Cảnh báo", message, [{ text: "OK" }]);
+            Alert.alert(t("common.warning"), message, [
+              { text: t("common.ok") },
+            ]);
           }
         } catch (notificationError) {
           // Notification scheduling error - event is still saved
           console.error("Notification scheduling error:", notificationError);
           Alert.alert(
-            "Cảnh báo",
-            "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở. Lỗi: " +
+            t("common.warning"),
+            t("events.reminderWarningError") +
               (notificationError instanceof Error
                 ? notificationError.message
                 : "Không xác định"),
-            [{ text: "OK" }]
+            [{ text: t("common.ok") }],
           );
         }
       }
 
       // Success - navigate back
-      Alert.alert("Thành công", "Đã thêm sự kiện mới", [
-        { text: "OK", onPress: () => router.back() },
+      Alert.alert(t("common.success"), t("events.addEventSuccess"), [
+        { text: t("common.ok"), onPress: () => router.back() },
       ]);
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : "Không thể thêm sự kiện";
-      Alert.alert("Lỗi", errorMessage, [
+        error instanceof Error ? error.message : t("events.addEventFailed");
+      Alert.alert(t("common.error"), errorMessage, [
         {
-          text: "Thử lại",
+          text: t("common.tryAgain"),
           onPress: () => {
             setIsSubmitting(false);
             handleSubmit(formData);
           },
         },
         {
-          text: "Hủy",
+          text: t("common.cancel"),
           style: "cancel",
           onPress: () => setIsSubmitting(false),
         },
@@ -113,8 +117,8 @@ export default function AddEventScreen() {
 
   const handleCancel = () => {
     if (isSubmitting) {
-      Alert.alert("Đang lưu", "Sự kiện đang được lưu. Vui lòng đợi.", [
-        { text: "OK" },
+      Alert.alert(t("common.saving"), t("events.eventSaving"), [
+        { text: t("common.ok") },
       ]);
       return;
     }

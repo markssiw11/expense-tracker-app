@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Sổ Tay Gia Đình",
+    "name": "Family Expense Tracker",
     "slug": "ExpenseTrackerApp",
     "version": "1.0.1",
     "runtimeVersion": {
@@ -16,7 +16,7 @@
       "bundleIdentifier": "com.family.expensetracker",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSFaceIDUsageDescription": "Sử dụng Face ID để mở khóa ứng dụng nhanh chóng và bảo mật"
+        "NSFaceIDUsageDescription": "Use Face ID to unlock the app quickly and securely"
       }
     },
     "notification": {
@@ -24,7 +24,7 @@
       "color": "#667eea",
       "iosDisplayInForeground": true,
       "androidMode": "default",
-      "androidCollapsedTitle": "Nhắc nhở lịch hẹn"
+      "androidCollapsedTitle": "Calendar Reminder"
     },
     "android": {
       "package": "com.family.expensetracker",
@@ -70,7 +70,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Sử dụng Face ID để mở khóa ứng dụng nhanh chóng và bảo mật"
+          "faceIDPermission": "Use Face ID to unlock the app quickly and securely"
         }
       ]
     ],

@@ -2,6 +2,7 @@ import { Colors } from "@/constants/theme";
 import { CalendarView } from "@/src/components/CalendarView";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
 import { EventList } from "@/src/components/EventList";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   clearError,
   loadEvents,
@@ -11,7 +12,6 @@ import {
   selectMarkedDates,
   selectSelectedCategory,
   selectSelectedDate,
-  selectTodayEvents,
   selectViewMode,
   setSelectedCategory,
   setSelectedDate,
@@ -48,6 +48,7 @@ interface CalendarContentProps {
   handleEventPress: (eventId: string) => void;
   formatSelectedDate: (date: string | null) => string;
   colors: any;
+  t: (key: string) => string;
 }
 
 function CalendarContent({
@@ -59,6 +60,7 @@ function CalendarContent({
   handleEventPress,
   formatSelectedDate,
   colors,
+  t,
 }: CalendarContentProps) {
   const filteredEvents = useAppSelector(selectFilteredEvents);
   const fadeAnim = React.useRef(new Animated.Value(1)).current;
@@ -107,7 +109,7 @@ function CalendarContent({
             <EventList
               events={selectedDateEvents}
               onEventPress={handleEventPress}
-              emptyMessage="Không có sự kiện nào trong ngày này."
+              emptyMessage={t("calendar.noEventsToday")}
               scrollEnabled={false}
             />
           </View>
@@ -120,12 +122,12 @@ function CalendarContent({
   return (
     <Animated.View style={[styles.listViewContainer, { opacity: fadeAnim }]}>
       <Text style={[styles.listViewTitle, { color: colors.text }]}>
-        Sự kiện sắp tới
+        {t("calendar.upcomingEvents")}
       </Text>
       <EventList
         events={upcomingEvents}
         onEventPress={handleEventPress}
-        emptyMessage="Chưa có lịch hẹn nào. Nhấn + để thêm sự kiện mới."
+        emptyMessage={t("events.noEvents")}
         scrollEnabled={false}
       />
     </Animated.View>
@@ -137,6 +139,7 @@ export default function CalendarTab() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { t } = useTranslation();
 
   // Refs for auto-scrolling
   const scrollViewRef = React.useRef<ScrollView>(null);
@@ -147,7 +150,6 @@ export default function CalendarTab() {
   const selectedDate = useAppSelector(selectSelectedDate);
   const viewMode = useAppSelector(selectViewMode);
   const selectedCategory = useAppSelector(selectSelectedCategory);
-  const todayEvents = useAppSelector(selectTodayEvents);
   const loading = useAppSelector(selectEventsLoading);
   const error = useAppSelector(selectEventsError);
 
@@ -169,22 +171,22 @@ export default function CalendarTab() {
   // Handle errors
   useEffect(() => {
     if (error) {
-      Alert.alert("Lỗi", error, [
+      Alert.alert(t("common.error"), error, [
         {
-          text: "Thử lại",
+          text: t("common.retry"),
           onPress: () => {
             dispatch(clearError());
             dispatch(loadEvents());
           },
         },
         {
-          text: "Đóng",
+          text: t("common.close"),
           onPress: () => dispatch(clearError()),
           style: "cancel",
         },
       ]);
     }
-  }, [error, dispatch]);
+  }, [error, dispatch, t]);
 
   // Handle date selection
   const handleDateSelect = (date: string) => {
@@ -245,39 +247,40 @@ export default function CalendarTab() {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     if (date.toDateString() === today.toDateString()) {
-      return "Hôm nay";
+      return t("calendar.today");
     }
     if (date.toDateString() === tomorrow.toDateString()) {
-      return "Ngày mai";
+      return "Tomorrow"; // You can add this to translations if needed
     }
 
+    // Use i18n for day and month names
     const dayNames = [
-      "Chủ Nhật",
-      "Thứ Hai",
-      "Thứ Ba",
-      "Thứ Tư",
-      "Thứ Năm",
-      "Thứ Sáu",
-      "Thứ Bảy",
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
     ];
-    const monthNames = [
-      "Tháng 1",
-      "Tháng 2",
-      "Tháng 3",
-      "Tháng 4",
-      "Tháng 5",
-      "Tháng 6",
-      "Tháng 7",
-      "Tháng 8",
-      "Tháng 9",
-      "Tháng 10",
-      "Tháng 11",
-      "Tháng 12",
+    const monthKeys = [
+      "january",
+      "february",
+      "march",
+      "april",
+      "may",
+      "june",
+      "july",
+      "august",
+      "september",
+      "october",
+      "november",
+      "december",
     ];
 
     const dayName = dayNames[date.getDay()];
     const day = date.getDate();
-    const monthName = monthNames[date.getMonth()];
+    const monthName = t(`months.${monthKeys[date.getMonth()]}`);
 
     return `${dayName}, ${day} ${monthName}`;
   };
@@ -288,15 +291,27 @@ export default function CalendarTab() {
       Work: {
         icon: "briefcase" as const,
         color: "#3B82F6",
-        label: "Công việc",
+        label: "Work", // You can add these to translations
       },
-      Personal: { icon: "person" as const, color: "#A855F7", label: "Cá nhân" },
-      Health: { icon: "fitness" as const, color: "#10B981", label: "Sức khỏe" },
-      Family: { icon: "people" as const, color: "#F59E0B", label: "Gia đình" },
+      Personal: {
+        icon: "person" as const,
+        color: "#A855F7",
+        label: "Personal",
+      },
+      Health: {
+        icon: "fitness" as const,
+        color: "#10B981",
+        label: "Health",
+      },
+      Family: {
+        icon: "people" as const,
+        color: "#F59E0B",
+        label: "Family",
+      },
       Other: {
         icon: "ellipsis-horizontal" as const,
         color: "#6B7280",
-        label: "Khác",
+        label: t("categories.other"),
       },
     };
     return categoryMap[category];
@@ -313,7 +328,7 @@ export default function CalendarTab() {
           style={[styles.header, { paddingTop: insets.top + 20 }]}
         >
           <View style={styles.headerTop}>
-            <Text style={styles.headerTitle}>Lịch</Text>
+            <Text style={styles.headerTitle}>{t("calendar.title")}</Text>
             <TouchableOpacity
               onPress={handleToggleViewMode}
               style={styles.viewModeButton}
@@ -352,7 +367,7 @@ export default function CalendarTab() {
                 !selectedCategory && styles.categoryChipTextActive,
               ]}
             >
-              Tất cả
+              {t("common.all")}
             </Text>
           </TouchableOpacity>
 
@@ -398,7 +413,7 @@ export default function CalendarTab() {
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#667eea" />
             <Text style={[styles.loadingText, { color: colors.text }]}>
-              Đang tải sự kiện...
+              {t("common.loading")}
             </Text>
           </View>
         ) : (
@@ -417,6 +432,7 @@ export default function CalendarTab() {
               handleEventPress={handleEventPress}
               formatSelectedDate={formatSelectedDate}
               colors={colors}
+              t={t}
             />
           </ScrollView>
         )}

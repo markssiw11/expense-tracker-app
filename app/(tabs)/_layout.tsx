@@ -5,11 +5,13 @@ import React from "react";
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import { selectTodayEvents } from "@/src/redux/reducers/eventSlice";
 import { useSelector } from "react-redux";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { t } = useTranslation();
   const todayEvents = useSelector(selectTodayEvents);
   const todayEventsCount = todayEvents.length;
 
@@ -24,7 +26,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="expenses"
         options={{
-          title: "Chi Phí",
+          title: t("navigation.expenses"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="wallet" size={size} color={color} />
           ),
@@ -34,7 +36,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="calendar"
         options={{
-          title: "Lịch",
+          title: t("navigation.calendar"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="calendar-outline" size={size} color={color} />
           ),
@@ -45,7 +47,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="notes"
         options={{
-          title: "Ghi Chú",
+          title: t("navigation.notes"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="document-text" size={size} color={color} />
           ),
@@ -55,7 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Cài đặt",
+          title: t("navigation.settings"),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="settings" size={size} color={color} />
           ),

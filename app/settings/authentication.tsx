@@ -1,8 +1,9 @@
 import { GoBackButton, PasswordModal, SettingCard } from "@/src/components";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   setAuthEnabled,
-  setBiometricEnabled,
   setBiometricAvailable,
+  setBiometricEnabled,
 } from "@/src/redux/reducers/authSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { authService } from "@/src/services/authService";
@@ -18,8 +19,9 @@ type Step = "current" | "new" | "confirm";
 
 export default function AuthenticationSettingsScreen() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { isEnabled, biometricEnabled, biometricAvailable } = useAppSelector(
-    (state) => state.auth
+    (state) => state.auth,
   );
   const insets = useSafeAreaInsets();
 
@@ -55,16 +57,16 @@ export default function AuthenticationSettingsScreen() {
   const handleBiometricToggle = async (value: boolean) => {
     if (!biometricAvailable) {
       Alert.alert(
-        "Không khả dụng",
-        "Thiết bị của bạn không hỗ trợ xác thực sinh trắc học hoặc chưa được thiết lập."
+        t("authentication.biometricNotAvailable"),
+        t("authentication.biometricNotAvailableDesc"),
       );
       return;
     }
 
     if (!isEnabled) {
       Alert.alert(
-        "Yêu cầu mật khẩu",
-        "Vui lòng bật bảo vệ mật khẩu trước khi sử dụng xác thực sinh trắc học."
+        t("authentication.passwordRequired"),
+        t("authentication.passwordRequiredDesc"),
       );
       return;
     }
@@ -81,7 +83,7 @@ export default function AuthenticationSettingsScreen() {
         dispatch(setBiometricEnabled(false));
       }
     } catch {
-      Alert.alert("Lỗi", "Không thể thay đổi cài đặt sinh trắc học");
+      Alert.alert(t("common.error"), t("authentication.biometricChangeFailed"));
     }
   };
 
@@ -90,7 +92,7 @@ export default function AuthenticationSettingsScreen() {
 
     if (step === "new") {
       if (newPassword.length < 4) {
-        setError("Mật khẩu phải có ít nhất 4 chữ số");
+        setError(t("authentication.passwordMinLength"));
         return;
       }
       setStep("confirm");
@@ -99,7 +101,7 @@ export default function AuthenticationSettingsScreen() {
 
     if (step === "confirm") {
       if (newPassword !== confirmPassword) {
-        setError("Mật khẩu không khớp");
+        setError(t("authentication.passwordMismatch"));
         setConfirmPassword("");
         return;
       }
@@ -107,10 +109,13 @@ export default function AuthenticationSettingsScreen() {
       try {
         await authService.setupPassword(newPassword);
         dispatch(setAuthEnabled(true));
-        Alert.alert("Thành công", "Mật khẩu đã được thiết lập");
+        Alert.alert(
+          t("common.success"),
+          t("authentication.passwordSetupSuccess"),
+        );
         closeModal();
       } catch {
-        setError("Không thể thiết lập mật khẩu");
+        setError(t("authentication.passwordSetupFailed"));
       }
     }
   };
@@ -121,7 +126,7 @@ export default function AuthenticationSettingsScreen() {
     if (step === "current") {
       const isValid = await authService.verifyPassword(currentPassword);
       if (!isValid) {
-        setError("Mật khẩu hiện tại không đúng");
+        setError(t("authentication.passwordIncorrect"));
         setCurrentPassword("");
         return;
       }
@@ -131,7 +136,7 @@ export default function AuthenticationSettingsScreen() {
 
     if (step === "new") {
       if (newPassword.length < 4) {
-        setError("Mật khẩu phải có ít nhất 4 chữ số");
+        setError(t("authentication.passwordMinLength"));
         return;
       }
       setStep("confirm");
@@ -140,7 +145,7 @@ export default function AuthenticationSettingsScreen() {
 
     if (step === "confirm") {
       if (newPassword !== confirmPassword) {
-        setError("Mật khẩu không khớp");
+        setError(t("authentication.passwordMismatch"));
         setConfirmPassword("");
         return;
       }
@@ -148,16 +153,19 @@ export default function AuthenticationSettingsScreen() {
       try {
         const success = await authService.changePassword(
           currentPassword,
-          newPassword
+          newPassword,
         );
         if (success) {
-          Alert.alert("Thành công", "Mật khẩu đã được thay đổi");
+          Alert.alert(
+            t("common.success"),
+            t("authentication.passwordChangeSuccess"),
+          );
           closeModal();
         } else {
-          setError("Không thể thay đổi mật khẩu");
+          setError(t("authentication.passwordChangeFailed"));
         }
       } catch {
-        setError("Không thể thay đổi mật khẩu");
+        setError(t("authentication.passwordChangeFailed"));
       }
     }
   };
@@ -167,7 +175,7 @@ export default function AuthenticationSettingsScreen() {
 
     const isValid = await authService.verifyPassword(currentPassword);
     if (!isValid) {
-      setError("Mật khẩu không đúng");
+      setError(t("authentication.passwordWrong"));
       setCurrentPassword("");
       return;
     }
@@ -176,10 +184,13 @@ export default function AuthenticationSettingsScreen() {
       await authService.removePassword();
       dispatch(setAuthEnabled(false));
       dispatch(setBiometricEnabled(false));
-      Alert.alert("Thành công", "Bảo vệ mật khẩu đã được tắt");
+      Alert.alert(
+        t("common.success"),
+        t("authentication.passwordDisableSuccess"),
+      );
       closeModal();
     } catch {
-      setError("Không thể tắt bảo vệ mật khẩu");
+      setError(t("authentication.passwordDisableFailed"));
     }
   };
 
@@ -238,8 +249,10 @@ export default function AuthenticationSettingsScreen() {
   };
 
   const getBiometricLabel = () => {
-    if (!biometricAvailable) return "Không khả dụng";
-    return biometricEnabled ? "Đã bật" : "Đã tắt";
+    if (!biometricAvailable) return t("authentication.biometricNotAvailable");
+    return biometricEnabled
+      ? t("authentication.biometricEnabled")
+      : t("authentication.biometricDisabled");
   };
 
   return (
@@ -252,21 +265,25 @@ export default function AuthenticationSettingsScreen() {
       >
         <GoBackButton />
         <View>
-          <Text style={styles.headerTitle}>Bảo mật 🔐</Text>
+          <Text style={styles.headerTitle}>
+            {t("authentication.headerTitle")}
+          </Text>
           <Text style={styles.headerSubtitle}>
-            Cài đặt xác thực và bảo vệ ứng dụng
+            {t("authentication.headerSubtitle")}
           </Text>
         </View>
       </LinearGradient>
 
       <ScrollView style={styles.content}>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Bảo vệ mật khẩu</Text>
+          <Text style={styles.sectionTitle}>
+            {t("authentication.passwordProtection")}
+          </Text>
 
           <SettingCard
             icon="lock-closed"
-            label="Bật bảo vệ mật khẩu"
-            description="Yêu cầu mật khẩu khi mở ứng dụng"
+            label={t("authentication.enablePassword")}
+            description={t("authentication.enablePasswordDesc")}
             type="switch"
             value={isEnabled}
             onValueChange={handlePasswordToggle}
@@ -275,8 +292,8 @@ export default function AuthenticationSettingsScreen() {
           {isEnabled && (
             <SettingCard
               icon="key"
-              label="Thay đổi mật khẩu"
-              description="Cập nhật mật khẩu bảo vệ"
+              label={t("authentication.changePassword")}
+              description={t("authentication.changePasswordDesc")}
               type="button"
               onPress={() => {
                 setModalType("change");
@@ -287,7 +304,9 @@ export default function AuthenticationSettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Xác thực sinh trắc học</Text>
+          <Text style={styles.sectionTitle}>
+            {t("authentication.biometricAuth")}
+          </Text>
 
           <SettingCard
             icon="finger-print"
@@ -303,8 +322,7 @@ export default function AuthenticationSettingsScreen() {
             <View style={styles.infoBox}>
               <Ionicons name="information-circle" size={20} color="#F59E0B" />
               <Text style={styles.infoText}>
-                Thiết bị của bạn không hỗ trợ xác thực sinh trắc học hoặc chưa
-                được thiết lập
+                {t("authentication.biometricNotAvailableDesc")}
               </Text>
             </View>
           )}
@@ -313,7 +331,7 @@ export default function AuthenticationSettingsScreen() {
             <View style={styles.infoBox}>
               <Ionicons name="information-circle" size={20} color="#3B82F6" />
               <Text style={styles.infoText}>
-                Bật bảo vệ mật khẩu để sử dụng xác thực sinh trắc học
+                {t("authentication.enablePasswordForBiometric")}
               </Text>
             </View>
           )}

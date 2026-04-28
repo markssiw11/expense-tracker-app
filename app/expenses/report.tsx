@@ -1,29 +1,30 @@
-import React, { useState, useMemo, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import {
-  generateMonthlySummary,
-  formatCurrency,
-  getPreviousMonth,
-  getNextMonth,
-  getCurrentMonth,
-  filterExpensesByMonth,
-} from "@/src/utils/expenseUtils";
-import { EXPENSE_CATEGORIES } from "@/src/constants/ExpenseCategories";
-import { loadFamilyMembers } from "@/src/redux";
-import { SpenderBreakdown } from "@/src/types";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { GoBackButton, StickyHeader } from "@/src/components";
+import { GoBackButton } from "@/src/components";
 import BarChart from "@/src/components/BarChart";
 import PieChart from "@/src/components/PieChart";
+import { getExpenseCategories } from "@/src/constants/ExpenseCategories";
+import { useTranslation } from "@/src/hooks/useTranslation";
+import { loadFamilyMembers } from "@/src/redux";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import { SpenderBreakdown } from "@/src/types";
+import {
+  filterExpensesByMonth,
+  formatCurrency,
+  generateMonthlySummary,
+  getCurrentMonth,
+  getNextMonth,
+  getPreviousMonth,
+} from "@/src/utils/expenseUtils";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function MonthlyReportScreen() {
   const expenses = useAppSelector((state) => state.expenses.expenses);
@@ -32,6 +33,9 @@ export default function MonthlyReportScreen() {
   const [viewMode, setViewMode] = useState<"category" | "spender">("spender");
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
+
+  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
 
   useEffect(() => {
     dispatch(loadFamilyMembers());
@@ -39,12 +43,12 @@ export default function MonthlyReportScreen() {
 
   const monthlySummary = useMemo(
     () => generateMonthlySummary(expenses, selectedMonth),
-    [expenses, selectedMonth]
+    [expenses, selectedMonth],
   );
 
   const monthlyExpenses = useMemo(
     () => filterExpensesByMonth(expenses, selectedMonth),
-    [expenses, selectedMonth]
+    [expenses, selectedMonth],
   );
 
   const spenderBreakdown = useMemo(() => {
@@ -100,7 +104,7 @@ export default function MonthlyReportScreen() {
           <View style={styles.headerContent}>
             <View style={styles.headerRow}>
               <GoBackButton />
-              <Text style={styles.headerTitle}>Báo cáo chi tiêu 📊</Text>
+              <Text style={styles.headerTitle}>{t("reports.headerTitle")}</Text>
               <View style={{ width: 40 }} />
             </View>
 
@@ -121,12 +125,14 @@ export default function MonthlyReportScreen() {
             </View>
 
             <View style={styles.summaryBox}>
-              <Text style={styles.summaryLabel}>Tổng chi phí</Text>
+              <Text style={styles.summaryLabel}>
+                {t("reports.totalExpenses")}
+              </Text>
               <Text style={styles.summaryAmount}>
                 {formatCurrency(monthlySummary.totalAmount)}
               </Text>
               <Text style={styles.summaryCount}>
-                {monthlySummary.expenseCount} giao dịch
+                {monthlySummary.expenseCount} {t("reports.transactions")}
               </Text>
             </View>
           </View>
@@ -152,7 +158,7 @@ export default function MonthlyReportScreen() {
                 viewMode === "spender" && styles.toggleTextActive,
               ]}
             >
-              Theo người
+              {t("reports.bySpender")}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -173,7 +179,7 @@ export default function MonthlyReportScreen() {
                 viewMode === "category" && styles.toggleTextActive,
               ]}
             >
-              Theo danh mục
+              {t("reports.byCategory")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -181,12 +187,16 @@ export default function MonthlyReportScreen() {
         {/* Spender Breakdown */}
         {viewMode === "spender" && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chi tiêu theo thành viên</Text>
+            <Text style={styles.sectionTitle}>
+              {t("reports.spenderBreakdown")}
+            </Text>
 
             {spenderBreakdown.length === 0 ? (
               <View style={styles.emptyState}>
                 <Ionicons name="people-outline" size={48} color="#ccc" />
-                <Text style={styles.emptyText}>Chưa có dữ liệu chi tiêu</Text>
+                <Text style={styles.emptyText}>
+                  {t("reports.noSpenderData")}
+                </Text>
               </View>
             ) : (
               <>
@@ -195,12 +205,12 @@ export default function MonthlyReportScreen() {
                   <PieChart
                     data={spenderBreakdown.map((breakdown) => {
                       const member = familyMembers.find(
-                        (m) => m.id === breakdown.spender
+                        (m) => m.id === breakdown.spender,
                       );
                       return {
                         value: breakdown.amount,
                         color: member?.color || "#999",
-                        label: member?.name || "Chưa phân loại",
+                        label: member?.name || t("reports.uncategorized"),
                         percentage: breakdown.percentage,
                       };
                     })}
@@ -210,9 +220,10 @@ export default function MonthlyReportScreen() {
                   <View style={styles.legendContainer}>
                     {spenderBreakdown.map((breakdown) => {
                       const member = familyMembers.find(
-                        (m) => m.id === breakdown.spender
+                        (m) => m.id === breakdown.spender,
                       );
-                      const displayName = member?.name || "Chưa phân loại";
+                      const displayName =
+                        member?.name || t("reports.uncategorized");
                       const color = member?.color || "#999";
 
                       return (
@@ -235,14 +246,16 @@ export default function MonthlyReportScreen() {
 
                 {/* Bar Chart */}
                 <View style={styles.chartCard}>
-                  <Text style={styles.chartTitle}>Chi tiết số tiền</Text>
+                  <Text style={styles.chartTitle}>
+                    {t("reports.amountDetail")}
+                  </Text>
                   <BarChart
                     data={spenderBreakdown.map((breakdown) => {
                       const member = familyMembers.find(
-                        (m) => m.id === breakdown.spender
+                        (m) => m.id === breakdown.spender,
                       );
                       return {
-                        label: member?.name || "Chưa phân loại",
+                        label: member?.name || t("reports.uncategorized"),
                         value: breakdown.amount,
                         percentage: breakdown.percentage,
                         color: member?.color || "#999",
@@ -260,13 +273,15 @@ export default function MonthlyReportScreen() {
         {/* Category Breakdown */}
         {viewMode === "category" && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Chi tiết theo danh mục</Text>
+            <Text style={styles.sectionTitle}>
+              {t("reports.categoryDetail")}
+            </Text>
 
             {monthlySummary.categoryBreakdown.length === 0 ? (
               <View style={styles.emptyState}>
                 <Ionicons name="document-outline" size={48} color="#ccc" />
                 <Text style={styles.emptyText}>
-                  Chưa có chi phí trong tháng này
+                  {t("reports.noExpensesThisMonth")}
                 </Text>
               </View>
             ) : (
@@ -276,7 +291,7 @@ export default function MonthlyReportScreen() {
                   <PieChart
                     data={monthlySummary.categoryBreakdown.map((breakdown) => {
                       const categoryConfig = getCategoryConfig(
-                        breakdown.category
+                        breakdown.category,
                       );
                       return {
                         value: breakdown.amount,
@@ -291,7 +306,7 @@ export default function MonthlyReportScreen() {
                   <View style={styles.legendContainer}>
                     {monthlySummary.categoryBreakdown.map((breakdown) => {
                       const categoryConfig = getCategoryConfig(
-                        breakdown.category
+                        breakdown.category,
                       );
                       if (!categoryConfig) return null;
 
@@ -320,11 +335,13 @@ export default function MonthlyReportScreen() {
 
                 {/* Bar Chart */}
                 <View style={styles.chartCard}>
-                  <Text style={styles.chartTitle}>Chi tiết số tiền</Text>
+                  <Text style={styles.chartTitle}>
+                    {t("reports.amountDetail")}
+                  </Text>
                   <BarChart
                     data={monthlySummary.categoryBreakdown.map((breakdown) => {
                       const categoryConfig = getCategoryConfig(
-                        breakdown.category
+                        breakdown.category,
                       );
                       return {
                         label: categoryConfig?.label || breakdown.category,

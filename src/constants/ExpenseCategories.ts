@@ -1,61 +1,65 @@
-import { ExpenseCategory, CategoryConfig } from "../types";
+import { CategoryConfig, ExpenseCategory } from "../types";
 
-export const EXPENSE_CATEGORIES: CategoryConfig[] = [
+export const EXPENSE_CATEGORIES_BASE: Omit<CategoryConfig, "label">[] = [
   {
     key: ExpenseCategory.FOOD,
-    label: "Ăn uống",
     icon: "restaurant",
     color: "#FF6B6B",
   },
   {
     key: ExpenseCategory.TRANSPORTATION,
-    label: "Đi lại",
     icon: "car",
     color: "#4ECDC4",
   },
   {
     key: ExpenseCategory.ENTERTAINMENT,
-    label: "Giải trí",
     icon: "game-controller",
     color: "#95E1D3",
   },
   {
     key: ExpenseCategory.SHOPPING,
-    label: "Mua sắm",
     icon: "cart",
     color: "#F38181",
   },
   {
     key: ExpenseCategory.BILLS,
-    label: "Hóa đơn",
     icon: "receipt",
     color: "#AA96DA",
   },
   {
     key: ExpenseCategory.HEALTHCARE,
-    label: "Y tế",
     icon: "medical",
     color: "#FCBAD3",
   },
   {
     key: ExpenseCategory.EDUCATION,
-    label: "Giáo dục",
     icon: "school",
     color: "#A8D8EA",
   },
   {
     key: ExpenseCategory.OTHER,
-    label: "Khác",
     icon: "ellipsis-horizontal",
     color: "#C7CEEA",
   },
 ];
 
+// Function to get categories with translated labels
+export const getExpenseCategories = (
+  t: (key: string) => string
+): CategoryConfig[] => {
+  return EXPENSE_CATEGORIES_BASE.map((category) => ({
+    ...category,
+    label: t(`categories.${category.key.toLowerCase()}`),
+  }));
+};
+
 export const getCategoryConfig = (
-  category: ExpenseCategory
+  category: ExpenseCategory,
+  t: (key: string) => string
 ): CategoryConfig => {
+  const categories = getExpenseCategories(t);
   return (
-    EXPENSE_CATEGORIES.find((c) => c.key === category) ||
-    EXPENSE_CATEGORIES[EXPENSE_CATEGORIES.length - 1]
+    categories.find((c) => c.key === category) ||
+    categories[categories.length - 1]
   );
 };

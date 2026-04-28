@@ -1,23 +1,31 @@
-import React, { useMemo, useRef } from "react";
+import { getExpenseCategories } from "@/src/constants/ExpenseCategories";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Platform,
-  KeyboardAvoidingView,
-  Alert,
-} from "react-native";
+  CURRENCIES,
+  CurrencyConfig,
+  useCurrency,
+} from "@/src/hooks/useCurrency";
+import useTranslation from "@/src/hooks/useTranslation";
+import { FamilyMember } from "@/src/redux";
+import { BudgetStatus, ExpenseCategory } from "@/src/types";
+import { formatDateObject } from "@/src/utils/formatUtils";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { ExpenseCategory, BudgetStatus } from "@/src/types";
-import { EXPENSE_CATEGORIES } from "@/src/constants/ExpenseCategories";
-import { FamilyMember } from "@/src/redux";
+import React, { useMemo, useRef, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BudgetWarningBanner from "./BudgetWarningBanner";
-import { formatDateObject } from "@/src/utils/formatUtils";
 
 interface FormErrors {
   amount?: string;
@@ -76,6 +84,10 @@ export default function ExpenseForm({
 }: ExpenseFormProps) {
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
+  const { t } = useTranslation();
+  const { currency, setCurrency, formatAmount } = useCurrency();
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false);
+  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
 
   const handleDateChange = (_: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
@@ -161,30 +173,30 @@ export default function ExpenseForm({
         predictiveBudgetStatus.weekly?.isExceeded &&
         !weeklyBudgetStatus?.isExceeded
       ) {
-        exceededPeriods.push("tuần");
+        exceededPeriods.push(t("budget.exceedWarningWeek"));
       }
       if (
         predictiveBudgetStatus.monthly?.isExceeded &&
         !monthlyBudgetStatus?.isExceeded
       ) {
-        exceededPeriods.push("tháng");
+        exceededPeriods.push(t("budget.exceedWarningMonth"));
       }
 
       Alert.alert(
-        "Vượt hạn mức",
-        `Chi phí này sẽ vượt hạn mức ${exceededPeriods.join(
-          " và "
-        )} của bạn. Bạn có muốn tiếp tục?`,
+        t("budget.exceedWarningTitle"),
+        t("budget.exceedWarningMessage", {
+          periods: exceededPeriods.join(` ${t("common.and") || "&"} `),
+        }),
         [
           {
-            text: "Hủy",
+            text: t("common.cancel"),
             style: "cancel",
           },
           {
-            text: "Tiếp tục",
+            text: t("budget.continue"),
             onPress: onSave,
           },
-        ]
+        ],
       );
     } else {
       onSave();
@@ -216,21 +228,35 @@ export default function ExpenseForm({
 
         {/* Amount Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Số tiền *</Text>
-          <TextInput
-            style={[styles.input, errors.amount && styles.inputError]}
-            placeholder="0"
-            keyboardType="numeric"
-            value={amount}
-            onChangeText={(text) => {
-              setAmount(text);
-              if (errors.amount) clearError("amount");
-            }}
-          />
+          <Text style={styles.label}>{t("expenses.amount")} *</Text>
+          <View style={styles.amountRow}>
+            <TextInput
+              style={[
+                styles.input,
+                styles.amountInput,
+                errors.amount && styles.inputError,
+              ]}
+              placeholder="0"
+              keyboardType="numeric"
+              value={amount}
+              onChangeText={(text) => {
+                setAmount(text);
+                if (errors.amount) clearError("amount");
+              }}
+            />
+            <TouchableOpacity
+              style={styles.currencyButton}
+              onPress={() => setShowCurrencyModal(true)}
+            >
+              <Text style={styles.currencySymbol}>{currency.symbol}</Text>
+              <Text style={styles.currencyCode}>{currency.code}</Text>
+              <Ionicons name="chevron-down" size={16} color="#666" />
+            </TouchableOpacity>
+          </View>
           {amount && !errors.amount && parseFloat(amount) > 0 && (
             <View style={styles.formattedAmountContainer}>
               <Text style={styles.formattedAmountText}>
-                {parseFloat(amount).toLocaleString("vi-VN")} ₫
+                {formatAmount(parseFloat(amount))}
               </Text>
             </View>
           )}
@@ -241,7 +267,7 @@ export default function ExpenseForm({
 
         {/* Category Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Danh mục *</Text>
+          <Text style={styles.label}>{t("expenses.category")} *</Text>
           <View style={styles.categoryGrid}>
             {EXPENSE_CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -281,7 +307,7 @@ export default function ExpenseForm({
 
         {/* Spender Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Người chi tiêu</Text>
+          <Text style={styles.label}>{t("expenses.spender")}</Text>
           <View style={styles.spenderGrid}>
             {familyMembers.map((member) => (
               <TouchableOpacity
@@ -315,7 +341,7 @@ export default function ExpenseForm({
 
         {/* Date Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Ngày</Text>
+          <Text style={styles.label}>{t("expenses.date")}</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
@@ -335,14 +361,14 @@ export default function ExpenseForm({
 
         {/* Note Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Ghi chú (tùy chọn)</Text>
+          <Text style={styles.label}>{t("expenses.noteOptional")}</Text>
           <TextInput
             style={[
               styles.input,
               styles.textArea,
               errors.note && styles.inputError,
             ]}
-            placeholder="Nhập ghi chú..."
+            placeholder={t("expenses.enterNote")}
             multiline
             numberOfLines={3}
             maxLength={200}
@@ -363,7 +389,9 @@ export default function ExpenseForm({
         {onDelete && (
           <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
             <Ionicons name="trash-outline" size={20} color="#fff" />
-            <Text style={styles.deleteButtonText}>Xóa chi phí</Text>
+            <Text style={styles.deleteButtonText}>
+              {t("expenses.deleteExpense")}
+            </Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -373,7 +401,7 @@ export default function ExpenseForm({
         style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 16) }]}
       >
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-          <Text style={styles.cancelButtonText}>Hủy</Text>
+          <Text style={styles.cancelButtonText}>{t("common.cancel")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.saveButton}
@@ -382,6 +410,71 @@ export default function ExpenseForm({
           <Text style={styles.saveButtonText}>{saveButtonText}</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Currency Selector Modal */}
+      <Modal
+        visible={showCurrencyModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowCurrencyModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setShowCurrencyModal(false)}
+              style={styles.modalCloseButton}
+            >
+              <Ionicons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {t("expenses.selectCurrency")}
+            </Text>
+            <View style={{ width: 40 }} />
+          </View>
+          <FlatList
+            data={CURRENCIES}
+            keyExtractor={(item) => item.code}
+            contentContainerStyle={styles.modalListContent}
+            renderItem={({ item }: { item: CurrencyConfig }) => {
+              const isSelected = currency.code === item.code;
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.currencyItem,
+                    isSelected && styles.currencyItemSelected,
+                  ]}
+                  onPress={() => {
+                    setCurrency(item);
+                    setShowCurrencyModal(false);
+                  }}
+                >
+                  <View style={styles.currencyItemLeft}>
+                    <Text style={styles.currencyItemSymbol}>{item.symbol}</Text>
+                    <View>
+                      <Text
+                        style={[
+                          styles.currencyItemCode,
+                          isSelected && styles.currencyItemTextSelected,
+                        ]}
+                      >
+                        {item.code}
+                      </Text>
+                      <Text style={styles.currencyItemName}>{item.name}</Text>
+                    </View>
+                  </View>
+                  {isSelected && (
+                    <Ionicons
+                      name="checkmark-circle"
+                      size={24}
+                      color="#667eea"
+                    />
+                  )}
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -566,5 +659,100 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#fff",
+  },
+  amountRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  amountInput: {
+    flex: 1,
+  },
+  currencyButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    gap: 4,
+  },
+  currencySymbol: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#667eea",
+  },
+  currencyCode: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#333",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#f5f6fa",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
+  },
+  modalCloseButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+  modalListContent: {
+    padding: 16,
+  },
+  currencyItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  currencyItemSelected: {
+    backgroundColor: "#F8F9FF",
+    borderWidth: 2,
+    borderColor: "#667eea",
+  },
+  currencyItemLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  currencyItemSymbol: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#667eea",
+    width: 36,
+    textAlign: "center",
+  },
+  currencyItemCode: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#333",
+  },
+  currencyItemTextSelected: {
+    color: "#667eea",
+  },
+  currencyItemName: {
+    fontSize: 13,
+    color: "#666",
   },
 });

@@ -1,31 +1,33 @@
+import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { useTranslation } from "@/src/hooks/useTranslation";
+import { deleteNote } from "@/src/redux/reducers/noteSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import { formatCurrency, formatDate } from "@/src/utils/expenseUtils";
+import { Ionicons } from "@expo/vector-icons";
+import { format, parseISO } from "date-fns";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { deleteNote } from "@/src/redux/reducers/noteSlice";
-import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
-import { formatDate, formatCurrency } from "@/src/utils/expenseUtils";
-import { format, parseISO } from "date-fns";
 
 export default function NoteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const note = useAppSelector((state) =>
-    state.notes.notes.find((n) => n.id === id)
+    state.notes.notes.find((n) => n.id === id),
   );
+  const { t } = useTranslation();
 
   // If note not found, go back
   useEffect(() => {
     if (!note && id) {
-      Alert.alert("Lỗi", "Không tìm thấy ghi chú");
+      Alert.alert(t("common.error"), t("notes.noteNotFound"));
       router.back();
     }
   }, [note, id]);
@@ -37,22 +39,22 @@ export default function NoteDetailScreen() {
   };
 
   const handleDelete = () => {
-    Alert.alert("Xác nhận xóa", "Bạn có chắc chắn muốn xóa ghi chú này?", [
+    Alert.alert(t("common.confirmDelete"), t("notes.deleteConfirm"), [
       {
-        text: "Hủy",
+        text: t("common.cancel"),
         style: "cancel",
       },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
           if (!note) return;
           try {
             await dispatch(deleteNote(note.id)).unwrap();
-            Alert.alert("Thành công", "Đã xóa ghi chú");
+            Alert.alert(t("common.success"), t("notes.deleteNoteSuccess"));
             router.back();
           } catch {
-            Alert.alert("Lỗi", "Không thể xóa ghi chú. Vui lòng thử lại.");
+            Alert.alert(t("common.error"), t("notes.deleteNoteFailed"));
           }
         },
       },
@@ -64,7 +66,7 @@ export default function NoteDetailScreen() {
   }
 
   const categoryConfig = NOTE_CATEGORIES.find(
-    (cat) => cat.key === note.category
+    (cat) => cat.key === note.category,
   );
 
   const formatTimestamp = (timestamp: string) => {

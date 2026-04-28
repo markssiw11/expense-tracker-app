@@ -16,6 +16,9 @@ import { loadExpenses } from "@/src/redux/reducers/expenseSlice";
 import { store, useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { rescheduleAllNotifications } from "@/src/services/notificationService";
 
+// Initialize i18n
+import "@/src/i18n";
+
 export const unstable_settings = {
   anchor: "(tabs)",
 };

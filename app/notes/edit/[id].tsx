@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from "react";
+import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { deleteNote, updateNote } from "@/src/redux/reducers/noteSlice";
+import { useAppDispatch, useAppSelector } from "@/src/redux/store";
+import { Note, NoteCategory } from "@/src/types/note.types";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Platform,
-  Switch,
-} from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+  formatTagsToString,
+  parseTagsString,
+  validateNoteData,
+} from "@/src/utils/noteUtils";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { updateNote, deleteNote } from "@/src/redux/reducers/noteSlice";
-import { NoteCategory, Note } from "@/src/types/note.types";
-import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
-  validateNoteData,
-  parseTagsString,
-  formatTagsToString,
-} from "@/src/utils/noteUtils";
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function EditNoteScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const note = useAppSelector((state) =>
-    state.notes.notes.find((n) => n.id === id)
+    state.notes.notes.find((n) => n.id === id),
   );
 
   const [title, setTitle] = useState("");
@@ -45,6 +45,7 @@ export default function EditNoteScreen() {
     amount?: string;
     tags?: string;
   }>({});
+  const { t } = useTranslation();
 
   // Pre-fill form with existing note data
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function EditNoteScreen() {
   // If note not found, go back
   useEffect(() => {
     if (!note && id) {
-      Alert.alert("Lỗi", "Không tìm thấy ghi chú");
+      Alert.alert(t("common.error"), t("notes.noteNotFound"));
       router.back();
     }
   }, [note, id]);
@@ -115,30 +116,30 @@ export default function EditNoteScreen() {
 
     try {
       await dispatch(updateNote({ id: note.id, data: updatedData })).unwrap();
-      Alert.alert("Thành công", "Đã cập nhật ghi chú");
+      Alert.alert(t("common.success"), t("notes.updateNoteSuccess"));
       router.back();
     } catch {
-      Alert.alert("Lỗi", "Không thể cập nhật ghi chú. Vui lòng thử lại.");
+      Alert.alert(t("common.error"), t("notes.updateNoteFailed"));
     }
   };
 
   const handleDelete = () => {
-    Alert.alert("Xác nhận xóa", "Bạn có chắc chắn muốn xóa ghi chú này?", [
+    Alert.alert(t("common.confirmDelete"), t("notes.deleteConfirm"), [
       {
-        text: "Hủy",
+        text: t("common.cancel"),
         style: "cancel",
       },
       {
-        text: "Xóa",
+        text: t("common.delete"),
         style: "destructive",
         onPress: async () => {
           if (!note) return;
           try {
             await dispatch(deleteNote(note.id)).unwrap();
-            Alert.alert("Thành công", "Đã xóa ghi chú");
+            Alert.alert(t("common.success"), t("notes.deleteNoteSuccess"));
             router.back();
           } catch {
-            Alert.alert("Lỗi", "Không thể xóa ghi chú. Vui lòng thử lại.");
+            Alert.alert(t("common.error"), t("notes.deleteNoteFailed"));
           }
         },
       },

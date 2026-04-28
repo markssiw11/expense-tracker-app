@@ -1,55 +1,66 @@
 import { NoteCategory, NoteCategoryConfig } from "../types";
 
-export const NOTE_CATEGORIES: NoteCategoryConfig[] = [
+export const NOTE_CATEGORIES_BASE: Omit<NoteCategoryConfig, "label">[] = [
   {
     key: NoteCategory.GOLD_PRICE,
-    label: "Giá vàng",
     icon: "logo-bitcoin",
     color: "#FFD700",
   },
   {
     key: NoteCategory.INVESTMENT,
-    label: "Đầu tư",
     icon: "trending-up",
     color: "#4CAF50",
   },
   {
     key: NoteCategory.IMPORTANT_INFO,
-    label: "Thông tin quan trọng",
     icon: "alert-circle",
     color: "#FF5722",
   },
   {
     key: NoteCategory.SHOPPING,
-    label: "Mua sắm",
     icon: "cart",
     color: "#E91E63",
   },
   {
     key: NoteCategory.PERSONAL,
-    label: "Cá nhân",
     icon: "person",
     color: "#9C27B0",
   },
   {
     key: NoteCategory.WORK,
-    label: "Công việc",
     icon: "briefcase",
     color: "#2196F3",
   },
   {
     key: NoteCategory.OTHER,
-    label: "Khác",
     icon: "ellipsis-horizontal",
     color: "#607D8B",
   },
 ];
 
+// Function to get categories with translated labels
+export const getNoteCategories = (
+  t: (key: string) => string
+): NoteCategoryConfig[] => {
+  return NOTE_CATEGORIES_BASE.map((category) => ({
+    ...category,
+    label: t(`noteCategories.${category.key.toLowerCase()}`),
+  }));
+};
+
 export const getNoteCategoryConfig = (
-  category: NoteCategory
+  category: NoteCategory,
+  t: (key: string) => string
 ): NoteCategoryConfig => {
+  const categories = getNoteCategories(t);
   return (
-    NOTE_CATEGORIES.find((c) => c.key === category) ||
-    NOTE_CATEGORIES[NOTE_CATEGORIES.length - 1]
+    categories.find((c) => c.key === category) ||
+    categories[categories.length - 1]
   );
 };
+
+// Legacy export for backward compatibility
+export const NOTE_CATEGORIES = NOTE_CATEGORIES_BASE.map((category) => ({
+  ...category,
+  label: category.key, // Fallback to key if no translation
+}));

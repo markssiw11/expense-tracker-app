@@ -1,15 +1,40 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { useTranslation } from "@/src/hooks/useTranslation";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  FlatList,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+interface Language {
+  code: string;
+  name: string;
+  nativeName: string;
+  flag: string;
+}
+
+const LANGUAGES: Language[] = [
+  {
+    code: "en",
+    name: "English",
+    nativeName: "English",
+    flag: "🇺🇸",
+  },
+  {
+    code: "vi",
+    name: "Vietnamese",
+    nativeName: "Tiếng Việt",
+    flag: "🇻🇳",
+  },
+];
 
 interface SettingItem {
   id: string;
@@ -20,38 +45,83 @@ interface SettingItem {
   route: string;
 }
 
-const SETTINGS_ITEMS: SettingItem[] = [
-  {
-    id: "authentication",
-    title: "Bảo mật",
-    subtitle: "Mật khẩu và xác thực sinh trắc học",
-    icon: "shield-checkmark",
-    iconColor: "#667eea",
-    route: "/settings/authentication",
-  },
-  {
-    id: "family-members",
-    title: "Thành viên gia đình",
-    subtitle: "Quản lý người chi tiêu",
-    icon: "people",
-    iconColor: "#FF6B9D",
-    route: "/settings/family-members",
-  },
-  {
-    id: "spending-limits",
-    title: "Giới hạn chi tiêu",
-    subtitle: "Thiết lập ngân sách hàng tuần và hàng tháng",
-    icon: "wallet",
-    iconColor: "#10b981",
-    route: "/settings/spending-limits",
-  },
-];
-
 export default function SettingsTab() {
   const insets = useSafeAreaInsets();
+  const { t, changeLanguage, getCurrentLanguage } = useTranslation();
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const currentLanguage = getCurrentLanguage();
+
+  const currentLanguageInfo =
+    LANGUAGES.find((lang) => lang.code === currentLanguage) || LANGUAGES[0];
+
+  const SETTINGS_ITEMS: SettingItem[] = [
+    {
+      id: "authentication",
+      title: t("settings.security"),
+      subtitle: t("settings.securityDesc"),
+      icon: "shield-checkmark",
+      iconColor: "#667eea",
+      route: "/settings/authentication",
+    },
+    {
+      id: "family-members",
+      title: t("settings.familyMembers"),
+      subtitle: t("settings.familyMembersDesc"),
+      icon: "people",
+      iconColor: "#FF6B9D",
+      route: "/settings/family-members",
+    },
+    {
+      id: "spending-limits",
+      title: t("settings.spendingLimits"),
+      subtitle: t("settings.spendingLimitsDesc"),
+      icon: "wallet",
+      iconColor: "#10b981",
+      route: "/settings/spending-limits",
+    },
+  ];
 
   const handleNavigate = (route: string) => {
     router.push(route as any);
+  };
+
+  const handleLanguageSelect = async (languageCode: string) => {
+    await changeLanguage(languageCode);
+    setShowLanguageModal(false);
+  };
+
+  const renderLanguageItem = ({ item }: { item: Language }) => {
+    const isSelected = currentLanguage === item.code;
+
+    return (
+      <TouchableOpacity
+        style={[styles.languageItem, isSelected && styles.selectedLanguageItem]}
+        onPress={() => handleLanguageSelect(item.code)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.languageLeft}>
+          <Text style={styles.flag}>{item.flag}</Text>
+          <View style={styles.languageInfo}>
+            <Text
+              style={[styles.languageName, isSelected && styles.selectedText]}
+            >
+              {item.nativeName}
+            </Text>
+            <Text
+              style={[
+                styles.languageSubname,
+                isSelected && styles.selectedSubtext,
+              ]}
+            >
+              {item.name}
+            </Text>
+          </View>
+        </View>
+        {isSelected && (
+          <Ionicons name="checkmark-circle" size={24} color="#667eea" />
+        )}
+      </TouchableOpacity>
+    );
   };
 
   const renderSettingItem = (item: SettingItem) => (
@@ -84,8 +154,8 @@ export default function SettingsTab() {
         style={[styles.header, { paddingTop: insets.top + 20 }]}
       >
         <View>
-          <Text style={styles.headerTitle}>Cài đặt ⚙️</Text>
-          <Text style={styles.headerSubtitle}>Quản lý tùy chọn ứng dụng</Text>
+          <Text style={styles.headerTitle}>{t("settings.title")} ⚙️</Text>
+          <Text style={styles.headerSubtitle}>{t("settings.subtitle")}</Text>
         </View>
       </LinearGradient>
 
@@ -93,11 +163,68 @@ export default function SettingsTab() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Language Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cài đặt chung</Text>
+          <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
+          <TouchableOpacity
+            style={styles.languageCard}
+            onPress={() => setShowLanguageModal(true)}
+          >
+            <View style={styles.settingLeft}>
+              <View
+                style={[styles.iconContainer, { backgroundColor: "#FF9500" }]}
+              >
+                <Ionicons name="language" size={24} color="#fff" />
+              </View>
+              <View style={styles.settingInfo}>
+                <Text style={styles.settingTitle}>
+                  {t("settings.changeLanguage")}
+                </Text>
+                <Text style={styles.settingSubtitle}>
+                  {currentLanguageInfo.flag} {currentLanguageInfo.nativeName}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={24} color="#999" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("settings.general")}</Text>
           {SETTINGS_ITEMS.map(renderSettingItem)}
         </View>
       </ScrollView>
+
+      {/* Language Selection Modal */}
+      <Modal
+        visible={showLanguageModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowLanguageModal(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setShowLanguageModal(false)}
+              style={styles.closeButton}
+            >
+              <Ionicons name="close" size={24} color="#333" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {t("language.selectLanguage")}
+            </Text>
+            <View style={styles.placeholder} />
+          </View>
+
+          <FlatList
+            data={LANGUAGES}
+            renderItem={renderLanguageItem}
+            keyExtractor={(item) => item.code}
+            contentContainerStyle={styles.modalListContent}
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -181,5 +308,100 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     lineHeight: 18,
+  },
+  languageCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "#f5f6fa",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#333",
+  },
+  placeholder: {
+    width: 40,
+  },
+  modalListContent: {
+    padding: 16,
+  },
+  languageItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  selectedLanguageItem: {
+    backgroundColor: "#F8F9FF",
+    borderWidth: 2,
+    borderColor: "#667eea",
+  },
+  languageLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  flag: {
+    fontSize: 32,
+    marginRight: 16,
+  },
+  languageInfo: {
+    flex: 1,
+  },
+  languageName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#333",
+    marginBottom: 2,
+  },
+  selectedText: {
+    color: "#667eea",
+  },
+  languageSubname: {
+    fontSize: 14,
+    color: "#666",
+  },
+  selectedSubtext: {
+    color: "#667eea",
+    opacity: 0.8,
   },
 });

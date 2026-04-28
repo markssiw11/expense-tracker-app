@@ -1,16 +1,17 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { GoBackButton, LanguageSelector } from "@/src/components";
+import { useTranslation } from "@/src/hooks/useTranslation";
+import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { GoBackButton } from "@/src/components";
 
 interface SettingItem {
   id: string;
@@ -18,48 +19,71 @@ interface SettingItem {
   subtitle: string;
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
-  route: string;
+  route?: string;
+  action?: () => void;
 }
-
-const SETTINGS_ITEMS: SettingItem[] = [
-  {
-    id: "authentication",
-    title: "Bảo mật",
-    subtitle: "Mật khẩu và xác thực sinh trắc học",
-    icon: "shield-checkmark",
-    iconColor: "#667eea",
-    route: "/settings/authentication",
-  },
-  {
-    id: "family-members",
-    title: "Thành viên gia đình",
-    subtitle: "Quản lý người chi tiêu",
-    icon: "people",
-    iconColor: "#FF6B9D",
-    route: "/settings/family-members",
-  },
-  {
-    id: "spending-limits",
-    title: "Giới hạn chi tiêu",
-    subtitle: "Thiết lập ngân sách hàng tuần và hàng tháng",
-    icon: "wallet",
-    iconColor: "#10b981",
-    route: "/settings/spending-limits",
-  },
-];
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
+  const { t, getCurrentLanguage } = useTranslation();
+  const [showLanguageSelector, setShowLanguageSelector] = useState(false);
+
+  const currentLanguage = getCurrentLanguage();
+  const languageDisplayName =
+    currentLanguage === "vi" ? "Tiếng Việt" : "English";
+
+  const SETTINGS_ITEMS: SettingItem[] = [
+    {
+      id: "language",
+      title: t("settings.language"),
+      subtitle: languageDisplayName,
+      icon: "language",
+      iconColor: "#FF9500",
+      action: () => setShowLanguageSelector(true),
+    },
+    {
+      id: "authentication",
+      title: t("settings.security"),
+      subtitle: t("authentication.securitySettings"),
+      icon: "shield-checkmark",
+      iconColor: "#667eea",
+      route: "/settings/authentication",
+    },
+    {
+      id: "family-members",
+      title: t("settings.familyMembers"),
+      subtitle: t("familyMembers.manageSpenders"),
+      icon: "people",
+      iconColor: "#FF6B9D",
+      route: "/settings/family-members",
+    },
+    {
+      id: "spending-limits",
+      title: t("settings.spendingLimits"),
+      subtitle: t("budget.budgetSettings"),
+      icon: "wallet",
+      iconColor: "#10b981",
+      route: "/settings/spending-limits",
+    },
+  ];
 
   const handleNavigate = (route: string) => {
     router.push(route as any);
+  };
+
+  const handleItemPress = (item: SettingItem) => {
+    if (item.action) {
+      item.action();
+    } else if (item.route) {
+      handleNavigate(item.route);
+    }
   };
 
   const renderSettingItem = (item: SettingItem) => (
     <TouchableOpacity
       key={item.id}
       style={styles.settingCard}
-      onPress={() => handleNavigate(item.route)}
+      onPress={() => handleItemPress(item)}
     >
       <View style={styles.settingLeft}>
         <View
@@ -86,8 +110,8 @@ export default function SettingsScreen() {
       >
         <GoBackButton />
         <View>
-          <Text style={styles.headerTitle}>Cài đặt ⚙️</Text>
-          <Text style={styles.headerSubtitle}>Quản lý tùy chọn ứng dụng</Text>
+          <Text style={styles.headerTitle}>{t("settings.title")} ⚙️</Text>
+          <Text style={styles.headerSubtitle}>{t("settings.appSettings")}</Text>
         </View>
       </LinearGradient>
 
@@ -96,10 +120,17 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Cài đặt chung</Text>
+          <Text style={styles.sectionTitle}>
+            {t("settings.generalSettings")}
+          </Text>
           {SETTINGS_ITEMS.map(renderSettingItem)}
         </View>
       </ScrollView>
+
+      <LanguageSelector
+        visible={showLanguageSelector}
+        onClose={() => setShowLanguageSelector(false)}
+      />
     </View>
   );
 }
