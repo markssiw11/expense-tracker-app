@@ -14,6 +14,10 @@ import AuthenticationProvider from "@/src/components/AuthenticationProvider";
 import { useCurrency } from "@/src/hooks/useCurrency";
 import { loadEvents, updateEvent } from "@/src/redux/reducers/eventSlice";
 import { loadExpenses } from "@/src/redux/reducers/expenseSlice";
+import {
+  loadRecurringExpenses,
+  processRecurringExpenses,
+} from "@/src/redux/reducers/recurringExpenseSlice";
 import { store, useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { rescheduleAllNotifications } from "@/src/services/notificationService";
 
@@ -48,6 +52,15 @@ function AppInitializer({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error("Failed to load expenses:", error);
         // Continue app initialization even if loading fails
+      }
+
+      try {
+        // Load recurring rules, then generate any expenses that are now due.
+        await dispatch(loadRecurringExpenses()).unwrap();
+        await dispatch(processRecurringExpenses()).unwrap();
+      } catch (error) {
+        console.error("Failed to process recurring expenses:", error);
+        // Continue app initialization even if this fails
       }
     };
 
@@ -169,6 +182,10 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="settings/spending-limits"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="settings/recurring-expenses"
                 options={{ headerShown: false }}
               />
               <Stack.Screen

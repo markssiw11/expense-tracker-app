@@ -1,10 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { useDispatch, useSelector, TypedUseSelectorHook } from "react-redux";
-import expenseReducer from "./reducers/expenseSlice";
-import noteReducer from "./reducers/noteSlice";
-import familyReducer from "./reducers/familySlice";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import authReducer from "./reducers/authSlice";
 import eventReducer from "./reducers/eventSlice";
+import expenseReducer from "./reducers/expenseSlice";
+import familyReducer from "./reducers/familySlice";
+import noteReducer from "./reducers/noteSlice";
+import recurringExpenseReducer from "./reducers/recurringExpenseSlice";
 import spendingLimitReducer from "./reducers/spendingLimitSlice";
 
 export const store = configureStore({
@@ -15,6 +16,7 @@ export const store = configureStore({
     auth: authReducer,
     events: eventReducer,
     spendingLimit: spendingLimitReducer,
+    recurringExpenses: recurringExpenseReducer,
   },
 });
 

@@ -82,6 +82,23 @@
     "categoryRequired": "カテゴリーを選択してください",
     "noteTooLong": "メモは200文字を超えることはできません"
   },
+  "recurring": {
+    "title": "定期支出",
+    "settingsSubtitle": "請求や定期的な支出を自動化",
+    "headerTitle": "定期支出 🔁",
+    "headerSubtitle": "定期的な支出を自動で追加します",
+    "addRule": "定期支出を追加",
+    "editRule": "定期支出を編集",
+    "deleteConfirm": "この定期支出を削除してもよろしいですか？すでに作成された支出は保持されます。",
+    "frequency": "頻度",
+    "weekly": "毎週",
+    "monthly": "毎月",
+    "startDate": "開始日",
+    "next": "次回",
+    "paused": "一時停止中",
+    "noRules": "定期支出はまだありません",
+    "addFirst": "＋を押して最初の定期支出を追加しましょう"
+  },
   "categories": {
     "food": "飲食",
     "transportation": "交通",
@@ -145,7 +162,9 @@
     "reminderBeforeMinutes": "{{count}}分前",
     "reminderBeforeHour": "1時間前",
     "reminderBeforeHours": "{{count}}時間前",
-    "reminderBeforeDay": "1日前"
+    "reminderBeforeDay": "1日前",
+    "notificationTime": "時間: {{time}}",
+    "notificationLocation": "場所: {{location}}"
   },
   "eventCategories": {
     "Work": "仕事",
@@ -172,7 +191,16 @@
     "updateNoteSuccess": "メモを更新しました",
     "updateNoteFailed": "メモを更新できませんでした。もう一度お試しください。",
     "deleteNoteSuccess": "メモを削除しました",
-    "deleteNoteFailed": "メモを削除できませんでした。もう一度お試しください。"
+    "deleteNoteFailed": "メモを削除できませんでした。もう一度お試しください。",
+    "validation": {
+      "titleRequired": "タイトルを入力してください",
+      "titleTooLong": "タイトルは100文字を超えることはできません",
+      "contentRequired": "内容を入力してください",
+      "contentTooLong": "内容は2000文字を超えることはできません",
+      "categoryRequired": "カテゴリーを選択してください",
+      "amountPositive": "金額は0より大きい必要があります",
+      "tooManyTags": "タグは10個を超えることはできません"
+    }
   },
   "settings": {
     "title": "設定",

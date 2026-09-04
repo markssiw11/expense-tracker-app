@@ -82,6 +82,23 @@
     "categoryRequired": "Vui lòng chọn danh mục",
     "noteTooLong": "Ghi chú không được vượt quá 200 ký tự"
   },
+  "recurring": {
+    "title": "Chi phí định kỳ",
+    "settingsSubtitle": "Tự động hóa hóa đơn và chi tiêu thường xuyên",
+    "headerTitle": "Chi phí định kỳ 🔁",
+    "headerSubtitle": "Tự động thêm các khoản chi thường xuyên",
+    "addRule": "Thêm chi phí định kỳ",
+    "editRule": "Sửa chi phí định kỳ",
+    "deleteConfirm": "Bạn có chắc muốn xóa chi phí định kỳ này? Các khoản đã tạo sẽ được giữ lại.",
+    "frequency": "Tần suất",
+    "weekly": "Hàng tuần",
+    "monthly": "Hàng tháng",
+    "startDate": "Ngày bắt đầu",
+    "next": "Kỳ tới",
+    "paused": "Đã tạm dừng",
+    "noRules": "Chưa có chi phí định kỳ nào",
+    "addFirst": "Nhấn + để thêm chi phí định kỳ đầu tiên"
+  },
   "categories": {
     "food": "Ăn uống",
     "transportation": "Đi lại",
@@ -145,7 +162,9 @@
     "reminderBeforeMinutes": "Nhắc trước {{count}} phút",
     "reminderBeforeHour": "Nhắc trước 1 giờ",
     "reminderBeforeHours": "Nhắc trước {{count}} giờ",
-    "reminderBeforeDay": "Nhắc trước 1 ngày"
+    "reminderBeforeDay": "Nhắc trước 1 ngày",
+    "notificationTime": "Thời gian: {{time}}",
+    "notificationLocation": "Địa điểm: {{location}}"
   },
   "eventCategories": {
     "Work": "Công việc",
@@ -172,7 +191,16 @@
     "updateNoteSuccess": "Đã cập nhật ghi chú",
     "updateNoteFailed": "Không thể cập nhật ghi chú. Vui lòng thử lại.",
     "deleteNoteSuccess": "Đã xóa ghi chú",
-    "deleteNoteFailed": "Không thể xóa ghi chú. Vui lòng thử lại."
+    "deleteNoteFailed": "Không thể xóa ghi chú. Vui lòng thử lại.",
+    "validation": {
+      "titleRequired": "Tiêu đề không được để trống",
+      "titleTooLong": "Tiêu đề không được vượt quá 100 ký tự",
+      "contentRequired": "Nội dung không được để trống",
+      "contentTooLong": "Nội dung không được vượt quá 2000 ký tự",
+      "categoryRequired": "Vui lòng chọn danh mục",
+      "amountPositive": "Số tiền phải lớn hơn 0",
+      "tooManyTags": "Không được vượt quá 10 thẻ"
+    }
   },
   "settings": {
     "title": "Cài đặt",

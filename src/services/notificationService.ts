@@ -1,5 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import i18n from "../i18n";
 import { Event } from "../types/event.types";
 
 /**
@@ -113,7 +114,7 @@ const calculateTriggerDate = (event: Event): Date | null => {
 
     // Calculate trigger time by subtracting reminder minutes
     const triggerDate = new Date(
-      eventDate.getTime() - event.reminderMinutes * 60 * 1000
+      eventDate.getTime() - event.reminderMinutes * 60 * 1000,
     );
 
     // Check if trigger date is in the past (with 1 minute buffer to avoid edge cases)
@@ -122,7 +123,7 @@ const calculateTriggerDate = (event: Event): Date | null => {
 
     if (triggerDate.getTime() <= now + bufferMs) {
       console.warn(
-        "Trigger date is in the past or too soon, notification will not be scheduled"
+        "Trigger date is in the past or too soon, notification will not be scheduled",
       );
       return null;
     }
@@ -140,10 +141,12 @@ const calculateTriggerDate = (event: Event): Date | null => {
  * @returns Formatted notification body string
  */
 const formatNotificationBody = (event: Event): string => {
-  const body = `Thời gian: ${event.time}`;
+  const body = i18n.t("events.notificationTime", { time: event.time });
 
   if (event.location) {
-    return `${body}\nĐịa điểm: ${event.location}`;
+    return `${body}\n${i18n.t("events.notificationLocation", {
+      location: event.location,
+    })}`;
   }
 
   return body;
@@ -205,7 +208,7 @@ export const scheduleEventReminder = async (event: Event): Promise<string> => {
  * @param notificationId - The ID of the notification to cancel
  */
 export const cancelNotification = async (
-  notificationId: string
+  notificationId: string,
 ): Promise<void> => {
   try {
     if (!notificationId) {
@@ -229,7 +232,7 @@ export const cancelNotification = async (
  */
 export const updateEventReminder = async (
   event: Event,
-  oldNotificationId?: string
+  oldNotificationId?: string,
 ): Promise<string> => {
   try {
     // Cancel old notification if it exists
@@ -282,7 +285,7 @@ export const getAllScheduledNotifications = async (): Promise<
  * @returns Promise<Map<string, string>> - Map of event IDs to new notification IDs
  */
 export const rescheduleAllNotifications = async (
-  events: Event[]
+  events: Event[],
 ): Promise<Map<string, string>> => {
   const notificationMap = new Map<string, string>();
 
@@ -308,7 +311,7 @@ export const rescheduleAllNotifications = async (
         } catch (error) {
           console.error(
             `Failed to reschedule notification for event ${event.id}:`,
-            error
+            error,
           );
           // Continue with other events even if one fails
         }
@@ -318,7 +321,7 @@ export const rescheduleAllNotifications = async (
     console.log(
       `Rescheduled ${notificationMap.size} notifications out of ${
         events.filter((e) => e.reminderEnabled).length
-      } events with reminders`
+      } events with reminders`,
     );
     return notificationMap;
   } catch (error) {

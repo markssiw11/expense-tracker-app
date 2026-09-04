@@ -12,6 +12,7 @@ const STORAGE_KEYS = [
   "@events",
   "@notes",
   "@spending_limit_config",
+  "@recurring_expenses",
   "@auth_enabled",
   "@biometric_enabled",
   "user-language",

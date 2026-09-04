@@ -82,6 +82,23 @@
     "categoryRequired": "Please select a category",
     "noteTooLong": "Note cannot exceed 200 characters"
   },
+  "recurring": {
+    "title": "Recurring Expenses",
+    "settingsSubtitle": "Automate bills and regular spending",
+    "headerTitle": "Recurring Expenses 🔁",
+    "headerSubtitle": "Automatically add regular expenses",
+    "addRule": "Add Recurring Expense",
+    "editRule": "Edit Recurring Expense",
+    "deleteConfirm": "Are you sure you want to delete this recurring expense? Already generated expenses will be kept.",
+    "frequency": "Frequency",
+    "weekly": "Weekly",
+    "monthly": "Monthly",
+    "startDate": "Start Date",
+    "next": "Next",
+    "paused": "Paused",
+    "noRules": "No recurring expenses yet",
+    "addFirst": "Tap + to add your first recurring expense"
+  },
   "categories": {
     "food": "Food & Dining",
     "transportation": "Transportation",
@@ -145,7 +162,9 @@
     "reminderBeforeMinutes": "{{count}} minutes before",
     "reminderBeforeHour": "1 hour before",
     "reminderBeforeHours": "{{count}} hours before",
-    "reminderBeforeDay": "1 day before"
+    "reminderBeforeDay": "1 day before",
+    "notificationTime": "Time: {{time}}",
+    "notificationLocation": "Location: {{location}}"
   },
   "eventCategories": {
     "Work": "Work",
@@ -172,7 +191,16 @@
     "updateNoteSuccess": "Note updated",
     "updateNoteFailed": "Unable to update note. Please try again.",
     "deleteNoteSuccess": "Note deleted",
-    "deleteNoteFailed": "Unable to delete note. Please try again."
+    "deleteNoteFailed": "Unable to delete note. Please try again.",
+    "validation": {
+      "titleRequired": "Title cannot be empty",
+      "titleTooLong": "Title cannot exceed 100 characters",
+      "contentRequired": "Content cannot be empty",
+      "contentTooLong": "Content cannot exceed 2000 characters",
+      "categoryRequired": "Please select a category",
+      "amountPositive": "Amount must be greater than 0",
+      "tooManyTags": "Cannot have more than 10 tags"
+    }
   },
   "settings": {
     "title": "Settings",

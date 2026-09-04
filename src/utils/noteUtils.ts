@@ -1,4 +1,4 @@
-import { parseISO, compareDesc } from "date-fns";
+import { compareDesc, parseISO } from "date-fns";
 import { Note, NoteCategory } from "../types";
 
 export type NoteSortBy = "date" | "title" | "updatedAt";
@@ -34,7 +34,7 @@ export const filterNotesByQuery = (notes: Note[], query: string): Note[] => {
  */
 export const filterNotesByCategories = (
   notes: Note[],
-  categories: NoteCategory[]
+  categories: NoteCategory[],
 ): Note[] => {
   if (categories.length === 0) {
     return notes;
@@ -102,7 +102,7 @@ export const sortNotes = (notes: Note[], sortBy: NoteSortBy): Note[] => {
  * @returns Object with pinned and unpinned notes arrays
  */
 export const separatePinnedNotes = (
-  notes: Note[]
+  notes: Note[],
 ): { pinned: Note[]; unpinned: Note[] } => {
   const pinned = notes.filter((note) => note.isPinned);
   const unpinned = notes.filter((note) => !note.isPinned);
@@ -115,40 +115,76 @@ export const separatePinnedNotes = (
  * @param note - Partial note object to validate
  * @returns Object with isValid flag and error messages
  */
+export type NoteValidationField =
+  | "title"
+  | "content"
+  | "category"
+  | "amount"
+  | "tags";
+
+export interface NoteValidationError {
+  field: NoteValidationField;
+  // i18n key to translate at the UI layer.
+  messageKey: string;
+}
+
+/**
+ * Validate note data. Returns i18n message KEYS (not translated strings) so the
+ * UI can display them in the active language and map them to form fields
+ * without fragile string matching.
+ */
 export const validateNoteData = (
-  note: Partial<Note>
-): { isValid: boolean; errors: string[] } => {
-  const errors: string[] = [];
+  note: Partial<Note>,
+): { isValid: boolean; errors: NoteValidationError[] } => {
+  const errors: NoteValidationError[] = [];
 
   // Title validation
   if (!note.title || note.title.trim().length === 0) {
-    errors.push("Tiêu đề không được để trống");
+    errors.push({
+      field: "title",
+      messageKey: "notes.validation.titleRequired",
+    });
   } else if (note.title.length > 100) {
-    errors.push("Tiêu đề không được vượt quá 100 ký tự");
+    errors.push({
+      field: "title",
+      messageKey: "notes.validation.titleTooLong",
+    });
   }
 
   // Content validation
   if (!note.content || note.content.trim().length === 0) {
-    errors.push("Nội dung không được để trống");
+    errors.push({
+      field: "content",
+      messageKey: "notes.validation.contentRequired",
+    });
   } else if (note.content.length > 2000) {
-    errors.push("Nội dung không được vượt quá 2000 ký tự");
+    errors.push({
+      field: "content",
+      messageKey: "notes.validation.contentTooLong",
+    });
   }
 
   // Category validation
   if (!note.category) {
-    errors.push("Vui lòng chọn danh mục");
+    errors.push({
+      field: "category",
+      messageKey: "notes.validation.categoryRequired",
+    });
   }
 
   // Amount validation (if provided)
   if (note.amount !== undefined && note.amount !== null) {
     if (note.amount <= 0) {
-      errors.push("Số tiền phải lớn hơn 0");
+      errors.push({
+        field: "amount",
+        messageKey: "notes.validation.amountPositive",
+      });
     }
   }
 
   // Tags validation (if provided)
   if (note.tags && note.tags.length > 10) {
-    errors.push("Không được vượt quá 10 tags");
+    errors.push({ field: "tags", messageKey: "notes.validation.tooManyTags" });
   }
 
   return {

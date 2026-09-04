@@ -82,6 +82,23 @@
     "categoryRequired": "카테고리를 선택해 주세요",
     "noteTooLong": "메모는 200자를 초과할 수 없습니다"
   },
+  "recurring": {
+    "title": "정기 지출",
+    "settingsSubtitle": "청구서 및 정기 지출 자동화",
+    "headerTitle": "정기 지출 🔁",
+    "headerSubtitle": "정기적인 지출을 자동으로 추가합니다",
+    "addRule": "정기 지출 추가",
+    "editRule": "정기 지출 편집",
+    "deleteConfirm": "이 정기 지출을 삭제하시겠습니까? 이미 생성된 지출은 유지됩니다.",
+    "frequency": "빈도",
+    "weekly": "매주",
+    "monthly": "매월",
+    "startDate": "시작일",
+    "next": "다음",
+    "paused": "일시 중지됨",
+    "noRules": "아직 정기 지출이 없습니다",
+    "addFirst": "+를 눌러 첫 정기 지출을 추가하세요"
+  },
   "categories": {
     "food": "식비",
     "transportation": "교통",
@@ -145,7 +162,9 @@
     "reminderBeforeMinutes": "{{count}}분 전",
     "reminderBeforeHour": "1시간 전",
     "reminderBeforeHours": "{{count}}시간 전",
-    "reminderBeforeDay": "1일 전"
+    "reminderBeforeDay": "1일 전",
+    "notificationTime": "시간: {{time}}",
+    "notificationLocation": "장소: {{location}}"
   },
   "eventCategories": {
     "Work": "업무",
@@ -172,7 +191,16 @@
     "updateNoteSuccess": "메모가 업데이트되었습니다",
     "updateNoteFailed": "메모를 업데이트할 수 없습니다. 다시 시도해 주세요.",
     "deleteNoteSuccess": "메모가 삭제되었습니다",
-    "deleteNoteFailed": "메모를 삭제할 수 없습니다. 다시 시도해 주세요."
+    "deleteNoteFailed": "메모를 삭제할 수 없습니다. 다시 시도해 주세요.",
+    "validation": {
+      "titleRequired": "제목을 입력해 주세요",
+      "titleTooLong": "제목은 100자를 초과할 수 없습니다",
+      "contentRequired": "내용을 입력해 주세요",
+      "contentTooLong": "내용은 2000자를 초과할 수 없습니다",
+      "categoryRequired": "카테고리를 선택해 주세요",
+      "amountPositive": "금액은 0보다 커야 합니다",
+      "tooManyTags": "태그는 10개를 초과할 수 없습니다"
+    }
   },
   "settings": {
     "title": "설정",

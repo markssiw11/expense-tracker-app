@@ -59,6 +59,14 @@ export default function SettingsTab() {
       route: "/settings/spending-limits",
     },
     {
+      id: "recurring-expenses",
+      title: t("recurring.title"),
+      subtitle: t("recurring.settingsSubtitle"),
+      icon: "repeat",
+      iconColor: "#F59E0B",
+      route: "/settings/recurring-expenses",
+    },
+    {
       id: "backup",
       title: t("settings.backup"),
       subtitle: t("backup.headerSubtitle"),

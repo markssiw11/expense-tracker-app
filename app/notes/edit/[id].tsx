@@ -83,12 +83,8 @@ export default function EditNoteScreen() {
 
     if (!validation.isValid) {
       const newErrors: typeof errors = {};
-      validation.errors.forEach((error) => {
-        if (error.includes("Tiêu đề")) newErrors.title = error;
-        else if (error.includes("Nội dung")) newErrors.content = error;
-        else if (error.includes("danh mục")) newErrors.category = error;
-        else if (error.includes("Số tiền")) newErrors.amount = error;
-        else if (error.includes("tags")) newErrors.tags = error;
+      validation.errors.forEach(({ field, messageKey }) => {
+        newErrors[field] = t(messageKey);
       });
       setErrors(newErrors);
       return false;
