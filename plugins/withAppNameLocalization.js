@@ -1,16 +1,33 @@
-const {
-  withInfoPlist,
-  withStringsXml,
-  withXcodeProject,
-} = require("expo/config-plugins");
+const { withStringsXml, withXcodeProject } = require("expo/config-plugins");
 const fs = require("fs");
 const path = require("path");
 
-function withAppNameLocalization(config) {
-  const enName = "FamFinance";
-  const viName = "Sổ Tay Gia Đình";
+// Localized app display names per language.
+// "en" is the base/default name; the others override it when the device
+// language matches. Add a new entry here to support another language.
+const APP_NAMES = {
+  en: "FamFinance",
+  vi: "Sổ Tay Gia Đình",
+  ja: "家計簿",
+  ko: "가계부",
+};
 
-  // iOS: Add localized InfoPlist.strings
+// Non-base locales that need their own localization folder/variant.
+const EXTRA_LOCALES = Object.keys(APP_NAMES).filter((lng) => lng !== "en");
+
+function escapeXcode(value) {
+  return value.replace(/"/g, '\\"');
+}
+
+function escapeXml(value) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function withAppNameLocalization(config) {
+  // iOS: write a localized InfoPlist.strings for each language.
   config = withXcodeProject(config, (config) => {
     const project = config.modResults;
     const projectRoot = config.modRequest.projectRoot;
@@ -20,67 +37,86 @@ function withAppNameLocalization(config) {
       config.modRequest.projectName,
     );
 
-    // Create en.lproj
-    const enDir = path.join(iosPath, "en.lproj");
-    fs.mkdirSync(enDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(enDir, "InfoPlist.strings"),
-      `CFBundleDisplayName = "${enName}";\nCFBundleName = "${enName}";\n`,
+    const writeInfoPlistStrings = (locale, name) => {
+      const dir = path.join(iosPath, `${locale}.lproj`);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(
+        path.join(dir, "InfoPlist.strings"),
+        `CFBundleDisplayName = "${escapeXcode(name)}";\nCFBundleName = "${escapeXcode(
+          name,
+        )}";\n`,
+      );
+    };
+
+    // Base (English) + all extra locales.
+    writeInfoPlistStrings("en", APP_NAMES.en);
+    EXTRA_LOCALES.forEach((locale) =>
+      writeInfoPlistStrings(locale, APP_NAMES[locale]),
     );
 
-    // Create vi.lproj
-    const viDir = path.join(iosPath, "vi.lproj");
-    fs.mkdirSync(viDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(viDir, "InfoPlist.strings"),
-      `CFBundleDisplayName = "${viName}";\nCFBundleName = "${viName}";\n`,
-    );
+    EXTRA_LOCALES.forEach((locale) => project.addKnownRegion(locale));
 
-    // Add known region
-    const pbxProject = project.hash.project;
-    const projectUuid = Object.keys(pbxProject)[0];
-    if (pbxProject[projectUuid] && pbxProject[projectUuid].knownRegions) {
-      const regions = pbxProject[projectUuid].knownRegions;
-      if (!regions.includes("vi")) {
-        regions.splice(regions.length - 1, 0, "vi");
-      }
+    // The xcode lib's addResourceFile calls correctForResourcesPath, which
+    // throws if there is no PBXGroup named "Resources". Expo projects don't
+    // ship one, so create it first.
+    if (!project.pbxGroupByName("Resources")) {
+      project.addPbxGroup([], "Resources", "Resources");
     }
 
-    // Add variant group for InfoPlist.strings
-    project.addKnownRegion("vi");
-    const groupKey = project.addLocalizationVariantGroup("InfoPlist.strings");
-    project.addResourceFile(
-      "en.lproj/InfoPlist.strings",
-      { variantGroup: true },
-      groupKey,
-    );
-    project.addResourceFile(
-      "vi.lproj/InfoPlist.strings",
-      { variantGroup: true },
-      groupKey,
-    );
+    // Register the localized InfoPlist.strings files as a single variant
+    // group. If the group already exists (e.g. prebuild re-run without
+    // clean), skip to avoid the xcode lib throwing on a null resources path.
+    const alreadyLocalized = JSON.stringify(
+      project.hash.project.objects,
+    ).includes("InfoPlist.strings");
+
+    if (!alreadyLocalized) {
+      const groupKey = project.addLocalizationVariantGroup("InfoPlist.strings");
+      ["en", ...EXTRA_LOCALES].forEach((locale) => {
+        try {
+          project.addResourceFile(
+            `${locale}.lproj/InfoPlist.strings`,
+            { variantGroup: true },
+            groupKey,
+          );
+        } catch (e) {
+          console.warn(
+            `withAppNameLocalization: could not add ${locale}.lproj/InfoPlist.strings`,
+            e.message,
+          );
+        }
+      });
+    }
 
     return config;
   });
 
-  // Android: Add localized strings
+  // Android: set the default app_name (English) in the base strings.xml.
   config = withStringsXml(config, (config) => {
-    config.modResults = setStringItem(config.modResults, "app_name", enName);
+    config.modResults = setStringItem(
+      config.modResults,
+      "app_name",
+      APP_NAMES.en,
+    );
     return config;
   });
 
-  // Write Android vi strings
+  // Android: write a values-<locale>/strings.xml for each extra locale.
   config = withStringsXml(config, (config) => {
     const projectRoot = config.modRequest.projectRoot;
-    const viValuesDir = path.join(
-      projectRoot,
-      "android/app/src/main/res/values-vi",
-    );
-    fs.mkdirSync(viValuesDir, { recursive: true });
-    fs.writeFileSync(
-      path.join(viValuesDir, "strings.xml"),
-      `<resources>\n  <string name="app_name">${viName}</string>\n</resources>\n`,
-    );
+    EXTRA_LOCALES.forEach((locale) => {
+      const valuesDir = path.join(
+        projectRoot,
+        `android/app/src/main/res/values-${locale}`,
+      );
+      fs.mkdirSync(valuesDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(valuesDir, "strings.xml"),
+        `<resources>\n  <string name="app_name">${escapeXml(
+          APP_NAMES[locale],
+        )}</string>\n</resources>\n`,
+      );
+    });
     return config;
   });
 

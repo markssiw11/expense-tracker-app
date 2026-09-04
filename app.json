@@ -16,7 +16,9 @@
       "bundleIdentifier": "com.family.expensetracker",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSFaceIDUsageDescription": "Use Face ID to unlock the app quickly and securely"
+        "NSFaceIDUsageDescription": "Use Face ID to unlock the app quickly and securely",
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations": ["en", "vi", "ja", "ko"]
       }
     },
     "notification": {
