@@ -4,6 +4,7 @@ import authReducer from "./reducers/authSlice";
 import eventReducer from "./reducers/eventSlice";
 import expenseReducer from "./reducers/expenseSlice";
 import familyReducer from "./reducers/familySlice";
+import incomeReducer from "./reducers/incomeSlice";
 import noteReducer from "./reducers/noteSlice";
 import recurringExpenseReducer from "./reducers/recurringExpenseSlice";
 import spendingLimitReducer from "./reducers/spendingLimitSlice";
@@ -17,6 +18,7 @@ export const store = configureStore({
     events: eventReducer,
     spendingLimit: spendingLimitReducer,
     recurringExpenses: recurringExpenseReducer,
+    incomes: incomeReducer,
   },
 });
 

@@ -80,7 +80,36 @@
     "deleteExpenseFailed": "Unable to delete expense. Please try again.",
     "amountRequired": "Amount must be greater than 0",
     "categoryRequired": "Please select a category",
-    "noteTooLong": "Note cannot exceed 200 characters"
+    "noteTooLong": "Note cannot exceed 200 characters",
+    "searchPlaceholder": "Search by note or amount..."
+  },
+  "dashboard": {
+    "title": "Overview",
+    "netBalance": "Net Balance",
+    "income": "Income",
+    "expense": "Expense",
+    "budgetLeft": "Budget Remaining",
+    "todayEvents": "Today's Events",
+    "upcomingRecurring": "Upcoming Recurring",
+    "pinnedNotes": "Pinned Notes"
+  },
+  "income": {
+    "title": "Income",
+    "addIncome": "Add Income",
+    "editIncome": "Edit Income",
+    "deleteConfirm": "Are you sure you want to delete this income?",
+    "monthlyTotal": "Monthly Income",
+    "earner": "Earner",
+    "noIncome": "No income yet",
+    "addFirst": "Tap + to add your first income"
+  },
+  "incomeCategories": {
+    "salary": "Salary",
+    "bonus": "Bonus",
+    "investment": "Investment",
+    "business": "Business",
+    "gift": "Gift",
+    "other": "Other"
   },
   "recurring": {
     "title": "Recurring Expenses",

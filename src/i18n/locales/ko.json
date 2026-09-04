@@ -80,7 +80,36 @@
     "deleteExpenseFailed": "지출을 삭제할 수 없습니다. 다시 시도해 주세요.",
     "amountRequired": "금액은 0보다 커야 합니다",
     "categoryRequired": "카테고리를 선택해 주세요",
-    "noteTooLong": "메모는 200자를 초과할 수 없습니다"
+    "noteTooLong": "메모는 200자를 초과할 수 없습니다",
+    "searchPlaceholder": "메모나 금액으로 검색..."
+  },
+  "dashboard": {
+    "title": "개요",
+    "netBalance": "순잔액",
+    "income": "수입",
+    "expense": "지출",
+    "budgetLeft": "남은 예산",
+    "todayEvents": "오늘의 이벤트",
+    "upcomingRecurring": "예정된 정기 지출",
+    "pinnedNotes": "고정된 메모"
+  },
+  "income": {
+    "title": "수입",
+    "addIncome": "수입 추가",
+    "editIncome": "수입 편집",
+    "deleteConfirm": "이 수입을 삭제하시겠습니까?",
+    "monthlyTotal": "월간 수입",
+    "earner": "수령인",
+    "noIncome": "아직 수입이 없습니다",
+    "addFirst": "+를 눌러 첫 수입을 추가하세요"
+  },
+  "incomeCategories": {
+    "salary": "급여",
+    "bonus": "보너스",
+    "investment": "투자",
+    "business": "사업",
+    "gift": "선물",
+    "other": "기타"
   },
   "recurring": {
     "title": "정기 지출",

@@ -36,6 +36,16 @@ export {
 } from "./reducers/familySlice";
 export type { FamilyMember } from "./reducers/familySlice";
 
+// Export income actions
+export {
+  addIncome,
+  clearIncomeError,
+  deleteIncome,
+  loadIncomes,
+  setIncomeSelectedMonth,
+  updateIncome,
+} from "./reducers/incomeSlice";
+
 // Export recurring expense actions
 export {
   addRecurringExpense,

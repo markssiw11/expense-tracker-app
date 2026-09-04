@@ -3,20 +3,29 @@ import * as DocumentPicker from "expo-document-picker";
 import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 
-const BACKUP_VERSION = 1;
+const BACKUP_VERSION = 2;
 const BACKUP_FILE_PREFIX = "FamFinance_Backup";
 
+// Actual AsyncStorage keys used by the app's storage services.
+// NOTE: authentication data lives in SecureStore (not AsyncStorage) and is
+// intentionally excluded from backups since it is sensitive and the backup
+// file is plain, unencrypted JSON.
+const EXPENSES_KEY = "@expense_tracker:expenses";
+const EVENTS_KEY = "@expense_tracker:events";
+const NOTES_KEY = "@expense_tracker:notes";
+const FAMILY_KEY = "@family_members";
+
 const STORAGE_KEYS = [
-  "@expenses",
-  "@family_members",
-  "@events",
-  "@notes",
-  "@spending_limit_config",
+  EXPENSES_KEY,
+  EVENTS_KEY,
+  NOTES_KEY,
+  FAMILY_KEY,
+  "@expense_tracker:incomes",
+  "@expense_tracker:spending_limits",
   "@recurring_expenses",
-  "@auth_enabled",
-  "@biometric_enabled",
   "user-language",
   "user-currency",
+  "user-currency-manual",
 ];
 
 export interface BackupData {
@@ -54,10 +63,10 @@ function countItems(data: Record<string, string | null>) {
     }
   };
   return {
-    expenses: parse("@expenses"),
-    events: parse("@events"),
-    notes: parse("@notes"),
-    familyMembers: parse("@family_members"),
+    expenses: parse(EXPENSES_KEY),
+    events: parse(EVENTS_KEY),
+    notes: parse(NOTES_KEY),
+    familyMembers: parse(FAMILY_KEY),
   };
 }
 

@@ -80,7 +80,36 @@
     "deleteExpenseFailed": "支出を削除できませんでした。もう一度お試しください。",
     "amountRequired": "金額は0より大きい必要があります",
     "categoryRequired": "カテゴリーを選択してください",
-    "noteTooLong": "メモは200文字を超えることはできません"
+    "noteTooLong": "メモは200文字を超えることはできません",
+    "searchPlaceholder": "メモや金額で検索..."
+  },
+  "dashboard": {
+    "title": "概要",
+    "netBalance": "収支",
+    "income": "収入",
+    "expense": "支出",
+    "budgetLeft": "予算の残り",
+    "todayEvents": "今日のイベント",
+    "upcomingRecurring": "今後の定期支出",
+    "pinnedNotes": "ピン留めしたメモ"
+  },
+  "income": {
+    "title": "収入",
+    "addIncome": "収入を追加",
+    "editIncome": "収入を編集",
+    "deleteConfirm": "この収入を削除してもよろしいですか？",
+    "monthlyTotal": "月間収入",
+    "earner": "受取人",
+    "noIncome": "収入はまだありません",
+    "addFirst": "＋を押して最初の収入を追加しましょう"
+  },
+  "incomeCategories": {
+    "salary": "給与",
+    "bonus": "ボーナス",
+    "investment": "投資",
+    "business": "事業",
+    "gift": "贈り物",
+    "other": "その他"
   },
   "recurring": {
     "title": "定期支出",

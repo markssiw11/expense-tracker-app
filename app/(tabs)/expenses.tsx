@@ -4,6 +4,7 @@ import {
   getCategoryConfig,
   getExpenseCategories,
 } from "@/src/constants/ExpenseCategories";
+import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
 import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import {
@@ -35,6 +36,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -59,6 +61,11 @@ export default function ExpensesTab() {
   // State for view mode: 'list' or 'grid'
   const [viewMode, setViewMode] = React.useState<"list" | "grid">("list");
 
+  // Local search + spender filter (not persisted).
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [spenderFilter, setSpenderFilter] = React.useState<string | null>(null);
+  const familyMembers = useAppSelector((state) => state.family.members);
+
   // Get expense categories with translations
   const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
 
@@ -80,8 +87,25 @@ export default function ExpensesTab() {
       );
     }
 
+    // Apply spender filter
+    if (spenderFilter) {
+      filtered = filtered.filter(
+        (expense) => expense.spender === spenderFilter,
+      );
+    }
+
+    // Apply text search (note text or amount)
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      filtered = filtered.filter((expense) => {
+        const noteMatch = expense.note?.toLowerCase().includes(query);
+        const amountMatch = expense.amount.toString().includes(query);
+        return noteMatch || amountMatch;
+      });
+    }
+
     return filtered;
-  }, [expenses, selectedMonth, filters]);
+  }, [expenses, selectedMonth, filters, spenderFilter, searchQuery]);
 
   const totalAmount = useMemo(() => {
     return calculateMonthlyTotal(monthlyExpenses);
@@ -261,6 +285,73 @@ export default function ExpensesTab() {
           </TouchableOpacity>
         </View>
       </LinearGradient>
+
+      {/* Search + Spender Filter */}
+      <View style={styles.searchContainer}>
+        <View style={styles.searchBox}>
+          <Ionicons name="search" size={18} color="#999" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder={t("expenses.searchPlaceholder")}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
+              <Ionicons name="close-circle" size={18} color="#ccc" />
+            </TouchableOpacity>
+          )}
+        </View>
+        {familyMembers.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.spenderFilterContent}
+          >
+            <TouchableOpacity
+              style={[
+                styles.spenderFilterChip,
+                !spenderFilter && styles.spenderFilterChipActive,
+              ]}
+              onPress={() => setSpenderFilter(null)}
+            >
+              <Text
+                style={[
+                  styles.spenderFilterText,
+                  !spenderFilter && styles.spenderFilterTextActive,
+                ]}
+              >
+                {t("common.all")}
+              </Text>
+            </TouchableOpacity>
+            {familyMembers.map((member) => {
+              const active = spenderFilter === member.id;
+              return (
+                <TouchableOpacity
+                  key={member.id}
+                  style={[
+                    styles.spenderFilterChip,
+                    active && styles.spenderFilterChipActive,
+                    active && { backgroundColor: member.color },
+                  ]}
+                  onPress={() => setSpenderFilter(active ? null : member.id)}
+                >
+                  <Text
+                    style={[
+                      styles.spenderFilterText,
+                      active && styles.spenderFilterTextActive,
+                    ]}
+                  >
+                    {getFamilyMemberName(member, t)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        )}
+      </View>
 
       {/* Category Filters with View Toggle */}
       <View style={styles.filterContainer}>
@@ -512,6 +603,55 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.25)",
+  },
+  searchContainer: {
+    marginTop: 12,
+    marginHorizontal: 16,
+    gap: 10,
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: "#333",
+    padding: 0,
+  },
+  spenderFilterContent: {
+    gap: 8,
+    paddingRight: 8,
+  },
+  spenderFilterChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  spenderFilterChipActive: {
+    backgroundColor: "#667eea",
+    borderColor: "transparent",
+  },
+  spenderFilterText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#666",
+  },
+  spenderFilterTextActive: {
+    color: "#fff",
   },
   filterContainer: {
     backgroundColor: "#fff",

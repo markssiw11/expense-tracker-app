@@ -80,7 +80,36 @@
     "deleteExpenseFailed": "Không thể xóa chi phí. Vui lòng thử lại.",
     "amountRequired": "Số tiền phải lớn hơn 0",
     "categoryRequired": "Vui lòng chọn danh mục",
-    "noteTooLong": "Ghi chú không được vượt quá 200 ký tự"
+    "noteTooLong": "Ghi chú không được vượt quá 200 ký tự",
+    "searchPlaceholder": "Tìm theo ghi chú hoặc số tiền..."
+  },
+  "dashboard": {
+    "title": "Tổng quan",
+    "netBalance": "Số dư ròng",
+    "income": "Thu",
+    "expense": "Chi",
+    "budgetLeft": "Ngân sách còn lại",
+    "todayEvents": "Sự kiện hôm nay",
+    "upcomingRecurring": "Định kỳ sắp tới",
+    "pinnedNotes": "Ghi chú đã ghim"
+  },
+  "income": {
+    "title": "Thu nhập",
+    "addIncome": "Thêm thu nhập",
+    "editIncome": "Sửa thu nhập",
+    "deleteConfirm": "Bạn có chắc muốn xóa khoản thu này?",
+    "monthlyTotal": "Thu nhập tháng",
+    "earner": "Người thu",
+    "noIncome": "Chưa có khoản thu nào",
+    "addFirst": "Nhấn + để thêm khoản thu đầu tiên"
+  },
+  "incomeCategories": {
+    "salary": "Lương",
+    "bonus": "Thưởng",
+    "investment": "Đầu tư",
+    "business": "Kinh doanh",
+    "gift": "Quà tặng",
+    "other": "Khác"
   },
   "recurring": {
     "title": "Chi phí định kỳ",

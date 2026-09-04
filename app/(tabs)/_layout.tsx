@@ -24,6 +24,16 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: t("navigation.home"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="expenses"
         options={{
           title: t("navigation.expenses"),
