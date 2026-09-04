@@ -77,7 +77,10 @@
     "updateExpenseSuccess": "Expense updated",
     "updateExpenseFailed": "Unable to update expense. Please try again.",
     "deleteExpenseSuccess": "Expense deleted",
-    "deleteExpenseFailed": "Unable to delete expense. Please try again."
+    "deleteExpenseFailed": "Unable to delete expense. Please try again.",
+    "amountRequired": "Amount must be greater than 0",
+    "categoryRequired": "Please select a category",
+    "noteTooLong": "Note cannot exceed 200 characters"
   },
   "categories": {
     "food": "Food & Dining",
@@ -136,7 +139,20 @@
     "reminderWarningError": "Event saved but reminder could not be set.",
     "reminderDisabledSuccess": "Event updated and reminder disabled",
     "eventSaving": "Event is being saved. Please wait.",
-    "eventUpdating": "Event is being updated. Please wait."
+    "eventUpdating": "Event is being updated. Please wait.",
+    "reminderTime": "Reminder time:",
+    "noReminder": "No reminder",
+    "reminderBeforeMinutes": "{{count}} minutes before",
+    "reminderBeforeHour": "1 hour before",
+    "reminderBeforeHours": "{{count}} hours before",
+    "reminderBeforeDay": "1 day before"
+  },
+  "eventCategories": {
+    "Work": "Work",
+    "Personal": "Personal",
+    "Health": "Health",
+    "Family": "Family",
+    "Other": "Other"
   },
   "notes": {
     "title": "Notes",
@@ -254,6 +270,8 @@
   "language": {
     "english": "English",
     "vietnamese": "Tiếng Việt",
+    "japanese": "日本語",
+    "korean": "한국어",
     "selectLanguage": "Select Language",
     "changeLanguage": "Change Language"
   },
@@ -273,7 +291,13 @@
     "nameLabel": "Name *",
     "namePlaceholder": "Enter name...",
     "selectIcon": "Select icon",
-    "selectColor": "Select color"
+    "selectColor": "Select color",
+    "defaultNames": {
+      "wife": "Wife",
+      "husband": "Husband",
+      "child": "Child",
+      "shared": "Shared"
+    }
   },
   "calendar": {
     "title": "Calendar",

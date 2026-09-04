@@ -1,8 +1,9 @@
 import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { deleteNote } from "@/src/redux/reducers/noteSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { formatCurrency, formatDate } from "@/src/utils/expenseUtils";
+import { formatDate } from "@/src/utils/expenseUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
 import { router, useLocalSearchParams } from "expo-router";
@@ -23,6 +24,7 @@ export default function NoteDetailScreen() {
     state.notes.notes.find((n) => n.id === id),
   );
   const { t } = useTranslation();
+  const formatCurrency = useCurrencyFormat();
 
   // If note not found, go back
   useEffect(() => {

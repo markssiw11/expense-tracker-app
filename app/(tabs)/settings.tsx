@@ -1,3 +1,4 @@
+import { Language, LANGUAGES } from "@/src/constants/Languages";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -13,28 +14,6 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-interface Language {
-  code: string;
-  name: string;
-  nativeName: string;
-  flag: string;
-}
-
-const LANGUAGES: Language[] = [
-  {
-    code: "en",
-    name: "English",
-    nativeName: "English",
-    flag: "🇺🇸",
-  },
-  {
-    code: "vi",
-    name: "Vietnamese",
-    nativeName: "Tiếng Việt",
-    flag: "🇻🇳",
-  },
-];
 
 interface SettingItem {
   id: string;

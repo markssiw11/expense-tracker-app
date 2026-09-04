@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { PasswordInput } from "./PasswordInput";
+import PasswordInput from "./PasswordInput";
 
 type ModalType = "setup" | "change" | "disable";
 type Step = "current" | "new" | "confirm";

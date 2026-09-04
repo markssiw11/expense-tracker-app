@@ -4,6 +4,7 @@ import {
   getCategoryConfig,
   getExpenseCategories,
 } from "@/src/constants/ExpenseCategories";
+import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   deleteExpense,
@@ -20,7 +21,6 @@ import { formatMonthYear } from "@/src/utils/dateUtils";
 import {
   calculateMonthlyTotal,
   filterExpensesByMonth,
-  formatCurrency,
   formatDate,
   getNextMonth,
   getPreviousMonth,
@@ -44,8 +44,9 @@ export default function ExpensesTab() {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const formatCurrency = useCurrencyFormat();
   const { expenses, loading, selectedMonth, filters } = useAppSelector(
-    (state) => state.expenses
+    (state) => state.expenses,
   );
 
   // Get budget status from Redux
@@ -75,7 +76,7 @@ export default function ExpensesTab() {
     // Apply category filters
     if (filters.categories.length > 0) {
       filtered = filtered.filter((expense) =>
-        filters.categories.includes(expense.category)
+        filters.categories.includes(expense.category),
       );
     }
 

@@ -1,24 +1,40 @@
+import { CURRENCIES, setActiveCurrency } from "../../services/currencyStore";
 import {
   formatCurrency,
   formatCurrencyIntl,
   formatDate,
-  formatDateWithDay,
   formatDateObject,
+  formatDateWithDay,
   formatDateWithMonthName,
   formatMonthYear,
   getWeekStartDay,
 } from "../formatUtils";
 
+const VND = CURRENCIES.find((c) => c.code === "VND")!;
+const USD = CURRENCIES.find((c) => c.code === "USD")!;
+
 describe("formatUtils", () => {
   describe("formatCurrency", () => {
-    it("should format currency with Vietnamese locale and ₫ symbol", () => {
-      expect(formatCurrency(1000000)).toBe("1.000.000₫");
-      expect(formatCurrency(500)).toBe("500₫");
-      expect(formatCurrency(0)).toBe("0₫");
+    afterEach(() => {
+      // Reset to the default currency so tests stay isolated.
+      setActiveCurrency(USD);
+    });
+
+    it("should format amounts using the active currency (VND)", () => {
+      setActiveCurrency(VND);
+      expect(formatCurrency(1000000)).toBe("1.000.000 ₫");
+      expect(formatCurrency(500)).toBe("500 ₫");
+      expect(formatCurrency(0)).toBe("0 ₫");
+    });
+
+    it("should format amounts using the active currency (USD)", () => {
+      setActiveCurrency(USD);
+      expect(formatCurrency(1000000)).toBe("1,000,000 $");
     });
 
     it("should handle decimal amounts", () => {
-      expect(formatCurrency(1234.56)).toBe("1.234,56₫");
+      setActiveCurrency(VND);
+      expect(formatCurrency(1234.56)).toBe("1.234,56 ₫");
     });
   });
 

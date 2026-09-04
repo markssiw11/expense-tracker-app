@@ -44,7 +44,7 @@ export default function AddExpenseScreen() {
   }, [dispatch]);
 
   const handleSave = async () => {
-    if (!validateForm()) {
+    if (!validateForm(t)) {
       return;
     }
 
@@ -70,7 +70,7 @@ export default function AddExpenseScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <CustomHeader title="Thêm Chi Phí" />
+      <CustomHeader title={t("expenses.addExpense")} />
       <ExpenseForm
         amount={amount}
         setAmount={setAmount}

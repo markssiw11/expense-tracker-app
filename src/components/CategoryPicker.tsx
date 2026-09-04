@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import useTranslation from "@/src/hooks/useTranslation";
 import { EventCategory } from "@/src/types/event.types";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface CategoryPickerProps {
   selectedCategory: EventCategory;
@@ -10,7 +11,6 @@ interface CategoryPickerProps {
 
 interface CategoryConfig {
   key: EventCategory;
-  label: string;
   icon: keyof typeof Ionicons.glyphMap;
   color: string;
 }
@@ -18,31 +18,26 @@ interface CategoryConfig {
 const EVENT_CATEGORIES: CategoryConfig[] = [
   {
     key: "Work",
-    label: "Công việc",
     icon: "briefcase",
     color: "#3B82F6", // Blue
   },
   {
     key: "Personal",
-    label: "Cá nhân",
     icon: "person",
     color: "#A855F7", // Purple
   },
   {
     key: "Health",
-    label: "Sức khỏe",
     icon: "fitness",
     color: "#10B981", // Green
   },
   {
     key: "Family",
-    label: "Gia đình",
     icon: "people",
     color: "#F59E0B", // Orange
   },
   {
     key: "Other",
-    label: "Khác",
     icon: "ellipsis-horizontal",
     color: "#6B7280", // Gray
   },
@@ -52,6 +47,7 @@ export default function CategoryPicker({
   selectedCategory,
   onSelect,
 }: CategoryPickerProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.categoryGrid}>
       {EVENT_CATEGORIES.map((cat) => (
@@ -78,7 +74,9 @@ export default function CategoryPicker({
               color={selectedCategory === cat.key ? "#fff" : "#666"}
             />
           </View>
-          <Text style={styles.categoryLabel}>{cat.label}</Text>
+          <Text style={styles.categoryLabel}>
+            {t(`eventCategories.${cat.key}`)}
+          </Text>
         </TouchableOpacity>
       ))}
     </View>

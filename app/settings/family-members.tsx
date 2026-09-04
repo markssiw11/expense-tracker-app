@@ -1,4 +1,5 @@
 import { GoBackButton } from "@/src/components";
+import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
 import useTranslation from "@/src/hooks/useTranslation";
 import {
   addMember,
@@ -120,7 +121,7 @@ export default function FamilyMembersScreen() {
 
   const openEditModal = (member: FamilyMember) => {
     setEditingMember(member);
-    setName(member.name);
+    setName(getFamilyMemberName(member, t));
     setSelectedIcon(member.icon);
     setSelectedColor(member.color);
     setModalVisible(true);
@@ -137,7 +138,7 @@ export default function FamilyMembersScreen() {
         <View style={[styles.memberIcon, { backgroundColor: item.color }]}>
           <Ionicons name={item.icon as any} size={28} color="#fff" />
         </View>
-        <Text style={styles.memberName}>{item.name}</Text>
+        <Text style={styles.memberName}>{getFamilyMemberName(item, t)}</Text>
       </View>
       <View style={styles.memberActions}>
         <TouchableOpacity

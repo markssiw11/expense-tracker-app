@@ -1,5 +1,6 @@
 import ErrorBoundary from "@/src/components/ErrorBoundary";
 import EventForm from "@/src/components/EventForm";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import { updateEvent } from "@/src/redux/reducers/eventSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { updateEventReminder } from "@/src/services/notificationService";

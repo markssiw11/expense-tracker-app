@@ -2,6 +2,7 @@ import {
   getNoteCategories,
   getNoteCategoryConfig,
 } from "@/src/constants/NoteCategories";
+import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   loadNotes,
@@ -11,7 +12,7 @@ import {
 } from "@/src/redux/reducers/noteSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Note, NoteCategory } from "@/src/types/note.types";
-import { formatCurrency, formatDate } from "@/src/utils/expenseUtils";
+import { formatDate } from "@/src/utils/expenseUtils";
 import {
   filterNotesByCategories,
   filterNotesByQuery,
@@ -39,6 +40,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export default function NotesTab() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const formatCurrency = useCurrencyFormat();
   const { notes, loading, searchQuery, sortBy, filters } = useAppSelector(
     (state) => state.notes,
   );

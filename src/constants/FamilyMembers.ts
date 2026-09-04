@@ -1,38 +1,19 @@
-// Family Members Configuration
-// Note: This file is deprecated. Use Redux familySlice instead.
-// Kept for backward compatibility only.
+import { FamilyMember } from "@/src/redux";
 
-export interface FamilyMember {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-}
+// IDs of the default (seeded) family members whose names should be localized.
+const DEFAULT_MEMBER_IDS = ["wife", "husband", "child", "shared"];
 
-// Default members - used as initial state in Redux
-export const DEFAULT_FAMILY_MEMBERS: FamilyMember[] = [
-  {
-    id: "wife",
-    name: "Vợ",
-    icon: "woman",
-    color: "#FF6B9D",
-  },
-  {
-    id: "husband",
-    name: "Chồng",
-    icon: "man",
-    color: "#4A90E2",
-  },
-  {
-    id: "child",
-    name: "Con",
-    icon: "happy",
-    color: "#FFA726",
-  },
-  {
-    id: "shared",
-    name: "Chung",
-    icon: "people",
-    color: "#9C27B0",
-  },
-];
+/**
+ * Returns the display name for a family member.
+ * Default seeded members (wife/husband/child/shared) are translated via i18n,
+ * while custom members created by the user keep their user-entered name.
+ */
+export const getFamilyMemberName = (
+  member: FamilyMember,
+  t: (key: string) => string,
+): string => {
+  if (DEFAULT_MEMBER_IDS.includes(member.id)) {
+    return t(`familyMembers.defaultNames.${member.id}`);
+  }
+  return member.name;
+};

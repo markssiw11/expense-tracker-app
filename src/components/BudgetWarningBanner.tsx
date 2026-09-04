@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { BudgetStatus, BudgetPeriodType } from "../types/spendingLimit.types";
-import { formatCurrency } from "../utils/formatUtils";
+import React, { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useCurrencyFormat } from "../hooks/useCurrency";
+import { BudgetPeriodType, BudgetStatus } from "../types/spendingLimit.types";
 
 interface BudgetWarningBannerProps {
   weeklyStatus: BudgetStatus | null;
@@ -14,8 +14,9 @@ export default function BudgetWarningBanner({
   weeklyStatus,
   monthlyStatus,
 }: BudgetWarningBannerProps) {
+  const formatCurrency = useCurrencyFormat();
   const [dismissedWarnings, setDismissedWarnings] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   // Determine which warnings to show
@@ -109,12 +110,12 @@ export default function BudgetWarningBanner({
         const message =
           warning.type === "exceeded"
             ? `Bạn đã vượt hạn mức ${periodLabel} ${formatCurrency(
-                warning.status.limit
+                warning.status.limit,
               )}. Đã chi: ${formatCurrency(warning.status.spent)}`
             : `Bạn đã chi ${warning.status.percentage.toFixed(
-                0
+                0,
               )}% hạn mức ${periodLabel}. Còn lại: ${formatCurrency(
-                warning.status.remaining
+                warning.status.remaining,
               )}`;
 
         return (

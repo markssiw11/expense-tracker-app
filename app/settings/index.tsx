@@ -1,4 +1,5 @@
 import { GoBackButton, LanguageSelector } from "@/src/components";
+import { LANGUAGES } from "@/src/constants/Languages";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -30,7 +31,8 @@ export default function SettingsScreen() {
 
   const currentLanguage = getCurrentLanguage();
   const languageDisplayName =
-    currentLanguage === "vi" ? "Tiếng Việt" : "English";
+    LANGUAGES.find((lang) => lang.code === currentLanguage)?.nativeName ??
+    LANGUAGES[0].nativeName;
 
   const SETTINGS_ITEMS: SettingItem[] = [
     {

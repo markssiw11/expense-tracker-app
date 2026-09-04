@@ -1,4 +1,5 @@
 import { GoBackButton } from "@/src/components";
+import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import useTranslation from "@/src/hooks/useTranslation";
 import {
   clearError,
@@ -12,7 +13,6 @@ import {
 } from "@/src/redux/reducers/spendingLimitSlice";
 import { AppDispatch } from "@/src/redux/store";
 import { BudgetPeriodType } from "@/src/types";
-import { formatCurrency } from "@/src/utils/formatUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -35,6 +35,7 @@ export default function SpendingLimitSettingsScreen() {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch<AppDispatch>();
   const { t } = useTranslation();
+  const formatCurrency = useCurrencyFormat();
 
   const weeklyLimit = useSelector(selectWeeklyLimit);
   const monthlyLimit = useSelector(selectMonthlyLimit);

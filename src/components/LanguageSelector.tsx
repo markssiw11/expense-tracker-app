@@ -8,29 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Language, LANGUAGES } from "../constants/Languages";
 import { useTranslation } from "../hooks/useTranslation";
-
-interface Language {
-  code: string;
-  name: string;
-  nativeName: string;
-  flag: string;
-}
-
-const LANGUAGES: Language[] = [
-  {
-    code: "en",
-    name: "English",
-    nativeName: "English",
-    flag: "🇺🇸",
-  },
-  {
-    code: "vi",
-    name: "Vietnamese",
-    nativeName: "Tiếng Việt",
-    flag: "🇻🇳",
-  },
-];
 
 interface LanguageSelectorProps {
   visible: boolean;

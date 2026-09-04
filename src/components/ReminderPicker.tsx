@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import useTranslation from "@/src/hooks/useTranslation";
 import { ReminderTime } from "@/src/types/event.types";
+import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
 interface ReminderPickerProps {
   enabled: boolean;
@@ -10,19 +11,7 @@ interface ReminderPickerProps {
   onSelectTime: (minutes: ReminderTime) => void;
 }
 
-interface ReminderOption {
-  value: ReminderTime;
-  label: string;
-}
-
-const REMINDER_OPTIONS: ReminderOption[] = [
-  { value: 5, label: "5 phút trước" },
-  { value: 10, label: "10 phút trước" },
-  { value: 15, label: "15 phút trước" },
-  { value: 30, label: "30 phút trước" },
-  { value: 60, label: "1 giờ trước" },
-  { value: 1440, label: "1 ngày trước" },
-];
+const REMINDER_VALUES: ReminderTime[] = [5, 10, 15, 30, 60, 1440];
 
 export default function ReminderPicker({
   enabled,
@@ -30,13 +19,30 @@ export default function ReminderPicker({
   onToggle,
   onSelectTime,
 }: ReminderPickerProps) {
+  const { t } = useTranslation();
+
+  const getReminderLabel = (minutes: ReminderTime): string => {
+    if (minutes === 1440) {
+      return t("events.reminderBeforeDay");
+    }
+    if (minutes === 60) {
+      return t("events.reminderBeforeHour");
+    }
+    if (minutes >= 60) {
+      return t("events.reminderBeforeHours", {
+        count: Math.floor(minutes / 60),
+      });
+    }
+    return t("events.reminderBeforeMinutes", { count: minutes });
+  };
+
   return (
     <View style={styles.container}>
       {/* Toggle Switch */}
       <View style={styles.toggleRow}>
         <View style={styles.toggleLabel}>
           <Ionicons name="notifications-outline" size={20} color="#666" />
-          <Text style={styles.label}>Nhắc nhở</Text>
+          <Text style={styles.label}>{t("events.reminder")}</Text>
         </View>
         <Switch
           value={enabled}
@@ -50,26 +56,24 @@ export default function ReminderPicker({
       {/* Reminder Time Options */}
       {enabled && (
         <View style={styles.optionsContainer}>
-          <Text style={styles.optionsLabel}>Thời gian nhắc:</Text>
+          <Text style={styles.optionsLabel}>{t("events.reminderTime")}</Text>
           <View style={styles.optionsGrid}>
-            {REMINDER_OPTIONS.map((option) => (
+            {REMINDER_VALUES.map((value) => (
               <TouchableOpacity
-                key={option.value}
+                key={value}
                 style={[
                   styles.optionButton,
-                  reminderMinutes === option.value &&
-                    styles.optionButtonSelected,
+                  reminderMinutes === value && styles.optionButtonSelected,
                 ]}
-                onPress={() => onSelectTime(option.value)}
+                onPress={() => onSelectTime(value)}
               >
                 <Text
                   style={[
                     styles.optionText,
-                    reminderMinutes === option.value &&
-                      styles.optionTextSelected,
+                    reminderMinutes === value && styles.optionTextSelected,
                   ]}
                 >
-                  {option.label}
+                  {getReminderLabel(value)}
                 </Text>
               </TouchableOpacity>
             ))}

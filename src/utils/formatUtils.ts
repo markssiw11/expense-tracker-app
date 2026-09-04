@@ -1,13 +1,16 @@
 import { format, parseISO } from "date-fns";
 import { vi } from "date-fns/locale";
+import { formatCurrency as formatCurrencyFromStore } from "../services/currencyStore";
 
 /**
- * Format currency in Vietnamese Dong with ₫ symbol
+ * Format an amount using the app's active currency (see currencyStore).
+ * NOTE: This is a plain function and does not re-render React components when
+ * the currency changes. In components, prefer the useCurrencyFormat() hook.
  * @param amount - Amount to format
- * @returns Formatted currency string (e.g., "1.000.000₫")
+ * @returns Formatted currency string (e.g., "1.000.000 ₫")
  */
 export const formatCurrency = (amount: number): string => {
-  return `${amount.toLocaleString("vi-VN")}₫`;
+  return formatCurrencyFromStore(amount);
 };
 
 /**
@@ -30,7 +33,7 @@ export const formatCurrencyIntl = (amount: number): string => {
  */
 export const formatDate = (
   dateString: string,
-  formatString: string = "dd/MM/yyyy"
+  formatString: string = "dd/MM/yyyy",
 ): string => {
   try {
     const date = parseISO(dateString);

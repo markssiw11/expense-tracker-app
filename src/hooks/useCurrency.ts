@@ -1,53 +1,82 @@
+import {
+  CURRENCIES,
+  CurrencyConfig,
+  getActiveCurrency,
+  getCurrencyForLanguage,
+  setActiveCurrency,
+  subscribeCurrency,
+} from "@/src/services/currencyStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useTranslation } from "react-i18next";
 
-export interface CurrencyConfig {
-  code: string;
-  symbol: string;
-  name: string;
-  locale: string;
-}
-
-export const CURRENCIES: CurrencyConfig[] = [
-  { code: "USD", symbol: "$", name: "US Dollar", locale: "en-US" },
-  { code: "VND", symbol: "₫", name: "Vietnamese Dong", locale: "vi-VN" },
-  { code: "EUR", symbol: "€", name: "Euro", locale: "de-DE" },
-  { code: "GBP", symbol: "£", name: "British Pound", locale: "en-GB" },
-  { code: "JPY", symbol: "¥", name: "Japanese Yen", locale: "ja-JP" },
-  { code: "KRW", symbol: "₩", name: "Korean Won", locale: "ko-KR" },
-  { code: "CNY", symbol: "¥", name: "Chinese Yuan", locale: "zh-CN" },
-  { code: "THB", symbol: "฿", name: "Thai Baht", locale: "th-TH" },
-];
+export { CURRENCIES } from "@/src/services/currencyStore";
+export type { CurrencyConfig } from "@/src/services/currencyStore";
 
 const STORAGE_KEY = "user-currency";
-const DEFAULT_CURRENCY = CURRENCIES[0]; // USD
+// Marks that the user picked a currency manually, so we stop auto-syncing it
+// with the app language.
+const MANUAL_FLAG_KEY = "user-currency-manual";
 
 export const useCurrency = () => {
-  const [currency, setCurrencyState] =
-    useState<CurrencyConfig>(DEFAULT_CURRENCY);
+  const { i18n } = useTranslation();
+  const currency = useSyncExternalStore(subscribeCurrency, getActiveCurrency);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // On mount: restore a manual pick, otherwise follow the app language.
   useEffect(() => {
     const load = async () => {
       try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (saved) {
+        const [saved, manualFlag] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY),
+          AsyncStorage.getItem(MANUAL_FLAG_KEY),
+        ]);
+
+        if (manualFlag === "true" && saved) {
           const parsed = JSON.parse(saved) as CurrencyConfig;
           const found = CURRENCIES.find((c) => c.code === parsed.code);
-          if (found) setCurrencyState(found);
+          if (found) {
+            setActiveCurrency(found);
+            return;
+          }
         }
+
+        setActiveCurrency(getCurrencyForLanguage(i18n.language));
       } catch {
-        // ignore
+        setActiveCurrency(getCurrencyForLanguage(i18n.language));
       } finally {
         setIsLoaded(true);
       }
     };
     load();
+    // Only on mount; language changes handled below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Keep currency in sync with the app language unless manually overridden.
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    let cancelled = false;
+    const syncWithLanguage = async () => {
+      const manualFlag = await AsyncStorage.getItem(MANUAL_FLAG_KEY);
+      if (manualFlag === "true" || cancelled) return;
+      setActiveCurrency(getCurrencyForLanguage(i18n.language));
+    };
+    syncWithLanguage();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [i18n.language, isLoaded]);
+
   const setCurrency = useCallback(async (config: CurrencyConfig) => {
-    setCurrencyState(config);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    setActiveCurrency(config);
+    // A manual pick disables language-based auto-sync from now on.
+    await AsyncStorage.multiSet([
+      [STORAGE_KEY, JSON.stringify(config)],
+      [MANUAL_FLAG_KEY, "true"],
+    ]);
   }, []);
 
   const formatAmount = useCallback(
@@ -64,6 +93,22 @@ export const useCurrency = () => {
     isLoaded,
     currencies: CURRENCIES,
   };
+};
+
+/**
+ * Lightweight hook for screens that only need to format amounts.
+ * Subscribes to the currency store so the component re-renders when the
+ * active currency changes (e.g. after switching language).
+ */
+export const useCurrencyFormat = () => {
+  const currency = useSyncExternalStore(subscribeCurrency, getActiveCurrency);
+
+  return useCallback(
+    (value: number) => {
+      return `${value.toLocaleString(currency.locale)} ${currency.symbol}`;
+    },
+    [currency],
+  );
 };
 
 export default useCurrency;

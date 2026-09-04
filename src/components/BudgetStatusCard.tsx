@@ -1,17 +1,17 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  useColorScheme,
-  Dimensions,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { BudgetStatus, BudgetPeriodType } from "../types/spendingLimit.types";
+import React from "react";
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
+} from "react-native";
 import { Colors } from "../../constants/theme";
-import { formatCurrency } from "../utils/formatUtils";
+import { useCurrencyFormat } from "../hooks/useCurrency";
+import { BudgetPeriodType, BudgetStatus } from "../types/spendingLimit.types";
 
 interface BudgetStatusCardProps {
   budgetStatus: BudgetStatus;
@@ -26,6 +26,7 @@ export default function BudgetStatusCard({
 }: BudgetStatusCardProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const formatCurrency = useCurrencyFormat();
 
   const handlePress = () => {
     if (onPress) {

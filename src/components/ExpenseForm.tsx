@@ -1,4 +1,5 @@
 import { getExpenseCategories } from "@/src/constants/ExpenseCategories";
+import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
 import {
   CURRENCIES,
   CurrencyConfig,
@@ -77,7 +78,7 @@ export default function ExpenseForm({
   onCancel,
   onSave,
   onDelete,
-  saveButtonText = "Lưu",
+  saveButtonText,
   weeklyBudgetStatus,
   monthlyBudgetStatus,
   existingExpenseAmount = 0,
@@ -333,7 +334,9 @@ export default function ExpenseForm({
                     color={spender === member.id ? "#fff" : "#666"}
                   />
                 </View>
-                <Text style={styles.spenderLabel}>{member.name}</Text>
+                <Text style={styles.spenderLabel}>
+                  {getFamilyMemberName(member, t)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -407,7 +410,9 @@ export default function ExpenseForm({
           style={styles.saveButton}
           onPress={handleSaveWithConfirmation}
         >
-          <Text style={styles.saveButtonText}>{saveButtonText}</Text>
+          <Text style={styles.saveButtonText}>
+            {saveButtonText ?? t("common.save")}
+          </Text>
         </TouchableOpacity>
       </View>
 

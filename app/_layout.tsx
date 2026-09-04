@@ -11,6 +11,7 @@ import { Provider } from "react-redux";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import AuthenticationProvider from "@/src/components/AuthenticationProvider";
+import { useCurrency } from "@/src/hooks/useCurrency";
 import { loadEvents, updateEvent } from "@/src/redux/reducers/eventSlice";
 import { loadExpenses } from "@/src/redux/reducers/expenseSlice";
 import { store, useAppDispatch, useAppSelector } from "@/src/redux/store";
@@ -26,6 +27,10 @@ export const unstable_settings = {
 function AppInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch();
   const events = useAppSelector((state) => state.events.events);
+
+  // Initialize the currency store early (restores a manual pick or follows the
+  // app language) so all screens format amounts consistently from launch.
+  useCurrency();
 
   useEffect(() => {
     const initializeApp = async () => {

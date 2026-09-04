@@ -77,7 +77,10 @@
     "updateExpenseSuccess": "Đã cập nhật chi phí",
     "updateExpenseFailed": "Không thể cập nhật chi phí. Vui lòng thử lại.",
     "deleteExpenseSuccess": "Đã xóa chi phí",
-    "deleteExpenseFailed": "Không thể xóa chi phí. Vui lòng thử lại."
+    "deleteExpenseFailed": "Không thể xóa chi phí. Vui lòng thử lại.",
+    "amountRequired": "Số tiền phải lớn hơn 0",
+    "categoryRequired": "Vui lòng chọn danh mục",
+    "noteTooLong": "Ghi chú không được vượt quá 200 ký tự"
   },
   "categories": {
     "food": "Ăn uống",
@@ -136,7 +139,20 @@
     "reminderWarningError": "Sự kiện đã được lưu nhưng không thể đặt nhắc nhở.",
     "reminderDisabledSuccess": "Đã cập nhật sự kiện và tắt nhắc nhở",
     "eventSaving": "Sự kiện đang được lưu. Vui lòng đợi.",
-    "eventUpdating": "Sự kiện đang được cập nhật. Vui lòng đợi."
+    "eventUpdating": "Sự kiện đang được cập nhật. Vui lòng đợi.",
+    "reminderTime": "Thời gian nhắc:",
+    "noReminder": "Không có nhắc nhở",
+    "reminderBeforeMinutes": "Nhắc trước {{count}} phút",
+    "reminderBeforeHour": "Nhắc trước 1 giờ",
+    "reminderBeforeHours": "Nhắc trước {{count}} giờ",
+    "reminderBeforeDay": "Nhắc trước 1 ngày"
+  },
+  "eventCategories": {
+    "Work": "Công việc",
+    "Personal": "Cá nhân",
+    "Health": "Sức khỏe",
+    "Family": "Gia đình",
+    "Other": "Khác"
   },
   "notes": {
     "title": "Ghi chú",
@@ -254,6 +270,8 @@
   "language": {
     "english": "English",
     "vietnamese": "Tiếng Việt",
+    "japanese": "日本語",
+    "korean": "한국어",
     "selectLanguage": "Chọn ngôn ngữ",
     "changeLanguage": "Đổi ngôn ngữ"
   },
@@ -273,7 +291,13 @@
     "nameLabel": "Tên *",
     "namePlaceholder": "Nhập tên...",
     "selectIcon": "Chọn icon",
-    "selectColor": "Chọn màu"
+    "selectColor": "Chọn màu",
+    "defaultNames": {
+      "wife": "Vợ",
+      "husband": "Chồng",
+      "child": "Con",
+      "shared": "Chung"
+    }
   },
   "calendar": {
     "title": "Lịch",

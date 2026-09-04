@@ -1,4 +1,5 @@
 import CustomHeader from "@/src/components/CustomHeader";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import { deleteEvent } from "@/src/redux/reducers/eventSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { cancelNotification } from "@/src/services/notificationService";
@@ -26,15 +27,6 @@ const CATEGORY_COLORS: Record<EventCategory, string> = {
   Other: "#6B7280",
 };
 
-// Category labels in Vietnamese
-const CATEGORY_LABELS: Record<EventCategory, string> = {
-  Work: "Công việc",
-  Personal: "Cá nhân",
-  Health: "Sức khỏe",
-  Family: "Gia đình",
-  Other: "Khác",
-};
-
 // Category icons
 const CATEGORY_ICONS: Record<EventCategory, keyof typeof Ionicons.glyphMap> = {
   Work: "briefcase",
@@ -45,16 +37,19 @@ const CATEGORY_ICONS: Record<EventCategory, keyof typeof Ionicons.glyphMap> = {
 };
 
 // Helper function to format reminder time
-const formatReminderTime = (minutes: number): string => {
+const formatReminderTime = (
+  minutes: number,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string => {
   if (minutes < 60) {
-    return `Nhắc trước ${minutes} phút`;
+    return t("events.reminderBeforeMinutes", { count: minutes });
   } else if (minutes === 60) {
-    return "Nhắc trước 1 giờ";
+    return t("events.reminderBeforeHour");
   } else if (minutes === 1440) {
-    return "Nhắc trước 1 ngày";
+    return t("events.reminderBeforeDay");
   } else {
     const hours = Math.floor(minutes / 60);
-    return `Nhắc trước ${hours} giờ`;
+    return t("events.reminderBeforeHours", { count: hours });
   }
 };
 
@@ -152,7 +147,7 @@ export default function EventDetailScreen() {
   };
 
   const categoryColor = CATEGORY_COLORS[event.category];
-  const categoryLabel = CATEGORY_LABELS[event.category];
+  const categoryLabel = t(`eventCategories.${event.category}`);
   const categoryIcon = CATEGORY_ICONS[event.category];
 
   return (
@@ -227,11 +222,11 @@ export default function EventDetailScreen() {
               />
             </View>
             <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Nhắc nhở</Text>
+              <Text style={styles.detailLabel}>{t("events.reminder")}</Text>
               <Text style={styles.detailValue}>
                 {event.reminderEnabled
-                  ? formatReminderTime(event.reminderMinutes)
-                  : "Không có nhắc nhở"}
+                  ? formatReminderTime(event.reminderMinutes, t)
+                  : t("events.noReminder")}
               </Text>
             </View>
           </View>

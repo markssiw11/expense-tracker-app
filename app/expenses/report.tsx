@@ -2,13 +2,14 @@ import { GoBackButton } from "@/src/components";
 import BarChart from "@/src/components/BarChart";
 import PieChart from "@/src/components/PieChart";
 import { getExpenseCategories } from "@/src/constants/ExpenseCategories";
+import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
+import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { loadFamilyMembers } from "@/src/redux";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { SpenderBreakdown } from "@/src/types";
 import {
   filterExpensesByMonth,
-  formatCurrency,
   generateMonthlySummary,
   getCurrentMonth,
   getNextMonth,
@@ -34,6 +35,7 @@ export default function MonthlyReportScreen() {
   const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const formatCurrency = useCurrencyFormat();
 
   const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
 
@@ -210,7 +212,9 @@ export default function MonthlyReportScreen() {
                       return {
                         value: breakdown.amount,
                         color: member?.color || "#999",
-                        label: member?.name || t("reports.uncategorized"),
+                        label: member
+                          ? getFamilyMemberName(member, t)
+                          : t("reports.uncategorized"),
                         percentage: breakdown.percentage,
                       };
                     })}
@@ -222,8 +226,9 @@ export default function MonthlyReportScreen() {
                       const member = familyMembers.find(
                         (m) => m.id === breakdown.spender,
                       );
-                      const displayName =
-                        member?.name || t("reports.uncategorized");
+                      const displayName = member
+                        ? getFamilyMemberName(member, t)
+                        : t("reports.uncategorized");
                       const color = member?.color || "#999";
 
                       return (
@@ -255,7 +260,9 @@ export default function MonthlyReportScreen() {
                         (m) => m.id === breakdown.spender,
                       );
                       return {
-                        label: member?.name || t("reports.uncategorized"),
+                        label: member
+                          ? getFamilyMemberName(member, t)
+                          : t("reports.uncategorized"),
                         value: breakdown.amount,
                         percentage: breakdown.percentage,
                         color: member?.color || "#999",

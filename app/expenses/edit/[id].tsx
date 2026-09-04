@@ -1,5 +1,6 @@
 import ExpenseForm from "@/src/components/ExpenseForm";
 import { useExpenseForm } from "@/src/hooks/useExpenseForm";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   deleteExpense,
   loadFamilyMembers,
@@ -66,7 +67,7 @@ export default function EditExpenseScreen() {
   }, [expense, id]);
 
   const handleSave = async () => {
-    if (!validateForm() || !expense) {
+    if (!validateForm(t) || !expense) {
       return;
     }
 

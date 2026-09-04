@@ -1,4 +1,5 @@
 import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { useTranslation } from "@/src/hooks/useTranslation";
 import { deleteNote, updateNote } from "@/src/redux/reducers/noteSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Note, NoteCategory } from "@/src/types/note.types";
