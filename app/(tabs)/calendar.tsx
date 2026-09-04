@@ -139,7 +139,7 @@ export default function CalendarTab() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Refs for auto-scrolling
   const scrollViewRef = React.useRef<ScrollView>(null);
@@ -232,13 +232,13 @@ export default function CalendarTab() {
               animated: true,
             });
           },
-          () => {}
+          () => {},
         );
       }
     }, 50);
   };
 
-  // Format selected date for display
+  // Format selected date for display, localized to the active language.
   const formatSelectedDate = (dateStr: string | null): string => {
     if (!dateStr) return "";
     const date = new Date(dateStr);
@@ -250,39 +250,15 @@ export default function CalendarTab() {
       return t("calendar.today");
     }
     if (date.toDateString() === tomorrow.toDateString()) {
-      return "Tomorrow"; // You can add this to translations if needed
+      return t("calendar.tomorrow");
     }
 
-    // Use i18n for day and month names
-    const dayNames = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const monthKeys = [
-      "january",
-      "february",
-      "march",
-      "april",
-      "may",
-      "june",
-      "july",
-      "august",
-      "september",
-      "october",
-      "november",
-      "december",
-    ];
-
-    const dayName = dayNames[date.getDay()];
-    const day = date.getDate();
-    const monthName = t(`months.${monthKeys[date.getMonth()]}`);
-
-    return `${dayName}, ${day} ${monthName}`;
+    // Localized weekday + day + month using the current app language.
+    return date.toLocaleDateString(i18n.language, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
   };
 
   // Get category info (icon, color, label)
@@ -291,30 +267,28 @@ export default function CalendarTab() {
       Work: {
         icon: "briefcase" as const,
         color: "#3B82F6",
-        label: "Work", // You can add these to translations
       },
       Personal: {
         icon: "person" as const,
         color: "#A855F7",
-        label: "Personal",
       },
       Health: {
         icon: "fitness" as const,
         color: "#10B981",
-        label: "Health",
       },
       Family: {
         icon: "people" as const,
         color: "#F59E0B",
-        label: "Family",
       },
       Other: {
         icon: "ellipsis-horizontal" as const,
         color: "#6B7280",
-        label: t("categories.other"),
       },
     };
-    return categoryMap[category];
+    return {
+      ...categoryMap[category],
+      label: t(`eventCategories.${category}`),
+    };
   };
 
   return (

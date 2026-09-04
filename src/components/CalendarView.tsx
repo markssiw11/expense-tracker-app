@@ -1,8 +1,9 @@
-import React from "react";
+import { useTranslation } from "react-i18next";
 import { useColorScheme } from "react-native";
 import { Calendar, DateData } from "react-native-calendars";
-import { MarkedDates } from "../types/event.types";
 import { Colors } from "../../constants/theme";
+import { MarkedDates } from "../types/event.types";
+import { setCalendarLocale } from "../utils/calendarLocale";
 
 interface CalendarViewProps {
   markedDates: MarkedDates;
@@ -11,14 +12,18 @@ interface CalendarViewProps {
   onMonthChange?: (month: { month: number; year: number }) => void;
 }
 
-export const CalendarView: React.FC<CalendarViewProps> = ({
+export function CalendarView({
   markedDates,
   selectedDate,
   onDateSelect,
   onMonthChange,
-}) => {
+}: CalendarViewProps) {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { i18n } = useTranslation();
+
+  // Keep the calendar's month/day names in sync with the app language.
+  setCalendarLocale(i18n.language);
 
   const handleDayPress = (day: DateData) => {
     onDateSelect(day.dateString);
@@ -30,6 +35,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
   return (
     <Calendar
+      key={i18n.language}
       current={selectedDate}
       markedDates={markedDates}
       onDayPress={handleDayPress}
@@ -58,4 +64,4 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       }}
     />
   );
-};
+}

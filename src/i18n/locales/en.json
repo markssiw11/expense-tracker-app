@@ -330,6 +330,7 @@
   "calendar": {
     "title": "Calendar",
     "today": "Today",
+    "tomorrow": "Tomorrow",
     "thisWeek": "This Week",
     "thisMonth": "This Month",
     "upcomingEvents": "Upcoming Events",

@@ -330,6 +330,7 @@
   "calendar": {
     "title": "Lịch",
     "today": "Hôm nay",
+    "tomorrow": "Ngày mai",
     "thisWeek": "Tuần này",
     "thisMonth": "Tháng này",
     "upcomingEvents": "Sự kiện sắp tới",
