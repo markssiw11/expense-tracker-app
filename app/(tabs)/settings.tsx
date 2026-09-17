@@ -1,10 +1,13 @@
+import { FlagIcon } from "@/src/components/FlagIcon";
 import { Language, LANGUAGES } from "@/src/constants/Languages";
 import { useTranslation } from "@/src/hooks/useTranslation";
+import { clearSampleData, seedSampleData } from "@/src/services/devSeed";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   FlatList,
   Modal,
   ScrollView,
@@ -85,6 +88,30 @@ export default function SettingsTab() {
     setShowLanguageModal(false);
   };
 
+  const handleSeedData = async () => {
+    try {
+      const summary = await seedSampleData();
+      Alert.alert(
+        "Seed data",
+        `Created: ${summary.expenses} expenses, ${summary.incomes} incomes, ${summary.events} events, ${summary.notes} notes.\n\nReload the app to see the data.`,
+      );
+    } catch (e) {
+      Alert.alert("Seed data", `Error: ${e instanceof Error ? e.message : e}`);
+    }
+  };
+
+  const handleClearData = async () => {
+    try {
+      await clearSampleData();
+      Alert.alert(
+        "Seed data",
+        "Sample data cleared. Reload the app to update.",
+      );
+    } catch (e) {
+      Alert.alert("Seed data", `Error: ${e instanceof Error ? e.message : e}`);
+    }
+  };
+
   const renderLanguageItem = ({ item }: { item: Language }) => {
     const isSelected = currentLanguage === item.code;
 
@@ -95,7 +122,9 @@ export default function SettingsTab() {
         activeOpacity={0.7}
       >
         <View style={styles.languageLeft}>
-          <Text style={styles.flag}>{item.flag}</Text>
+          <View style={styles.flag}>
+            <FlagIcon country={item.countryCode} size={32} />
+          </View>
           <View style={styles.languageInfo}>
             <Text
               style={[styles.languageName, isSelected && styles.selectedText]}
@@ -149,7 +178,10 @@ export default function SettingsTab() {
         style={[styles.header, { paddingTop: insets.top + 20 }]}
       >
         <View>
-          <Text style={styles.headerTitle}>{t("settings.title")} ⚙️</Text>
+          <View style={styles.headerTitleRow}>
+            <Text style={styles.headerTitle}>{t("settings.title")}</Text>
+            <Ionicons name="settings-sharp" size={22} color="#fff" />
+          </View>
           <Text style={styles.headerSubtitle}>{t("settings.subtitle")}</Text>
         </View>
       </LinearGradient>
@@ -175,9 +207,15 @@ export default function SettingsTab() {
                 <Text style={styles.settingTitle}>
                   {t("settings.changeLanguage")}
                 </Text>
-                <Text style={styles.settingSubtitle}>
-                  {currentLanguageInfo.flag} {currentLanguageInfo.nativeName}
-                </Text>
+                <View style={styles.subtitleRow}>
+                  <FlagIcon
+                    country={currentLanguageInfo.countryCode}
+                    size={20}
+                  />
+                  <Text style={styles.settingSubtitle}>
+                    {currentLanguageInfo.nativeName}
+                  </Text>
+                </View>
               </View>
             </View>
             <Ionicons name="chevron-forward" size={24} color="#999" />
@@ -188,6 +226,51 @@ export default function SettingsTab() {
           <Text style={styles.sectionTitle}>{t("settings.general")}</Text>
           {SETTINGS_ITEMS.map(renderSettingItem)}
         </View>
+
+        {__DEV__ && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>DEV — SCREENSHOT DATA</Text>
+            <TouchableOpacity
+              style={styles.settingCard}
+              onPress={handleSeedData}
+            >
+              <View style={styles.settingLeft}>
+                <View
+                  style={[styles.iconContainer, { backgroundColor: "#10b981" }]}
+                >
+                  <Ionicons name="sparkles" size={24} color="#fff" />
+                </View>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingTitle}>Seed sample data</Text>
+                  <Text style={styles.settingSubtitle}>
+                    Generate sample data for screenshots
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#999" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.settingCard}
+              onPress={handleClearData}
+            >
+              <View style={styles.settingLeft}>
+                <View
+                  style={[styles.iconContainer, { backgroundColor: "#EF4444" }]}
+                >
+                  <Ionicons name="trash" size={24} color="#fff" />
+                </View>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingTitle}>Clear sample data</Text>
+                  <Text style={styles.settingSubtitle}>
+                    Clear expenses / income / events / notes
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#999" />
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
 
       {/* Language Selection Modal */}
@@ -236,11 +319,16 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
   },
+  headerTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
   headerTitle: {
     fontSize: 24,
     fontWeight: "800",
     color: "#fff",
-    marginBottom: 6,
   },
   headerSubtitle: {
     fontSize: 14,
@@ -376,8 +464,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flag: {
-    fontSize: 32,
     marginRight: 16,
+  },
+  subtitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   languageInfo: {
     flex: 1,

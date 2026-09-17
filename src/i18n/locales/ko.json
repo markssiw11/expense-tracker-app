@@ -35,7 +35,20 @@
     "saving": "저장 중",
     "pleaseWait": "잠시 기다려 주세요.",
     "warning": "경고",
-    "tryAgain": "다시 시도"
+    "tryAgain": "다시 시도",
+    "date": "날짜",
+    "time": "시간",
+    "location": "장소",
+    "description": "설명",
+    "createdAt": "생성:",
+    "updatedAt": "수정:",
+    "deleting": "삭제 중...",
+    "unknown": "알 수 없음",
+    "optional": "선택",
+    "tags": "태그",
+    "tagsOptional": "태그 (선택)",
+    "tagsPlaceholder": "태그를 쉼표로 구분하여 입력...",
+    "tagsHelper": "예: 중요, 재확인, 쇼핑"
   },
   "navigation": {
     "home": "홈",
@@ -193,7 +206,17 @@
     "reminderBeforeHours": "{{count}}시간 전",
     "reminderBeforeDay": "1일 전",
     "notificationTime": "시간: {{time}}",
-    "notificationLocation": "장소: {{location}}"
+    "notificationLocation": "장소: {{location}}",
+    "titleLabel": "제목",
+    "titlePlaceholder": "이벤트 제목 입력...",
+    "titleRequired": "제목은 필수입니다",
+    "descriptionLabel": "설명 (선택)",
+    "descriptionPlaceholder": "설명 입력...",
+    "locationLabel": "장소 (선택)",
+    "locationPlaceholder": "장소 입력...",
+    "dateLabel": "날짜",
+    "timeLabel": "시간",
+    "categoryLabel": "카테고리"
   },
   "eventCategories": {
     "Work": "업무",
@@ -221,6 +244,15 @@
     "updateNoteFailed": "메모를 업데이트할 수 없습니다. 다시 시도해 주세요.",
     "deleteNoteSuccess": "메모가 삭제되었습니다",
     "deleteNoteFailed": "메모를 삭제할 수 없습니다. 다시 시도해 주세요.",
+    "titleLabel": "제목",
+    "titlePlaceholder": "제목 입력...",
+    "contentLabel": "내용",
+    "contentPlaceholder": "내용 입력...",
+    "amountOptional": "금액 (선택)",
+    "categoryLabel": "카테고리",
+    "pinNote": "메모 고정",
+    "deleteNoteButton": "메모 삭제",
+    "pinnedBadge": "고정됨",
     "validation": {
       "titleRequired": "제목을 입력해 주세요",
       "titleTooLong": "제목은 100자를 초과할 수 없습니다",
@@ -290,7 +322,27 @@
     "passwordWrong": "비밀번호가 올바르지 않습니다",
     "passwordDisableSuccess": "비밀번호 보호가 해제되었습니다",
     "passwordDisableFailed": "비밀번호 보호를 해제할 수 없습니다",
-    "enablePasswordForBiometric": "생체 인증을 사용하려면 비밀번호 보호를 활성화하세요"
+    "enablePasswordForBiometric": "생체 인증을 사용하려면 비밀번호 보호를 활성화하세요",
+    "modalCreateNew": "새 비밀번호 만들기",
+    "modalConfirm": "비밀번호 확인",
+    "modalEnterCurrent": "현재 비밀번호 입력",
+    "modalEnterNew": "새 비밀번호 입력",
+    "modalConfirmNew": "새 비밀번호 확인",
+    "modalEnterToDisable": "해제할 비밀번호 입력",
+    "continue": "계속"
+  },
+  "errorBoundary": {
+    "title": "오류가 발생했습니다",
+    "message": "앱에서 예기치 않은 문제가 발생했습니다. 다시 시도해 주세요.",
+    "retry": "다시 시도"
+  },
+  "storageErrors": {
+    "saveEvent": "이벤트를 저장할 수 없습니다. 기기 저장공간을 확인하세요.",
+    "loadEvent": "이벤트를 불러올 수 없습니다. 연결을 확인하고 다시 시도하세요.",
+    "deleteEvent": "이벤트 데이터를 삭제할 수 없습니다."
+  },
+  "app": {
+    "name": "가계부"
   },
   "budget": {
     "weeklyLimit": "주간 한도",
@@ -299,6 +351,15 @@
     "remaining": "잔액",
     "exceeded": "초과",
     "onTrack": "정상",
+    "thisWeek": "이번 주",
+    "thisMonth": "이번 달",
+    "limitLabel": "한도: {{amount}}",
+    "overBudget": "예산을 초과했습니다",
+    "nearLimit": "한도에 근접했습니다",
+    "periodWeek": "주간",
+    "periodMonth": "월간",
+    "warnExceeded": "{{period}} 한도 {{limit}}을(를) 초과했습니다. 지출: {{spent}}",
+    "warnNearLimit": "{{period}} 한도의 {{percent}}%를 사용했습니다. 잔액: {{remaining}}",
     "warning": "경고",
     "danger": "예산 초과",
     "setLimit": "한도 설정",
@@ -365,6 +426,8 @@
     "upcomingEvents": "예정된 이벤트",
     "noEventsToday": "오늘 이벤트가 없습니다",
     "noEventsThisWeek": "이번 주 이벤트가 없습니다",
+    "noEvents": "이벤트가 없습니다",
+    "noEventsMessage": "예정된 이벤트가 없습니다.",
     "viewAll": "모두 보기"
   },
   "reports": {

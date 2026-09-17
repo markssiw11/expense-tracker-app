@@ -85,7 +85,7 @@ export default function AddEventScreen() {
             t("events.reminderWarningError") +
               (notificationError instanceof Error
                 ? notificationError.message
-                : "Không xác định"),
+                : t("common.unknown")),
             [{ text: t("common.ok") }],
           );
         }

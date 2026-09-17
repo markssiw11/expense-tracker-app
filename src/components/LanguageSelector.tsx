@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Language, LANGUAGES } from "../constants/Languages";
 import { useTranslation } from "../hooks/useTranslation";
+import { FlagIcon } from "./FlagIcon";
 
 interface LanguageSelectorProps {
   visible: boolean;
@@ -38,7 +39,9 @@ export default function LanguageSelector({
         activeOpacity={0.7}
       >
         <View style={styles.languageLeft}>
-          <Text style={styles.flag}>{item.flag}</Text>
+          <View style={styles.flag}>
+            <FlagIcon country={item.countryCode} size={32} />
+          </View>
           <View style={styles.languageInfo}>
             <Text
               style={[styles.languageName, isSelected && styles.selectedText]}
@@ -149,7 +152,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   flag: {
-    fontSize: 32,
     marginRight: 16,
   },
   languageInfo: {

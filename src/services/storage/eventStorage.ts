@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import i18n from "../../i18n";
 import { Event } from "../../types/event.types";
 
 const STORAGE_KEY = "@expense_tracker:events";
@@ -11,7 +12,7 @@ class EventStorageService {
    */
   private async retryOperation<T>(
     operation: () => Promise<T>,
-    attempts: number = MAX_RETRY_ATTEMPTS
+    attempts: number = MAX_RETRY_ATTEMPTS,
   ): Promise<T> {
     let lastError: Error | null = null;
 
@@ -22,13 +23,13 @@ class EventStorageService {
         lastError = error instanceof Error ? error : new Error(String(error));
         console.warn(
           `Storage operation failed (attempt ${i + 1}/${attempts}):`,
-          lastError.message
+          lastError.message,
         );
 
         // Wait before retrying (except on last attempt)
         if (i < attempts - 1) {
           await new Promise((resolve) =>
-            setTimeout(resolve, RETRY_DELAY_MS * (i + 1))
+            setTimeout(resolve, RETRY_DELAY_MS * (i + 1)),
           );
         }
       }
@@ -87,9 +88,7 @@ class EventStorageService {
       });
     } catch (error) {
       console.error("Error saving events after retries:", error);
-      throw new Error(
-        "Không thể lưu sự kiện. Vui lòng kiểm tra bộ nhớ thiết bị."
-      );
+      throw new Error(i18n.t("storageErrors.saveEvent"));
     }
   }
 
@@ -117,9 +116,7 @@ class EventStorageService {
       });
     } catch (error) {
       console.error("Error loading events after retries:", error);
-      throw new Error(
-        "Không thể tải sự kiện. Vui lòng kiểm tra kết nối và thử lại."
-      );
+      throw new Error(i18n.t("storageErrors.loadEvent"));
     }
   }
 
@@ -146,7 +143,7 @@ class EventStorageService {
       });
     } catch (error) {
       console.error("Error clearing events after retries:", error);
-      throw new Error("Không thể xóa dữ liệu sự kiện.");
+      throw new Error(i18n.t("storageErrors.deleteEvent"));
     }
   }
 }

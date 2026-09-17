@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from "react";
+import { Colors } from "@/constants/theme";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  useColorScheme,
   Image,
   Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+  View,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { Ionicons } from "@expo/vector-icons";
-import { Colors } from "@/constants/theme";
-import PasswordInput from "./PasswordInput";
-import { authService } from "../services/authService";
+import { useTranslation } from "../hooks/useTranslation";
 import {
+  clearLockout,
   incrementFailedAttempts,
   resetFailedAttempts,
-  setLockout,
-  clearLockout,
   setAuthenticated,
+  setLockout,
 } from "../redux/reducers/authSlice";
 import type { RootState } from "../redux/store";
+import { authService } from "../services/authService";
+import PasswordInput from "./PasswordInput";
 
 interface LockScreenProps {
   onAuthenticated: () => void;
@@ -30,6 +31,7 @@ export default function LockScreen({ onAuthenticated }: LockScreenProps) {
   const dispatch = useDispatch();
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { t } = useTranslation();
 
   const { biometricEnabled, biometricAvailable, failedAttempts, lockoutUntil } =
     useSelector((state: RootState) => state.auth);
@@ -99,7 +101,7 @@ export default function LockScreen({ onAuthenticated }: LockScreenProps) {
           const lockoutTimestamp = Date.now() + lockoutDuration * 1000;
           dispatch(setLockout(lockoutTimestamp));
           setError(
-            `Too many failed attempts. Please wait ${lockoutDuration} seconds.`
+            `Too many failed attempts. Please wait ${lockoutDuration} seconds.`,
           );
         } else {
           setError(`Incorrect password (${newFailedAttempts}/${5} attempts)`);
@@ -130,7 +132,7 @@ export default function LockScreen({ onAuthenticated }: LockScreenProps) {
           setError("Biometric authentication failed. Please use password.");
         } else {
           setError(
-            "Biometric authentication failed. Try again or use password."
+            "Biometric authentication failed. Try again or use password.",
           );
         }
       }
@@ -164,7 +166,7 @@ export default function LockScreen({ onAuthenticated }: LockScreenProps) {
           resizeMode="contain"
         />
         <Text style={[styles.appTitle, { color: colors.text }]}>
-          Sổ Tay Gia Đình
+          {t("app.name")}
         </Text>
         <Text style={[styles.subtitle, { color: colors.icon }]}>
           Enter your password to continue

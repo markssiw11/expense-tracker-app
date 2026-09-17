@@ -35,7 +35,20 @@
     "saving": "Đang lưu",
     "pleaseWait": "Vui lòng đợi.",
     "warning": "Cảnh báo",
-    "tryAgain": "Thử lại"
+    "tryAgain": "Thử lại",
+    "date": "Ngày",
+    "time": "Thời gian",
+    "location": "Địa điểm",
+    "description": "Mô tả",
+    "createdAt": "Tạo lúc:",
+    "updatedAt": "Cập nhật:",
+    "deleting": "Đang xóa...",
+    "unknown": "Không xác định",
+    "optional": "tùy chọn",
+    "tags": "Tags",
+    "tagsOptional": "Tags (tùy chọn)",
+    "tagsPlaceholder": "Nhập tags, phân cách bằng dấu phẩy...",
+    "tagsHelper": "Ví dụ: quan trọng, cần xem lại, mua sắm"
   },
   "navigation": {
     "home": "Trang chủ",
@@ -193,7 +206,17 @@
     "reminderBeforeHours": "Nhắc trước {{count}} giờ",
     "reminderBeforeDay": "Nhắc trước 1 ngày",
     "notificationTime": "Thời gian: {{time}}",
-    "notificationLocation": "Địa điểm: {{location}}"
+    "notificationLocation": "Địa điểm: {{location}}",
+    "titleLabel": "Tiêu đề",
+    "titlePlaceholder": "Nhập tiêu đề sự kiện...",
+    "titleRequired": "Tiêu đề là bắt buộc",
+    "descriptionLabel": "Mô tả (tùy chọn)",
+    "descriptionPlaceholder": "Nhập mô tả...",
+    "locationLabel": "Địa điểm (tùy chọn)",
+    "locationPlaceholder": "Nhập địa điểm...",
+    "dateLabel": "Ngày",
+    "timeLabel": "Thời gian",
+    "categoryLabel": "Danh mục"
   },
   "eventCategories": {
     "Work": "Công việc",
@@ -221,6 +244,15 @@
     "updateNoteFailed": "Không thể cập nhật ghi chú. Vui lòng thử lại.",
     "deleteNoteSuccess": "Đã xóa ghi chú",
     "deleteNoteFailed": "Không thể xóa ghi chú. Vui lòng thử lại.",
+    "titleLabel": "Tiêu đề",
+    "titlePlaceholder": "Nhập tiêu đề...",
+    "contentLabel": "Nội dung",
+    "contentPlaceholder": "Nhập nội dung...",
+    "amountOptional": "Số tiền (tùy chọn)",
+    "categoryLabel": "Danh mục",
+    "pinNote": "Ghim ghi chú",
+    "deleteNoteButton": "Xóa ghi chú",
+    "pinnedBadge": "Đã ghim",
     "validation": {
       "titleRequired": "Tiêu đề không được để trống",
       "titleTooLong": "Tiêu đề không được vượt quá 100 ký tự",
@@ -290,7 +322,27 @@
     "passwordWrong": "Mật khẩu không đúng",
     "passwordDisableSuccess": "Bảo vệ mật khẩu đã được tắt",
     "passwordDisableFailed": "Không thể tắt bảo vệ mật khẩu",
-    "enablePasswordForBiometric": "Bật bảo vệ mật khẩu để sử dụng xác thực sinh trắc học"
+    "enablePasswordForBiometric": "Bật bảo vệ mật khẩu để sử dụng xác thực sinh trắc học",
+    "modalCreateNew": "Tạo mật khẩu mới",
+    "modalConfirm": "Xác nhận mật khẩu",
+    "modalEnterCurrent": "Nhập mật khẩu hiện tại",
+    "modalEnterNew": "Nhập mật khẩu mới",
+    "modalConfirmNew": "Xác nhận mật khẩu mới",
+    "modalEnterToDisable": "Nhập mật khẩu để tắt",
+    "continue": "Tiếp tục"
+  },
+  "errorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "message": "Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại.",
+    "retry": "Thử lại"
+  },
+  "storageErrors": {
+    "saveEvent": "Không thể lưu sự kiện. Vui lòng kiểm tra bộ nhớ thiết bị.",
+    "loadEvent": "Không thể tải sự kiện. Vui lòng kiểm tra kết nối và thử lại.",
+    "deleteEvent": "Không thể xóa dữ liệu sự kiện."
+  },
+  "app": {
+    "name": "Sổ Tay Gia Đình"
   },
   "budget": {
     "weeklyLimit": "Giới hạn tuần",
@@ -299,6 +351,15 @@
     "remaining": "Còn lại",
     "exceeded": "Vượt quá",
     "onTrack": "Đúng kế hoạch",
+    "thisWeek": "Tuần này",
+    "thisMonth": "Tháng này",
+    "limitLabel": "Hạn mức: {{amount}}",
+    "overBudget": "Đã vượt hạn mức",
+    "nearLimit": "Sắp đạt hạn mức",
+    "periodWeek": "tuần",
+    "periodMonth": "tháng",
+    "warnExceeded": "Bạn đã vượt hạn mức {{period}} {{limit}}. Đã chi: {{spent}}",
+    "warnNearLimit": "Bạn đã chi {{percent}}% hạn mức {{period}}. Còn lại: {{remaining}}",
     "warning": "Cảnh báo",
     "danger": "Vượt ngân sách",
     "setLimit": "Đặt giới hạn",
@@ -365,6 +426,8 @@
     "upcomingEvents": "Sự kiện sắp tới",
     "noEventsToday": "Không có sự kiện hôm nay",
     "noEventsThisWeek": "Không có sự kiện tuần này",
+    "noEvents": "Không có sự kiện",
+    "noEventsMessage": "Chưa có sự kiện nào.",
     "viewAll": "Xem tất cả"
   },
   "reports": {

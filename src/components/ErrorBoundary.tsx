@@ -1,6 +1,7 @@
-import React, { Component, ErrorInfo, ReactNode } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import i18n from "../i18n";
 
 interface Props {
   children: ReactNode;
@@ -51,9 +52,9 @@ class ErrorBoundary extends Component<Props, State> {
         <View style={styles.container}>
           <View style={styles.content}>
             <Ionicons name="alert-circle" size={64} color="#FF3B30" />
-            <Text style={styles.title}>Đã xảy ra lỗi</Text>
+            <Text style={styles.title}>{i18n.t("errorBoundary.title")}</Text>
             <Text style={styles.message}>
-              Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại.
+              {i18n.t("errorBoundary.message")}
             </Text>
             {__DEV__ && this.state.error && (
               <View style={styles.errorDetails}>
@@ -63,7 +64,9 @@ class ErrorBoundary extends Component<Props, State> {
               </View>
             )}
             <TouchableOpacity style={styles.button} onPress={this.handleReset}>
-              <Text style={styles.buttonText}>Thử lại</Text>
+              <Text style={styles.buttonText}>
+                {i18n.t("errorBoundary.retry")}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "../hooks/useTranslation";
 import PasswordInput from "./PasswordInput";
 
 type ModalType = "setup" | "change" | "disable";
@@ -28,15 +29,18 @@ export default function PasswordModal({
   getCurrentPasswordValue,
   isPasswordComplete,
 }: PasswordModalProps) {
+  const { t } = useTranslation();
   const getModalTitle = () => {
     if (modalType === "setup") {
-      return step === "new" ? "Tạo mật khẩu mới" : "Xác nhận mật khẩu";
+      return step === "new"
+        ? t("authentication.modalCreateNew")
+        : t("authentication.modalConfirm");
     } else if (modalType === "change") {
-      if (step === "current") return "Nhập mật khẩu hiện tại";
-      if (step === "new") return "Nhập mật khẩu mới";
-      return "Xác nhận mật khẩu mới";
+      if (step === "current") return t("authentication.modalEnterCurrent");
+      if (step === "new") return t("authentication.modalEnterNew");
+      return t("authentication.modalConfirmNew");
     } else if (modalType === "disable") {
-      return "Nhập mật khẩu để tắt";
+      return t("authentication.modalEnterToDisable");
     }
     return "";
   };
@@ -65,7 +69,7 @@ export default function PasswordModal({
               style={styles.modalCancelButton}
               onPress={onClose}
             >
-              <Text style={styles.modalCancelText}>Hủy</Text>
+              <Text style={styles.modalCancelText}>{t("common.cancel")}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
@@ -82,8 +86,8 @@ export default function PasswordModal({
                 ]}
               >
                 {step === "confirm" || modalType === "disable"
-                  ? "Xác nhận"
-                  : "Tiếp tục"}
+                  ? t("common.confirm")
+                  : t("authentication.continue")}
               </Text>
             </TouchableOpacity>
           </View>

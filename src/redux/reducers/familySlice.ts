@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const STORAGE_KEY = "@family_members";
 
@@ -16,11 +16,13 @@ interface FamilyState {
 }
 
 // Default members
+// Names are localized at render time via getFamilyMemberName (keyed by id);
+// the stored name here is only a fallback.
 const DEFAULT_MEMBERS: FamilyMember[] = [
-  { id: "wife", name: "Vợ", icon: "woman", color: "#FF6B9D" },
-  { id: "husband", name: "Chồng", icon: "man", color: "#4A90E2" },
-  { id: "child", name: "Con", icon: "happy", color: "#FFA726" },
-  { id: "shared", name: "Chung", icon: "people", color: "#9C27B0" },
+  { id: "wife", name: "Wife", icon: "woman", color: "#FF6B9D" },
+  { id: "husband", name: "Husband", icon: "man", color: "#4A90E2" },
+  { id: "child", name: "Child", icon: "happy", color: "#FFA726" },
+  { id: "shared", name: "Shared", icon: "people", color: "#9C27B0" },
 ];
 
 const initialState: FamilyState = {
@@ -34,7 +36,7 @@ export const loadFamilyMembers = createAsyncThunk(
   async () => {
     const data = await AsyncStorage.getItem(STORAGE_KEY);
     return data ? JSON.parse(data) : DEFAULT_MEMBERS;
-  }
+  },
 );
 
 export const saveFamilyMembers = createAsyncThunk(
@@ -42,7 +44,7 @@ export const saveFamilyMembers = createAsyncThunk(
   async (members: FamilyMember[]) => {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(members));
     return members;
-  }
+  },
 );
 
 const familySlice = createSlice({
@@ -54,7 +56,7 @@ const familySlice = createSlice({
     },
     updateMember: (
       state,
-      action: PayloadAction<{ id: string; data: Partial<FamilyMember> }>
+      action: PayloadAction<{ id: string; data: Partial<FamilyMember> }>,
     ) => {
       const index = state.members.findIndex((m) => m.id === action.payload.id);
       if (index !== -1) {

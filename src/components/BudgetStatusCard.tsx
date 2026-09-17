@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { Colors } from "../../constants/theme";
 import { useCurrencyFormat } from "../hooks/useCurrency";
+import { useTranslation } from "../hooks/useTranslation";
 import { BudgetPeriodType, BudgetStatus } from "../types/spendingLimit.types";
 
 interface BudgetStatusCardProps {
@@ -27,6 +28,7 @@ export default function BudgetStatusCard({
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
   const formatCurrency = useCurrencyFormat();
+  const { t } = useTranslation();
 
   const handlePress = () => {
     if (onPress) {
@@ -51,8 +53,8 @@ export default function BudgetStatusCard({
   // Get period label
   const getPeriodLabel = () => {
     return budgetStatus.periodType === BudgetPeriodType.WEEKLY
-      ? "Tuần này"
-      : "Tháng này";
+      ? t("budget.thisWeek")
+      : t("budget.thisMonth");
   };
 
   // Get period icon
@@ -79,7 +81,9 @@ export default function BudgetStatusCard({
             {getPeriodLabel()}
           </Text>
           <Text style={[styles.limitText, { color: colors.icon }]}>
-            Hạn mức: {formatCurrency(budgetStatus.limit)}
+            {t("budget.limitLabel", {
+              amount: formatCurrency(budgetStatus.limit),
+            })}
           </Text>
         </View>
         {onPress && (
@@ -91,7 +95,7 @@ export default function BudgetStatusCard({
       <View style={styles.amountsContainer}>
         <View style={styles.amountItem}>
           <Text style={[styles.amountLabel, { color: colors.icon }]}>
-            Đã chi
+            {t("budget.spent")}
           </Text>
           <Text style={[styles.amountValue, { color: statusColor }]}>
             {formatCurrency(budgetStatus.spent)}
@@ -99,7 +103,7 @@ export default function BudgetStatusCard({
         </View>
         <View style={styles.amountItem}>
           <Text style={[styles.amountLabel, { color: colors.icon }]}>
-            Còn lại
+            {t("budget.remaining")}
           </Text>
           <Text
             style={[
@@ -144,7 +148,7 @@ export default function BudgetStatusCard({
         <View style={[styles.statusMessage, { backgroundColor: "#FEE2E2" }]}>
           <Ionicons name="alert-circle" size={16} color="#EF4444" />
           <Text style={[styles.statusMessageText, { color: "#991B1B" }]}>
-            Đã vượt hạn mức
+            {t("budget.overBudget")}
           </Text>
         </View>
       )}
@@ -152,7 +156,7 @@ export default function BudgetStatusCard({
         <View style={[styles.statusMessage, { backgroundColor: "#FEF3C7" }]}>
           <Ionicons name="warning" size={16} color="#F59E0B" />
           <Text style={[styles.statusMessageText, { color: "#92400E" }]}>
-            Sắp đạt hạn mức
+            {t("budget.nearLimit")}
           </Text>
         </View>
       )}

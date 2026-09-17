@@ -1,4 +1,4 @@
-import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { getNoteCategoryConfig } from "@/src/constants/NoteCategories";
 import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { deleteNote } from "@/src/redux/reducers/noteSlice";
@@ -16,6 +16,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function NoteDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -67,9 +68,7 @@ export default function NoteDetailScreen() {
     return null;
   }
 
-  const categoryConfig = NOTE_CATEGORIES.find(
-    (cat) => cat.key === note.category,
-  );
+  const categoryConfig = getNoteCategoryConfig(note.category, t);
 
   const formatTimestamp = (timestamp: string) => {
     try {
@@ -83,23 +82,27 @@ export default function NoteDetailScreen() {
   return (
     <View style={styles.container}>
       {/* Header with Actions */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
-        </TouchableOpacity>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleEdit}>
-            <Ionicons name="create-outline" size={24} color="#007AFF" />
+      <SafeAreaView>
+        <View style={styles.header}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#007AFF" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton} onPress={handleDelete}>
-            <Ionicons name="trash-outline" size={24} color="#FF3B30" />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleEdit}>
+              <Ionicons name="create-outline" size={24} color="#007AFF" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={handleDelete}
+            >
+              <Ionicons name="trash-outline" size={24} color="#FF3B30" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-
+      </SafeAreaView>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -108,7 +111,7 @@ export default function NoteDetailScreen() {
         {note.isPinned && (
           <View style={styles.pinnedBadge}>
             <Ionicons name="pin" size={16} color="#FF9500" />
-            <Text style={styles.pinnedText}>Đã ghim</Text>
+            <Text style={styles.pinnedText}>{t("notes.pinnedBadge")}</Text>
           </View>
         )}
 
@@ -167,13 +170,13 @@ export default function NoteDetailScreen() {
         {/* Timestamps */}
         <View style={styles.timestampsSection}>
           <View style={styles.timestampRow}>
-            <Text style={styles.timestampLabel}>Tạo lúc:</Text>
+            <Text style={styles.timestampLabel}>{t("common.createdAt")}</Text>
             <Text style={styles.timestampValue}>
               {formatTimestamp(note.createdAt)}
             </Text>
           </View>
           <View style={styles.timestampRow}>
-            <Text style={styles.timestampLabel}>Cập nhật:</Text>
+            <Text style={styles.timestampLabel}>{t("common.updatedAt")}</Text>
             <Text style={styles.timestampValue}>
               {formatTimestamp(note.updatedAt)}
             </Text>

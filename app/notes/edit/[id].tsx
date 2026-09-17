@@ -1,4 +1,4 @@
-import { NOTE_CATEGORIES } from "@/src/constants/NoteCategories";
+import { getNoteCategories } from "@/src/constants/NoteCategories";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { deleteNote, updateNote } from "@/src/redux/reducers/noteSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
@@ -47,6 +47,7 @@ export default function EditNoteScreen() {
     tags?: string;
   }>({});
   const { t } = useTranslation();
+  const NOTE_CATEGORIES = getNoteCategories(t);
 
   // Pre-fill form with existing note data
   useEffect(() => {
@@ -162,10 +163,10 @@ export default function EditNoteScreen() {
       >
         {/* Title Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Tiêu đề *</Text>
+          <Text style={styles.label}>{t("notes.titleLabel")} *</Text>
           <TextInput
             style={[styles.input, errors.title && styles.inputError]}
-            placeholder="Nhập tiêu đề..."
+            placeholder={t("notes.titlePlaceholder")}
             maxLength={100}
             value={title}
             onChangeText={(text) => {
@@ -179,7 +180,7 @@ export default function EditNoteScreen() {
 
         {/* Category Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Danh mục *</Text>
+          <Text style={styles.label}>{t("notes.categoryLabel")} *</Text>
           <View style={styles.categoryGrid}>
             {NOTE_CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -222,14 +223,14 @@ export default function EditNoteScreen() {
 
         {/* Content Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Nội dung *</Text>
+          <Text style={styles.label}>{t("notes.contentLabel")} *</Text>
           <TextInput
             style={[
               styles.input,
               styles.textArea,
               errors.content && styles.inputError,
             ]}
-            placeholder="Nhập nội dung..."
+            placeholder={t("notes.contentPlaceholder")}
             multiline
             numberOfLines={6}
             maxLength={2000}
@@ -247,7 +248,7 @@ export default function EditNoteScreen() {
 
         {/* Date Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Ngày</Text>
+          <Text style={styles.label}>{t("common.date")}</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
@@ -269,7 +270,7 @@ export default function EditNoteScreen() {
 
         {/* Amount Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Số tiền (tùy chọn)</Text>
+          <Text style={styles.label}>{t("notes.amountOptional")}</Text>
           <TextInput
             style={[styles.input, errors.amount && styles.inputError]}
             placeholder="0"
@@ -287,19 +288,17 @@ export default function EditNoteScreen() {
 
         {/* Tags Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Tags (tùy chọn)</Text>
+          <Text style={styles.label}>{t("common.tagsOptional")}</Text>
           <TextInput
             style={[styles.input, errors.tags && styles.inputError]}
-            placeholder="Nhập tags, phân cách bằng dấu phẩy..."
+            placeholder={t("common.tagsPlaceholder")}
             value={tagsInput}
             onChangeText={(text) => {
               setTagsInput(text);
               if (errors.tags) setErrors({ ...errors, tags: undefined });
             }}
           />
-          <Text style={styles.helperText}>
-            Ví dụ: quan trọng, cần xem lại, mua sắm
-          </Text>
+          <Text style={styles.helperText}>{t("common.tagsHelper")}</Text>
           {errors.tags && <Text style={styles.errorText}>{errors.tags}</Text>}
         </View>
 
@@ -308,7 +307,7 @@ export default function EditNoteScreen() {
           <View style={styles.switchRow}>
             <View style={styles.switchLabel}>
               <Ionicons name="pin" size={20} color="#FF9500" />
-              <Text style={styles.label}>Ghim ghi chú</Text>
+              <Text style={styles.label}>{t("notes.pinNote")}</Text>
             </View>
             <Switch
               value={isPinned}
@@ -322,7 +321,9 @@ export default function EditNoteScreen() {
         {/* Delete Button */}
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Ionicons name="trash-outline" size={20} color="#fff" />
-          <Text style={styles.deleteButtonText}>Xóa ghi chú</Text>
+          <Text style={styles.deleteButtonText}>
+            {t("notes.deleteNoteButton")}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -332,10 +333,10 @@ export default function EditNoteScreen() {
           style={styles.cancelButton}
           onPress={() => router.back()}
         >
-          <Text style={styles.cancelButtonText}>Hủy</Text>
+          <Text style={styles.cancelButtonText}>{t("common.cancel")}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Lưu</Text>
+          <Text style={styles.saveButtonText}>{t("common.save")}</Text>
         </TouchableOpacity>
       </View>
     </View>

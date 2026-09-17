@@ -1,15 +1,30 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { useMemo } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   SectionList,
+  StyleSheet,
+  Text,
   useColorScheme,
+  View,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "../../constants/theme";
+import { useTranslation } from "../hooks/useTranslation";
 import { Event } from "../types/event.types";
 import { EventCard } from "./EventCard";
-import { Colors } from "../../constants/theme";
+
+// Maps the app language code to a BCP-47 locale tag for date formatting.
+const localeTagFor = (language: string): string => {
+  switch (language) {
+    case "vi":
+      return "vi-VN";
+    case "ja":
+      return "ja-JP";
+    case "ko":
+      return "ko-KR";
+    default:
+      return "en-US";
+  }
+};
 
 interface EventListProps {
   events: Event[];
@@ -23,63 +38,44 @@ interface EventSection {
   data: Event[];
 }
 
-// Format date for section headers (e.g., "Thứ Hai, 18 Tháng 11")
-const formatSectionDate = (dateString: string): string => {
+// Format date for section headers, localized. Uses "Today"/"Tomorrow" labels
+// when applicable, otherwise a full weekday + day + month via Intl.
+const formatSectionDate = (
+  dateString: string,
+  t: (key: string) => string,
+  locale: string,
+): string => {
   const date = new Date(dateString);
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
 
-  // Check if it's today
   if (date.toDateString() === today.toDateString()) {
-    return "Hôm nay";
+    return t("calendar.today");
   }
 
-  // Check if it's tomorrow
   if (date.toDateString() === tomorrow.toDateString()) {
-    return "Ngày mai";
+    return t("calendar.tomorrow");
   }
 
-  // Format as "Thứ X, DD Tháng MM"
-  const dayNames = [
-    "Chủ Nhật",
-    "Thứ Hai",
-    "Thứ Ba",
-    "Thứ Tư",
-    "Thứ Năm",
-    "Thứ Sáu",
-    "Thứ Bảy",
-  ];
-  const monthNames = [
-    "Tháng 1",
-    "Tháng 2",
-    "Tháng 3",
-    "Tháng 4",
-    "Tháng 5",
-    "Tháng 6",
-    "Tháng 7",
-    "Tháng 8",
-    "Tháng 9",
-    "Tháng 10",
-    "Tháng 11",
-    "Tháng 12",
-  ];
-
-  const dayName = dayNames[date.getDay()];
-  const day = date.getDate();
-  const monthName = monthNames[date.getMonth()];
-
-  return `${dayName}, ${day} ${monthName}`;
+  return date.toLocaleDateString(locale, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 };
 
 export const EventList: React.FC<EventListProps> = ({
   events,
   onEventPress,
-  emptyMessage = "Không có sự kiện nào.",
+  emptyMessage,
   scrollEnabled = true,
 }) => {
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const { t, getCurrentLanguage } = useTranslation();
+  const locale = localeTagFor(getCurrentLanguage());
+  const resolvedEmptyMessage = emptyMessage ?? t("calendar.noEventsMessage");
 
   // Group events by date and sort chronologically
   const sections = useMemo<EventSection[]>(() => {
@@ -91,21 +87,24 @@ export const EventList: React.FC<EventListProps> = ({
     });
 
     // Group by date
-    const grouped = sortedEvents.reduce((acc, event) => {
-      const dateKey = event.date;
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-      acc[dateKey].push(event);
-      return acc;
-    }, {} as Record<string, Event[]>);
+    const grouped = sortedEvents.reduce(
+      (acc, event) => {
+        const dateKey = event.date;
+        if (!acc[dateKey]) {
+          acc[dateKey] = [];
+        }
+        acc[dateKey].push(event);
+        return acc;
+      },
+      {} as Record<string, Event[]>,
+    );
 
     // Convert to sections array
     return Object.entries(grouped).map(([date, dateEvents]) => ({
-      title: formatSectionDate(date),
+      title: formatSectionDate(date, t, locale),
       data: dateEvents,
     }));
-  }, [events]);
+  }, [events, t, locale]);
 
   // Render empty state
   if (events.length === 0) {
@@ -115,10 +114,10 @@ export const EventList: React.FC<EventListProps> = ({
           <Ionicons name="calendar-outline" size={64} color={colors.icon} />
         </View>
         <Text style={[styles.emptyTitle, { color: colors.text }]}>
-          Không có sự kiện
+          {t("calendar.noEvents")}
         </Text>
         <Text style={[styles.emptyText, { color: colors.icon }]}>
-          {emptyMessage}
+          {resolvedEmptyMessage}
         </Text>
       </View>
     );

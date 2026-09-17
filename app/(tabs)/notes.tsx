@@ -196,7 +196,7 @@ export default function NotesTab() {
   );
 
   const renderSearchEmptyState = () => (
-    <View style={styles.emptyState}>
+    <View style={styles.listEmptyState}>
       <Ionicons name="search-outline" size={64} color="#ccc" />
       <Text style={styles.emptyTitle}>{t("common.noData")}</Text>
       <Text style={styles.emptyText}>{t("notes.searchNotes")}</Text>
@@ -216,26 +216,10 @@ export default function NotesTab() {
     filteredAndSortedNotes.pinned.length > 0 ||
     filteredAndSortedNotes.unpinned.length > 0;
 
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient
-        colors={["#667eea", "#764ba2"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.header, { paddingTop: insets.top + 20 }]}
-      >
-        <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>{t("notes.title")}</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => router.push("/notes/add")}
-          >
-            <Ionicons name="add" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-
+  // Search + filters live inside the list header so they scroll away with the
+  // content, giving the notes list more room once the user scrolls up.
+  const renderListHeader = () => (
+    <View>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons
@@ -314,7 +298,7 @@ export default function NotesTab() {
       {/* Tag Filters */}
       {availableTags.length > 0 && (
         <View style={styles.filterSection}>
-          <Text style={styles.filterLabel}>Tags</Text>
+          <Text style={styles.filterLabel}>{t("common.tags")}</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -346,35 +330,63 @@ export default function NotesTab() {
         </View>
       )}
 
+      {/* Pinned section title */}
+      {filteredAndSortedNotes.pinned.length > 0 && (
+        <View style={styles.sectionHeader}>
+          <Ionicons name="pin" size={16} color="#FF9500" />
+          <Text style={styles.sectionTitle}>
+            {t("notes.pinned") || "Pinned"}
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Header */}
+      <LinearGradient
+        colors={["#667eea", "#764ba2"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.header, { paddingTop: insets.top + 20 }]}
+      >
+        <View style={styles.headerTop}>
+          <Text style={styles.headerTitle}>{t("notes.title")}</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push("/notes/add")}
+          >
+            <Ionicons name="add" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
+
       {/* Notes List */}
       {!hasNotes ? (
         renderEmptyState()
-      ) : !hasResults ? (
-        renderSearchEmptyState()
       ) : (
         <FlatList
-          data={[
-            ...filteredAndSortedNotes.pinned.map((note) => ({
-              ...note,
-              isPinned: true,
-            })),
-            ...filteredAndSortedNotes.unpinned,
-          ]}
+          data={
+            hasResults
+              ? [
+                  ...filteredAndSortedNotes.pinned.map((note) => ({
+                    ...note,
+                    isPinned: true,
+                  })),
+                  ...filteredAndSortedNotes.unpinned,
+                ]
+              : []
+          }
           renderItem={({ item }) =>
             renderNoteItem({ item, isPinned: item.isPinned })
           }
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
-          ListHeaderComponent={
-            filteredAndSortedNotes.pinned.length > 0 ? (
-              <View style={styles.sectionHeader}>
-                <Ionicons name="pin" size={16} color="#FF9500" />
-                <Text style={styles.sectionTitle}>
-                  {t("notes.pinned") || "Pinned"}
-                </Text>
-              </View>
-            ) : null
-          }
+          ListHeaderComponent={renderListHeader}
+          ListEmptyComponent={renderSearchEmptyState}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>
@@ -627,6 +639,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 32,
+  },
+  listEmptyState: {
+    alignItems: "center",
+    paddingVertical: 48,
+    paddingHorizontal: 32,
   },
   emptyTitle: {
     fontSize: 18,

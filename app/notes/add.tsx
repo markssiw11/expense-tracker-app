@@ -241,19 +241,17 @@ export default function AddNoteScreen() {
 
         {/* Tags Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Tags (tùy chọn)</Text>
+          <Text style={styles.label}>{t("common.tagsOptional")}</Text>
           <TextInput
             style={[styles.input, errors.tags && styles.inputError]}
-            placeholder="Nhập tags, phân cách bằng dấu phẩy..."
+            placeholder={t("common.tagsPlaceholder")}
             value={tagsInput}
             onChangeText={(text) => {
               setTagsInput(text);
               if (errors.tags) setErrors({ ...errors, tags: undefined });
             }}
           />
-          <Text style={styles.helperText}>
-            Ví dụ: quan trọng, cần xem lại, mua sắm
-          </Text>
+          <Text style={styles.helperText}>{t("common.tagsHelper")}</Text>
           {errors.tags && <Text style={styles.errorText}>{errors.tags}</Text>}
         </View>
 

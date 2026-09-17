@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useCurrencyFormat } from "../hooks/useCurrency";
+import { useTranslation } from "../hooks/useTranslation";
 import { BudgetPeriodType, BudgetStatus } from "../types/spendingLimit.types";
 
 interface BudgetWarningBannerProps {
@@ -15,6 +16,7 @@ export default function BudgetWarningBanner({
   monthlyStatus,
 }: BudgetWarningBannerProps) {
   const formatCurrency = useCurrencyFormat();
+  const { t } = useTranslation();
   const [dismissedWarnings, setDismissedWarnings] = useState<Set<string>>(
     new Set(),
   );
@@ -80,7 +82,9 @@ export default function BudgetWarningBanner({
   };
 
   const getPeriodLabel = (periodType: BudgetPeriodType) => {
-    return periodType === BudgetPeriodType.WEEKLY ? "tuần" : "tháng";
+    return periodType === BudgetPeriodType.WEEKLY
+      ? t("budget.periodWeek")
+      : t("budget.periodMonth");
   };
 
   const getWarningConfig = (type: "warning" | "exceeded") => {
@@ -109,14 +113,16 @@ export default function BudgetWarningBanner({
         const periodLabel = getPeriodLabel(warning.status.periodType);
         const message =
           warning.type === "exceeded"
-            ? `Bạn đã vượt hạn mức ${periodLabel} ${formatCurrency(
-                warning.status.limit,
-              )}. Đã chi: ${formatCurrency(warning.status.spent)}`
-            : `Bạn đã chi ${warning.status.percentage.toFixed(
-                0,
-              )}% hạn mức ${periodLabel}. Còn lại: ${formatCurrency(
-                warning.status.remaining,
-              )}`;
+            ? t("budget.warnExceeded", {
+                period: periodLabel,
+                limit: formatCurrency(warning.status.limit),
+                spent: formatCurrency(warning.status.spent),
+              })
+            : t("budget.warnNearLimit", {
+                percent: warning.status.percentage.toFixed(0),
+                period: periodLabel,
+                remaining: formatCurrency(warning.status.remaining),
+              });
 
         return (
           <View

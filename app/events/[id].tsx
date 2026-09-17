@@ -6,7 +6,7 @@ import { cancelNotification } from "@/src/services/notificationService";
 import { EventCategory } from "@/src/types/event.types";
 import { Ionicons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
-import { vi } from "date-fns/locale";
+import { enUS, ja, ko, vi } from "date-fns/locale";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -60,7 +60,8 @@ export default function EventDetailScreen() {
     state.events.events.find((e) => e.id === id),
   );
   const [isDeleting, setIsDeleting] = useState(false);
-  const { t } = useTranslation();
+  const { t, getCurrentLanguage } = useTranslation();
+  const dateFnsLocale = { vi, ja, ko, en: enUS }[getCurrentLanguage()] ?? enUS;
 
   // If event not found, go back
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function EventDetailScreen() {
   const formatEventDate = (dateStr: string) => {
     try {
       const date = parseISO(dateStr);
-      return format(date, "EEEE, dd MMMM yyyy", { locale: vi });
+      return format(date, "EEEE, dd MMMM yyyy", { locale: dateFnsLocale });
     } catch {
       return dateStr;
     }
@@ -176,7 +177,7 @@ export default function EventDetailScreen() {
               <Ionicons name="calendar" size={20} color="#007AFF" />
             </View>
             <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Ngày</Text>
+              <Text style={styles.detailLabel}>{t("common.date")}</Text>
               <Text style={styles.detailValue}>
                 {formatEventDate(event.date)}
               </Text>
@@ -188,7 +189,7 @@ export default function EventDetailScreen() {
               <Ionicons name="time" size={20} color="#007AFF" />
             </View>
             <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Thời gian</Text>
+              <Text style={styles.detailLabel}>{t("common.time")}</Text>
               <Text style={styles.detailValue}>{event.time}</Text>
             </View>
           </View>
@@ -199,7 +200,7 @@ export default function EventDetailScreen() {
                 <Ionicons name="location" size={20} color="#007AFF" />
               </View>
               <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>Địa điểm</Text>
+                <Text style={styles.detailLabel}>{t("common.location")}</Text>
                 <Text style={styles.detailValue}>{event.location}</Text>
               </View>
             </View>
@@ -237,7 +238,9 @@ export default function EventDetailScreen() {
           <View style={styles.descriptionCard}>
             <View style={styles.descriptionHeader}>
               <Ionicons name="document-text" size={20} color="#666" />
-              <Text style={styles.descriptionLabel}>Mô tả</Text>
+              <Text style={styles.descriptionLabel}>
+                {t("common.description")}
+              </Text>
             </View>
             <Text style={styles.descriptionText}>{event.description}</Text>
           </View>
@@ -246,13 +249,13 @@ export default function EventDetailScreen() {
         {/* Timestamps */}
         <View style={styles.timestampsSection}>
           <View style={styles.timestampRow}>
-            <Text style={styles.timestampLabel}>Tạo lúc:</Text>
+            <Text style={styles.timestampLabel}>{t("common.createdAt")}</Text>
             <Text style={styles.timestampValue}>
               {formatTimestamp(event.createdAt)}
             </Text>
           </View>
           <View style={styles.timestampRow}>
-            <Text style={styles.timestampLabel}>Cập nhật:</Text>
+            <Text style={styles.timestampLabel}>{t("common.updatedAt")}</Text>
             <Text style={styles.timestampValue}>
               {formatTimestamp(event.updatedAt)}
             </Text>
@@ -265,7 +268,7 @@ export default function EventDetailScreen() {
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color="#667eea" />
-            <Text style={styles.loadingText}>Đang xóa...</Text>
+            <Text style={styles.loadingText}>{t("common.deleting")}</Text>
           </View>
         </View>
       )}

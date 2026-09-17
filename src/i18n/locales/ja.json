@@ -35,7 +35,20 @@
     "saving": "保存中",
     "pleaseWait": "お待ちください。",
     "warning": "警告",
-    "tryAgain": "再試行"
+    "tryAgain": "再試行",
+    "date": "日付",
+    "time": "時間",
+    "location": "場所",
+    "description": "説明",
+    "createdAt": "作成:",
+    "updatedAt": "更新:",
+    "deleting": "削除中...",
+    "unknown": "不明",
+    "optional": "任意",
+    "tags": "タグ",
+    "tagsOptional": "タグ（任意）",
+    "tagsPlaceholder": "タグをカンマ区切りで入力...",
+    "tagsHelper": "例: 重要, 要確認, 買い物"
   },
   "navigation": {
     "home": "ホーム",
@@ -193,7 +206,17 @@
     "reminderBeforeHours": "{{count}}時間前",
     "reminderBeforeDay": "1日前",
     "notificationTime": "時間: {{time}}",
-    "notificationLocation": "場所: {{location}}"
+    "notificationLocation": "場所: {{location}}",
+    "titleLabel": "タイトル",
+    "titlePlaceholder": "イベントのタイトルを入力...",
+    "titleRequired": "タイトルは必須です",
+    "descriptionLabel": "説明（任意）",
+    "descriptionPlaceholder": "説明を入力...",
+    "locationLabel": "場所（任意）",
+    "locationPlaceholder": "場所を入力...",
+    "dateLabel": "日付",
+    "timeLabel": "時間",
+    "categoryLabel": "カテゴリー"
   },
   "eventCategories": {
     "Work": "仕事",
@@ -221,6 +244,15 @@
     "updateNoteFailed": "メモを更新できませんでした。もう一度お試しください。",
     "deleteNoteSuccess": "メモを削除しました",
     "deleteNoteFailed": "メモを削除できませんでした。もう一度お試しください。",
+    "titleLabel": "タイトル",
+    "titlePlaceholder": "タイトルを入力...",
+    "contentLabel": "内容",
+    "contentPlaceholder": "内容を入力...",
+    "amountOptional": "金額（任意）",
+    "categoryLabel": "カテゴリー",
+    "pinNote": "メモをピン留め",
+    "deleteNoteButton": "メモを削除",
+    "pinnedBadge": "ピン留め済み",
     "validation": {
       "titleRequired": "タイトルを入力してください",
       "titleTooLong": "タイトルは100文字を超えることはできません",
@@ -290,7 +322,27 @@
     "passwordWrong": "パスワードが正しくありません",
     "passwordDisableSuccess": "パスワード保護を無効にしました",
     "passwordDisableFailed": "パスワード保護を無効にできませんでした",
-    "enablePasswordForBiometric": "生体認証を使用するにはパスワード保護を有効にしてください"
+    "enablePasswordForBiometric": "生体認証を使用するにはパスワード保護を有効にしてください",
+    "modalCreateNew": "新しいパスワードを作成",
+    "modalConfirm": "パスワードを確認",
+    "modalEnterCurrent": "現在のパスワードを入力",
+    "modalEnterNew": "新しいパスワードを入力",
+    "modalConfirmNew": "新しいパスワードを確認",
+    "modalEnterToDisable": "無効にするパスワードを入力",
+    "continue": "続ける"
+  },
+  "errorBoundary": {
+    "title": "エラーが発生しました",
+    "message": "アプリで予期しない問題が発生しました。もう一度お試しください。",
+    "retry": "再試行"
+  },
+  "storageErrors": {
+    "saveEvent": "イベントを保存できませんでした。デバイスのストレージを確認してください。",
+    "loadEvent": "イベントを読み込めませんでした。接続を確認してもう一度お試しください。",
+    "deleteEvent": "イベントデータを削除できませんでした。"
+  },
+  "app": {
+    "name": "家計簿"
   },
   "budget": {
     "weeklyLimit": "週次制限",
@@ -299,6 +351,15 @@
     "remaining": "残高",
     "exceeded": "超過",
     "onTrack": "順調",
+    "thisWeek": "今週",
+    "thisMonth": "今月",
+    "limitLabel": "上限: {{amount}}",
+    "overBudget": "予算を超過しました",
+    "nearLimit": "上限に近づいています",
+    "periodWeek": "週間",
+    "periodMonth": "月間",
+    "warnExceeded": "{{period}}の上限 {{limit}} を超えました。支出: {{spent}}",
+    "warnNearLimit": "{{period}}の上限の{{percent}}%を使用しました。残り: {{remaining}}",
     "warning": "警告",
     "danger": "予算超過",
     "setLimit": "制限を設定",
@@ -365,6 +426,8 @@
     "upcomingEvents": "今後のイベント",
     "noEventsToday": "今日のイベントはありません",
     "noEventsThisWeek": "今週のイベントはありません",
+    "noEvents": "イベントがありません",
+    "noEventsMessage": "予定されているイベントはありません。",
     "viewAll": "すべて表示"
   },
   "reports": {

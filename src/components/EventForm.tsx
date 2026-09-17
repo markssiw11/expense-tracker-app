@@ -1,3 +1,4 @@
+import useTranslation from "@/src/hooks/useTranslation";
 import {
   EventCategory,
   EventFormData,
@@ -24,6 +25,20 @@ interface FormErrors {
   title?: string;
 }
 
+// Map the app language code to a BCP-47 locale tag for date/time formatting.
+function getLocaleTag(language: string): string {
+  switch (language) {
+    case "vi":
+      return "vi-VN";
+    case "ja":
+      return "ja-JP";
+    case "ko":
+      return "ko-KR";
+    default:
+      return "en-US";
+  }
+}
+
 interface EventFormProps {
   initialData?: Partial<EventFormData>;
   onSubmit: (data: EventFormData) => void;
@@ -37,22 +52,25 @@ export default function EventForm({
   onCancel,
   isSubmitting = false,
 }: EventFormProps) {
+  const { t, getCurrentLanguage } = useTranslation();
+  const locale = getLocaleTag(getCurrentLanguage());
+
   // Form state
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(
-    initialData?.description || ""
+    initialData?.description || "",
   );
   const [location, setLocation] = useState(initialData?.location || "");
   const [category, setCategory] = useState<EventCategory>(
-    initialData?.category || "Personal"
+    initialData?.category || "Personal",
   );
   const [date, setDate] = useState(initialData?.date || new Date());
   const [time, setTime] = useState(initialData?.time || new Date());
   const [reminderEnabled, setReminderEnabled] = useState(
-    initialData?.reminderEnabled ?? false
+    initialData?.reminderEnabled ?? false,
   );
   const [reminderMinutes, setReminderMinutes] = useState<ReminderTime>(
-    initialData?.reminderMinutes || 5
+    initialData?.reminderMinutes || 5,
   );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -63,7 +81,7 @@ export default function EventForm({
     const newErrors: FormErrors = {};
 
     if (title.trim().length === 0) {
-      newErrors.title = "Tiêu đề là bắt buộc";
+      newErrors.title = t("events.titleRequired");
     }
 
     setErrors(newErrors);
@@ -111,10 +129,10 @@ export default function EventForm({
       >
         {/* Title Input */}
         <View style={[styles.section, { marginTop: insets?.top }]}>
-          <Text style={styles.label}>Tiêu đề *</Text>
+          <Text style={styles.label}>{t("events.titleLabel")} *</Text>
           <TextInput
             style={[styles.input, errors.title && styles.inputError]}
-            placeholder="Nhập tiêu đề sự kiện..."
+            placeholder={t("events.titlePlaceholder")}
             value={title}
             onChangeText={(text) => {
               setTitle(text);
@@ -127,10 +145,10 @@ export default function EventForm({
 
         {/* Description Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Mô tả (tùy chọn)</Text>
+          <Text style={styles.label}>{t("events.descriptionLabel")}</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
-            placeholder="Nhập mô tả..."
+            placeholder={t("events.descriptionPlaceholder")}
             multiline
             numberOfLines={3}
             maxLength={200}
@@ -144,10 +162,10 @@ export default function EventForm({
 
         {/* Location Input */}
         <View style={styles.section}>
-          <Text style={styles.label}>Địa điểm (tùy chọn)</Text>
+          <Text style={styles.label}>{t("events.locationLabel")}</Text>
           <TextInput
             style={styles.input}
-            placeholder="Nhập địa điểm..."
+            placeholder={t("events.locationPlaceholder")}
             value={location}
             onChangeText={setLocation}
             maxLength={100}
@@ -156,14 +174,14 @@ export default function EventForm({
 
         {/* Date Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Ngày</Text>
+          <Text style={styles.label}>{t("events.dateLabel")}</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowDatePicker(true)}
           >
             <Ionicons name="calendar-outline" size={20} color="#666" />
             <Text style={styles.dateText}>
-              {date.toLocaleDateString("vi-VN")}
+              {date.toLocaleDateString(locale)}
             </Text>
           </TouchableOpacity>
           {showDatePicker && (
@@ -183,14 +201,14 @@ export default function EventForm({
 
         {/* Time Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Thời gian</Text>
+          <Text style={styles.label}>{t("events.timeLabel")}</Text>
           <TouchableOpacity
             style={styles.dateButton}
             onPress={() => setShowTimePicker(true)}
           >
             <Ionicons name="time-outline" size={20} color="#666" />
             <Text style={styles.dateText}>
-              {time.toLocaleTimeString("vi-VN", {
+              {time.toLocaleTimeString(locale, {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
@@ -213,7 +231,7 @@ export default function EventForm({
 
         {/* Category Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>Danh mục</Text>
+          <Text style={styles.label}>{t("events.categoryLabel")}</Text>
           <CategoryPicker selectedCategory={category} onSelect={setCategory} />
         </View>
 
@@ -235,7 +253,7 @@ export default function EventForm({
           onPress={onCancel}
           disabled={isSubmitting}
         >
-          <Text style={styles.cancelButtonText}>Hủy</Text>
+          <Text style={styles.cancelButtonText}>{t("common.cancel")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -246,7 +264,7 @@ export default function EventForm({
           disabled={!isFormValid || isSubmitting}
         >
           <Text style={styles.saveButtonText}>
-            {isSubmitting ? "Đang lưu..." : "Lưu"}
+            {isSubmitting ? `${t("common.saving")}...` : t("common.save")}
           </Text>
         </TouchableOpacity>
       </View>

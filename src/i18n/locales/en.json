@@ -35,7 +35,20 @@
     "saving": "Saving",
     "pleaseWait": "Please wait.",
     "warning": "Warning",
-    "tryAgain": "Try Again"
+    "tryAgain": "Try Again",
+    "date": "Date",
+    "time": "Time",
+    "location": "Location",
+    "description": "Description",
+    "createdAt": "Created:",
+    "updatedAt": "Updated:",
+    "deleting": "Deleting...",
+    "unknown": "Unknown",
+    "optional": "optional",
+    "tags": "Tags",
+    "tagsOptional": "Tags (optional)",
+    "tagsPlaceholder": "Enter tags, separated by commas...",
+    "tagsHelper": "e.g. important, review, shopping"
   },
   "navigation": {
     "home": "Home",
@@ -193,7 +206,17 @@
     "reminderBeforeHours": "{{count}} hours before",
     "reminderBeforeDay": "1 day before",
     "notificationTime": "Time: {{time}}",
-    "notificationLocation": "Location: {{location}}"
+    "notificationLocation": "Location: {{location}}",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Enter event title...",
+    "titleRequired": "Title is required",
+    "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Enter description...",
+    "locationLabel": "Location (optional)",
+    "locationPlaceholder": "Enter location...",
+    "dateLabel": "Date",
+    "timeLabel": "Time",
+    "categoryLabel": "Category"
   },
   "eventCategories": {
     "Work": "Work",
@@ -221,6 +244,15 @@
     "updateNoteFailed": "Unable to update note. Please try again.",
     "deleteNoteSuccess": "Note deleted",
     "deleteNoteFailed": "Unable to delete note. Please try again.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Enter title...",
+    "contentLabel": "Content",
+    "contentPlaceholder": "Enter content...",
+    "amountOptional": "Amount (optional)",
+    "categoryLabel": "Category",
+    "pinNote": "Pin note",
+    "deleteNoteButton": "Delete note",
+    "pinnedBadge": "Pinned",
     "validation": {
       "titleRequired": "Title cannot be empty",
       "titleTooLong": "Title cannot exceed 100 characters",
@@ -290,7 +322,27 @@
     "passwordWrong": "Incorrect password",
     "passwordDisableSuccess": "Password protection has been disabled",
     "passwordDisableFailed": "Unable to disable password protection",
-    "enablePasswordForBiometric": "Enable password protection to use biometric authentication"
+    "enablePasswordForBiometric": "Enable password protection to use biometric authentication",
+    "modalCreateNew": "Create new password",
+    "modalConfirm": "Confirm password",
+    "modalEnterCurrent": "Enter current password",
+    "modalEnterNew": "Enter new password",
+    "modalConfirmNew": "Confirm new password",
+    "modalEnterToDisable": "Enter password to disable",
+    "continue": "Continue"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "The app encountered an unexpected error. Please try again.",
+    "retry": "Try Again"
+  },
+  "storageErrors": {
+    "saveEvent": "Unable to save event. Please check device storage.",
+    "loadEvent": "Unable to load events. Please check your connection and try again.",
+    "deleteEvent": "Unable to delete event data."
+  },
+  "app": {
+    "name": "FamFinance"
   },
   "budget": {
     "weeklyLimit": "Weekly Limit",
@@ -299,6 +351,15 @@
     "remaining": "Remaining",
     "exceeded": "Exceeded",
     "onTrack": "On Track",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "limitLabel": "Limit: {{amount}}",
+    "overBudget": "Over budget",
+    "nearLimit": "Near limit",
+    "periodWeek": "weekly",
+    "periodMonth": "monthly",
+    "warnExceeded": "You exceeded your {{period}} limit of {{limit}}. Spent: {{spent}}",
+    "warnNearLimit": "You've spent {{percent}}% of your {{period}} limit. Remaining: {{remaining}}",
     "warning": "Warning",
     "danger": "Over Budget",
     "setLimit": "Set Limit",
@@ -365,6 +426,8 @@
     "upcomingEvents": "Upcoming Events",
     "noEventsToday": "No events today",
     "noEventsThisWeek": "No events this week",
+    "noEvents": "No events",
+    "noEventsMessage": "No events scheduled.",
     "viewAll": "View All"
   },
   "reports": {
