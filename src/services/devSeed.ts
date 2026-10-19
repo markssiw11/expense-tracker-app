@@ -4,6 +4,8 @@ import { ExpenseCategory } from "../types/expense.types";
 import { IncomeCategory } from "../types/income.types";
 import { NoteCategory } from "../types/note.types";
 import { BudgetPeriodType } from "../types/spendingLimit.types";
+import type { SplitTrip } from "../types/splitExpense.types";
+import { RANDOM_PICKER_ENTRIES_KEY } from "../utils/randomPicker";
 
 // Dev-only seeder that fills AsyncStorage with realistic, good-looking sample
 // data for App Store screenshots. Not wired into production flows; call it from
@@ -16,6 +18,7 @@ const EVENTS_KEY = "@expense_tracker:events";
 const NOTES_KEY = "@expense_tracker:notes";
 const SPENDING_LIMITS_KEY = "@expense_tracker:spending_limits";
 const FAMILY_KEY = "@family_members";
+const SPLIT_TRIPS_KEY = "@expense_tracker:split_trips";
 
 // --- date helpers -----------------------------------------------------------
 
@@ -362,6 +365,73 @@ function buildNotes() {
   }));
 }
 
+function buildSplitTrips(): SplitTrip[] {
+  const participants = [
+    { id: "seed-split-alex", name: "Alex Morgan" },
+    { id: "seed-split-maya", name: "Maya Chen" },
+    { id: "seed-split-jordan", name: "Jordan Lee" },
+    { id: "seed-split-sam", name: "Sam Rivera" },
+  ];
+  const [alex, maya, jordan, sam] = participants;
+  const date = dayFromToday(-1);
+
+  return [
+    {
+      id: "seed-split-coastal-weekend",
+      name: "Coastal Weekend",
+      participants,
+      expenses: [
+        {
+          id: "seed-split-stay",
+          title: "Oceanview house",
+          amount: 180,
+          paidById: alex.id,
+          shares: participants.map((participant) => ({
+            participantId: participant.id,
+            amount: 45,
+          })),
+          date,
+        },
+        {
+          id: "seed-split-dinner",
+          title: "Seafood dinner",
+          amount: 72,
+          paidById: maya.id,
+          shares: participants.map((participant) => ({
+            participantId: participant.id,
+            amount: 18,
+          })),
+          date,
+        },
+        {
+          id: "seed-split-museum",
+          title: "Museum tickets",
+          amount: 34.4,
+          paidById: jordan.id,
+          shares: [
+            { participantId: alex.id, amount: 12 },
+            { participantId: maya.id, amount: 12 },
+            { participantId: jordan.id, amount: 10.4 },
+          ],
+          date,
+        },
+        {
+          id: "seed-split-coffee",
+          title: "Coffee & pastries",
+          amount: 18,
+          paidById: sam.id,
+          shares: participants.map((participant) => ({
+            participantId: participant.id,
+            amount: 4.5,
+          })),
+          date,
+        },
+      ],
+      createdAt: now.toISOString(),
+    },
+  ];
+}
+
 function buildSpendingLimits() {
   // Weekly + monthly budget so the dashboard shows nice progress bars.
   const ts = now.toISOString();
@@ -403,12 +473,24 @@ export async function seedSampleData(): Promise<{
   incomes: number;
   events: number;
   notes: number;
+  splitTrips: number;
+  splitExpenses: number;
+  randomPickerNames: number;
 }> {
   const expenses = buildExpenses();
   const incomes = buildIncomes();
   const events = buildEvents();
   const notes = buildNotes();
   const spendingLimits = buildSpendingLimits();
+  const splitTrips = buildSplitTrips();
+  const randomPickerEntries = [
+    "Alex Morgan",
+    "Maya Chen",
+    "Jordan Lee",
+    "Sam Rivera",
+    "Taylor Kim",
+    "Casey Park",
+  ];
 
   await AsyncStorage.multiSet([
     [EXPENSES_KEY, JSON.stringify(expenses)],
@@ -417,6 +499,8 @@ export async function seedSampleData(): Promise<{
     [NOTES_KEY, JSON.stringify(notes)],
     [SPENDING_LIMITS_KEY, JSON.stringify(spendingLimits)],
     [FAMILY_KEY, JSON.stringify(DEFAULT_MEMBERS)],
+    [SPLIT_TRIPS_KEY, JSON.stringify(splitTrips)],
+    [RANDOM_PICKER_ENTRIES_KEY, JSON.stringify(randomPickerEntries)],
   ]);
 
   return {
@@ -424,6 +508,12 @@ export async function seedSampleData(): Promise<{
     incomes: incomes.length,
     events: events.length,
     notes: notes.length,
+    splitTrips: splitTrips.length,
+    splitExpenses: splitTrips.reduce(
+      (count, trip) => count + trip.expenses.length,
+      0,
+    ),
+    randomPickerNames: randomPickerEntries.length,
   };
 }
 
@@ -435,5 +525,8 @@ export async function clearSampleData(): Promise<void> {
     EVENTS_KEY,
     NOTES_KEY,
     SPENDING_LIMITS_KEY,
+    FAMILY_KEY,
+    SPLIT_TRIPS_KEY,
+    RANDOM_PICKER_ENTRIES_KEY,
   ]);
 }

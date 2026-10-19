@@ -2,6 +2,15 @@ import { FlagIcon } from "@/src/components/FlagIcon";
 import { Language, LANGUAGES } from "@/src/constants/Languages";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { clearSampleData, seedSampleData } from "@/src/services/devSeed";
+import { loadEvents } from "@/src/redux/reducers/eventSlice";
+import {
+  loadExpenses,
+  loadFamilyMembers,
+  loadIncomes,
+  loadNotes,
+  loadConfig,
+  useAppDispatch,
+} from "@/src/redux";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
@@ -28,6 +37,7 @@ interface SettingItem {
 }
 
 export default function SettingsTab() {
+  const dispatch = useAppDispatch();
   const insets = useSafeAreaInsets();
   const { t, changeLanguage, getCurrentLanguage } = useTranslation();
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -88,12 +98,24 @@ export default function SettingsTab() {
     setShowLanguageModal(false);
   };
 
+  const refreshSeededData = async () => {
+    await dispatch(loadConfig()).unwrap();
+    await Promise.all([
+      dispatch(loadExpenses()).unwrap(),
+      dispatch(loadIncomes()).unwrap(),
+      dispatch(loadEvents()).unwrap(),
+      dispatch(loadNotes()).unwrap(),
+      dispatch(loadFamilyMembers()).unwrap(),
+    ]);
+  };
+
   const handleSeedData = async () => {
     try {
       const summary = await seedSampleData();
+      await refreshSeededData();
       Alert.alert(
         "Seed data",
-        `Created: ${summary.expenses} expenses, ${summary.incomes} incomes, ${summary.events} events, ${summary.notes} notes.\n\nReload the app to see the data.`,
+        `Created: ${summary.expenses} expenses, ${summary.incomes} incomes, ${summary.events} events, ${summary.notes} notes, ${summary.splitTrips} split trip with ${summary.splitExpenses} expenses, and ${summary.randomPickerNames} picker names.\n\nAll sample data is ready to view.`,
       );
     } catch (e) {
       Alert.alert("Seed data", `Error: ${e instanceof Error ? e.message : e}`);
@@ -103,9 +125,10 @@ export default function SettingsTab() {
   const handleClearData = async () => {
     try {
       await clearSampleData();
+      await refreshSeededData();
       Alert.alert(
         "Seed data",
-        "Sample data cleared. Reload the app to update.",
+        "Sample data cleared.",
       );
     } catch (e) {
       Alert.alert("Seed data", `Error: ${e instanceof Error ? e.message : e}`);

@@ -36,7 +36,7 @@ export default function CustomHeader({
       style={[
         styles.container,
         {
-          paddingTop: insets.top + Platform.OS === "android" ? 20 : 10,
+          paddingTop: insets.top + (Platform.OS === "android" ? 20 : 10),
         },
       ]}
     >

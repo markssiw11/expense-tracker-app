@@ -148,6 +148,15 @@ export default function DashboardTab() {
             </View>
             <Text style={styles.quickText}>{t("expenses.report")}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickAction}
+            onPress={() => router.push("/random-picker")}
+          >
+            <View style={[styles.quickIcon, { backgroundColor: "#CDED77" }]}>
+              <Ionicons name="shuffle" size={20} color="#18342F" />
+            </View>
+            <Text style={styles.quickText}>{t("randomPicker.shortTitle")}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Budget */}

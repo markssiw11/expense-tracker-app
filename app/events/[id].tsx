@@ -1,4 +1,3 @@
-import CustomHeader from "@/src/components/CustomHeader";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { deleteEvent } from "@/src/redux/reducers/eventSlice";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
@@ -7,6 +6,7 @@ import { EventCategory } from "@/src/types/event.types";
 import { Ionicons } from "@expo/vector-icons";
 import { format, parseISO } from "date-fns";
 import { enUS, ja, ko, vi } from "date-fns/locale";
+import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -15,17 +15,10 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
-
-// Category colors matching design document
-const CATEGORY_COLORS: Record<EventCategory, string> = {
-  Work: "#3B82F6",
-  Personal: "#A855F7",
-  Health: "#10B981",
-  Family: "#F59E0B",
-  Other: "#6B7280",
-};
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Category icons
 const CATEGORY_ICONS: Record<EventCategory, keyof typeof Ionicons.glyphMap> = {
@@ -60,6 +53,7 @@ export default function EventDetailScreen() {
     state.events.events.find((e) => e.id === id),
   );
   const [isDeleting, setIsDeleting] = useState(false);
+  const insets = useSafeAreaInsets();
   const { t, getCurrentLanguage } = useTranslation();
   const dateFnsLocale = { vi, ja, ko, en: enUS }[getCurrentLanguage()] ?? enUS;
 
@@ -70,7 +64,7 @@ export default function EventDetailScreen() {
         { text: t("common.ok"), onPress: () => router.back() },
       ]);
     }
-  }, [event, id]);
+  }, [event, id, t]);
 
   const handleEdit = () => {
     if (event && !isDeleting) {
@@ -147,34 +141,54 @@ export default function EventDetailScreen() {
     }
   };
 
-  const categoryColor = CATEGORY_COLORS[event.category];
   const categoryLabel = t(`eventCategories.${event.category}`);
   const categoryIcon = CATEGORY_ICONS[event.category];
 
   return (
     <View style={styles.container}>
-      <CustomHeader title="" />
+      <LinearGradient
+        colors={["#667eea", "#764ba2"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.hero, { paddingTop: insets.top + 8 }]}
+      >
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            accessibilityLabel={t("common.back")}
+            style={styles.headerIconButton}
+            onPress={() => router.back()}
+            disabled={isDeleting}
+          >
+            <Ionicons name="arrow-back" size={22} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            accessibilityLabel={t("common.delete")}
+            style={styles.headerIconButton}
+            onPress={handleDelete}
+            disabled={isDeleting}
+          >
+            <Ionicons name="trash-outline" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.heroCopy}>
+          <View style={styles.categoryBadge}>
+            <Ionicons name={categoryIcon} size={17} color="#fff" />
+            <Text style={styles.categoryBadgeText}>{categoryLabel}</Text>
+          </View>
+          <Text style={styles.title}>{event.title}</Text>
+        </View>
+      </LinearGradient>
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
       >
-        {/* Category Badge */}
-        <View
-          style={[styles.categoryBadge, { backgroundColor: categoryColor }]}
-        >
-          <Ionicons name={categoryIcon} size={20} color="#fff" />
-          <Text style={styles.categoryBadgeText}>{categoryLabel}</Text>
-        </View>
-
-        {/* Title */}
-        <Text style={styles.title}>{event.title}</Text>
-
-        {/* Date and Time */}
         <View style={styles.detailsCard}>
           <View style={styles.detailRow}>
             <View style={styles.detailIcon}>
-              <Ionicons name="calendar" size={20} color="#007AFF" />
+              <Ionicons name="calendar" size={19} color="#667eea" />
             </View>
             <View style={styles.detailContent}>
               <Text style={styles.detailLabel}>{t("common.date")}</Text>
@@ -186,7 +200,7 @@ export default function EventDetailScreen() {
 
           <View style={styles.detailRow}>
             <View style={styles.detailIcon}>
-              <Ionicons name="time" size={20} color="#007AFF" />
+              <Ionicons name="time" size={19} color="#667eea" />
             </View>
             <View style={styles.detailContent}>
               <Text style={styles.detailLabel}>{t("common.time")}</Text>
@@ -197,7 +211,7 @@ export default function EventDetailScreen() {
           {event.location && (
             <View style={styles.detailRow}>
               <View style={styles.detailIcon}>
-                <Ionicons name="location" size={20} color="#007AFF" />
+                <Ionicons name="location" size={19} color="#667eea" />
               </View>
               <View style={styles.detailContent}>
                 <Text style={styles.detailLabel}>{t("common.location")}</Text>
@@ -237,7 +251,7 @@ export default function EventDetailScreen() {
         {event.description && (
           <View style={styles.descriptionCard}>
             <View style={styles.descriptionHeader}>
-              <Ionicons name="document-text" size={20} color="#666" />
+              <Ionicons name="document-text" size={20} color="#667eea" />
               <Text style={styles.descriptionLabel}>
                 {t("common.description")}
               </Text>
@@ -261,7 +275,25 @@ export default function EventDetailScreen() {
             </Text>
           </View>
         </View>
+        <View style={{ height: 12 }} />
       </ScrollView>
+
+      <View
+        style={[
+          styles.footer,
+          { paddingBottom: Math.max(insets.bottom, 12) },
+        ]}
+      >
+        <TouchableOpacity
+          style={[styles.editButton, isDeleting && styles.disabledButton]}
+          onPress={handleEdit}
+          disabled={isDeleting}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="create-outline" size={20} color="#fff" />
+          <Text style={styles.editButtonText}>{t("events.editEvent")}</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Deleting Overlay */}
       {isDeleting && (
@@ -279,96 +311,105 @@ export default function EventDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f5f6fa",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
-  },
-  backButton: {
-    padding: 4,
+  hero: {
+    paddingHorizontal: 20,
+    paddingBottom: 25,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   headerActions: {
     flexDirection: "row",
-    gap: 16,
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  actionButton: {
-    padding: 4,
+  headerIconButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  heroCopy: {
+    marginTop: 27,
+  },
+  categoryBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    marginBottom: 13,
+  },
+  categoryBadgeText: {
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: "700",
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    padding: 16,
-  },
-  categoryBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    marginBottom: 16,
-    gap: 6,
-  },
-  categoryBadgeText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
+    padding: 18,
+    paddingBottom: 14,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 24,
+    fontSize: 29,
+    fontWeight: "800",
+    color: "#fff",
     lineHeight: 36,
   },
   detailsCard: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 18,
+    padding: 18,
     marginBottom: 16,
-    gap: 16,
+    gap: 18,
+    borderWidth: 1,
+    borderColor: "#ECECF2",
   },
   detailRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
+    alignItems: "center",
+    gap: 13,
   },
   detailIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#F0F9FF",
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: "#EEF0FF",
     justifyContent: "center",
     alignItems: "center",
   },
   detailIconActive: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: "#FFF4D6",
   },
   detailContent: {
     flex: 1,
   },
   detailLabel: {
     fontSize: 12,
-    color: "#999",
+    color: "#85899A",
     marginBottom: 4,
   },
   detailValue: {
     fontSize: 16,
-    color: "#333",
-    fontWeight: "500",
+    color: "#252735",
+    fontWeight: "600",
+    lineHeight: 22,
   },
   descriptionCard: {
     backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 18,
+    padding: 18,
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#ECECF2",
   },
   descriptionHeader: {
     flexDirection: "row",
@@ -379,18 +420,20 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#666",
+    color: "#505365",
   },
   descriptionText: {
     fontSize: 15,
-    color: "#333",
+    color: "#3F4250",
     lineHeight: 22,
   },
   timestampsSection: {
     backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 12,
-    gap: 8,
+    padding: 18,
+    borderRadius: 18,
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#ECECF2",
   },
   timestampRow: {
     flexDirection: "row",
@@ -399,11 +442,35 @@ const styles = StyleSheet.create({
   },
   timestampLabel: {
     fontSize: 12,
-    color: "#999",
+    color: "#85899A",
   },
   timestampValue: {
     fontSize: 12,
-    color: "#666",
+    color: "#6F7382",
+  },
+  footer: {
+    paddingHorizontal: 18,
+    paddingTop: 10,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#E9EAF0",
+  },
+  editButton: {
+    minHeight: 52,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 9,
+    backgroundColor: "#667eea",
+    borderRadius: 14,
+  },
+  editButtonText: {
+    color: "#fff",
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   loadingOverlay: {
     position: "absolute",

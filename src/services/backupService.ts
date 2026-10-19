@@ -14,12 +14,14 @@ const EXPENSES_KEY = "@expense_tracker:expenses";
 const EVENTS_KEY = "@expense_tracker:events";
 const NOTES_KEY = "@expense_tracker:notes";
 const FAMILY_KEY = "@family_members";
+const SPLIT_TRIPS_KEY = "@expense_tracker:split_trips";
 
 const STORAGE_KEYS = [
   EXPENSES_KEY,
   EVENTS_KEY,
   NOTES_KEY,
   FAMILY_KEY,
+  SPLIT_TRIPS_KEY,
   "@expense_tracker:incomes",
   "@expense_tracker:spending_limits",
   "@recurring_expenses",

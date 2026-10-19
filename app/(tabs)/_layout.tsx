@@ -44,6 +44,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="split"
+        options={{
+          title: t("navigation.split"),
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={size} color={color} />
+          ),
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="calendar"
         options={{
           title: t("navigation.calendar"),
