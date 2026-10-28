@@ -18,6 +18,7 @@ import React, { useState } from "react";
 import {
   Alert,
   FlatList,
+  Linking,
   Modal,
   ScrollView,
   StyleSheet,
@@ -33,8 +34,11 @@ interface SettingItem {
   subtitle: string;
   icon: keyof typeof Ionicons.glyphMap;
   iconColor: string;
-  route: string;
+  route?: string;
+  action?: () => void;
 }
+
+const SUPPORT_EMAIL = "longnguyen95.xn@gmail.com";
 
 export default function SettingsTab() {
   const dispatch = useAppDispatch();
@@ -87,11 +91,49 @@ export default function SettingsTab() {
       iconColor: "#8B5CF6",
       route: "/settings/backup",
     },
+    {
+      id: "feedback",
+      title: t("settings.feedback"),
+      subtitle: t("settings.feedbackDesc"),
+      icon: "chatbubble-ellipses",
+      iconColor: "#0F9D8A",
+      action: handleFeedback,
+    },
   ];
 
   const handleNavigate = (route: string) => {
     router.push(route as any);
   };
+
+  const openFeedbackEmail = async () => {
+    const subject = encodeURIComponent(t("settings.feedbackSubject"));
+    const body = encodeURIComponent(t("settings.feedbackEmailBody"));
+
+    try {
+      await Linking.openURL(
+        `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`,
+      );
+    } catch {
+      Alert.alert(
+        t("settings.feedbackEmailUnavailableTitle"),
+        t("settings.feedbackEmailUnavailable", { email: SUPPORT_EMAIL }),
+      );
+    }
+  };
+
+  function handleFeedback() {
+    Alert.alert(
+      t("settings.feedback"),
+      t("settings.feedbackDisclosure", { email: SUPPORT_EMAIL }),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("settings.feedbackContinue"),
+          onPress: () => void openFeedbackEmail(),
+        },
+      ],
+    );
+  }
 
   const handleLanguageSelect = async (languageCode: string) => {
     await changeLanguage(languageCode);
@@ -175,7 +217,13 @@ export default function SettingsTab() {
     <TouchableOpacity
       key={item.id}
       style={styles.settingCard}
-      onPress={() => handleNavigate(item.route)}
+      onPress={() => {
+        if (item.action) {
+          item.action();
+        } else if (item.route) {
+          handleNavigate(item.route);
+        }
+      }}
     >
       <View style={styles.settingLeft}>
         <View

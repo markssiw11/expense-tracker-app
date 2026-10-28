@@ -1,10 +1,9 @@
-import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Expense, ExpenseCategory } from "../../types";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import expenseStorage from "../../services/storage/expenseStorage";
+import { BudgetPeriodType, Expense, ExpenseCategory } from "../../types";
+import { calculateBudgetStatus } from "../../utils/budgetCalculator";
 import { getCurrentMonth } from "../../utils/expenseUtils";
 import { updateBudgetStatus } from "./spendingLimitSlice";
-import { calculateBudgetStatus } from "../../utils/budgetCalculator";
-import { BudgetPeriodType } from "../../types";
 
 interface ExpenseState {
   expenses: Expense[];
@@ -42,7 +41,7 @@ export const loadExpenses = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.weekly,
-              BudgetPeriodType.WEEKLY
+              BudgetPeriodType.WEEKLY,
             )
           : null;
 
@@ -50,22 +49,22 @@ export const loadExpenses = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.monthly,
-              BudgetPeriodType.MONTHLY
+              BudgetPeriodType.MONTHLY,
             )
           : null;
 
         dispatch(
-          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus }),
         );
       }
 
       return expenses;
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to load expenses"
+        error instanceof Error ? error.message : "Failed to load expenses",
       );
     }
-  }
+  },
 );
 
 export const addExpense = createAsyncThunk(
@@ -84,7 +83,7 @@ export const addExpense = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.weekly,
-              BudgetPeriodType.WEEKLY
+              BudgetPeriodType.WEEKLY,
             )
           : null;
 
@@ -92,29 +91,29 @@ export const addExpense = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.monthly,
-              BudgetPeriodType.MONTHLY
+              BudgetPeriodType.MONTHLY,
             )
           : null;
 
         dispatch(
-          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus }),
         );
       }
 
       return expense;
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to add expense"
+        error instanceof Error ? error.message : "Failed to add expense",
       );
     }
-  }
+  },
 );
 
 export const updateExpense = createAsyncThunk(
   "expenses/updateExpense",
   async (
     { id, data }: { id: string; data: Partial<Expense> },
-    { rejectWithValue, dispatch, getState }
+    { rejectWithValue, dispatch, getState },
   ) => {
     try {
       await expenseStorage.updateExpense(id, data);
@@ -122,7 +121,9 @@ export const updateExpense = createAsyncThunk(
       // Trigger budget recalculation after updating expense
       const state = getState() as any;
       const expenses = state.expenses.expenses.map((e: Expense) =>
-        e.id === id ? { ...e, ...data, updatedAt: new Date().toISOString() } : e
+        e.id === id
+          ? { ...e, ...data, updatedAt: new Date().toISOString() }
+          : e,
       );
       const spendingLimitConfig = state.spendingLimit?.config;
 
@@ -131,7 +132,7 @@ export const updateExpense = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.weekly,
-              BudgetPeriodType.WEEKLY
+              BudgetPeriodType.WEEKLY,
             )
           : null;
 
@@ -139,22 +140,22 @@ export const updateExpense = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.monthly,
-              BudgetPeriodType.MONTHLY
+              BudgetPeriodType.MONTHLY,
             )
           : null;
 
         dispatch(
-          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus }),
         );
       }
 
       return { id, data };
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to update expense"
+        error instanceof Error ? error.message : "Failed to update expense",
       );
     }
-  }
+  },
 );
 
 export const deleteExpense = createAsyncThunk(
@@ -166,7 +167,7 @@ export const deleteExpense = createAsyncThunk(
       // Trigger budget recalculation after deleting expense
       const state = getState() as any;
       const expenses = state.expenses.expenses.filter(
-        (e: Expense) => e.id !== id
+        (e: Expense) => e.id !== id,
       );
       const spendingLimitConfig = state.spendingLimit?.config;
 
@@ -175,7 +176,7 @@ export const deleteExpense = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.weekly,
-              BudgetPeriodType.WEEKLY
+              BudgetPeriodType.WEEKLY,
             )
           : null;
 
@@ -183,22 +184,66 @@ export const deleteExpense = createAsyncThunk(
           ? calculateBudgetStatus(
               expenses,
               spendingLimitConfig.monthly,
-              BudgetPeriodType.MONTHLY
+              BudgetPeriodType.MONTHLY,
             )
           : null;
 
         dispatch(
-          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus })
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus }),
         );
       }
 
       return id;
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to delete expense"
+        error instanceof Error ? error.message : "Failed to delete expense",
       );
     }
-  }
+  },
+);
+
+export const syncSplitExpenses = createAsyncThunk(
+  "expenses/syncSplitExpenses",
+  async (splitExpenses: Expense[], { rejectWithValue, dispatch, getState }) => {
+    try {
+      const currentExpenses = await expenseStorage.loadExpenses();
+      const expenses = [
+        ...currentExpenses.filter((expense) => !expense.splitExpenseSource),
+        ...splitExpenses,
+      ];
+      await expenseStorage.saveExpenses(expenses);
+
+      const state = getState() as any;
+      const spendingLimitConfig = state.spendingLimit?.config;
+      if (spendingLimitConfig) {
+        const weeklyStatus = spendingLimitConfig.weekly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.weekly,
+              BudgetPeriodType.WEEKLY,
+            )
+          : null;
+        const monthlyStatus = spendingLimitConfig.monthly?.enabled
+          ? calculateBudgetStatus(
+              expenses,
+              spendingLimitConfig.monthly,
+              BudgetPeriodType.MONTHLY,
+            )
+          : null;
+        dispatch(
+          updateBudgetStatus({ weekly: weeklyStatus, monthly: monthlyStatus }),
+        );
+      }
+
+      return expenses;
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error
+          ? error.message
+          : "Failed to sync split expenses",
+      );
+    }
+  },
 );
 
 const expenseSlice = createSlice({
@@ -210,7 +255,7 @@ const expenseSlice = createSlice({
     },
     setFilters: (
       state,
-      action: PayloadAction<{ categories: ExpenseCategory[] }>
+      action: PayloadAction<{ categories: ExpenseCategory[] }>,
     ) => {
       state.filters = action.payload;
     },
@@ -281,6 +326,10 @@ const expenseSlice = createSlice({
     builder.addCase(deleteExpense.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload as string;
+    });
+
+    builder.addCase(syncSplitExpenses.fulfilled, (state, action) => {
+      state.expenses = action.payload;
     });
   },
 });

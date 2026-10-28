@@ -6,7 +6,7 @@ const path = require("path");
 // "en" is the base/default name; the others override it when the device
 // language matches. Add a new entry here to support another language.
 const APP_NAMES = {
-  en: "FamFinance",
+  en: "FamFinance Family Budget",
   vi: "Sổ Tay Gia Đình",
   ja: "家計簿",
   ko: "가계부",

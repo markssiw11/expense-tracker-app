@@ -22,6 +22,8 @@ export interface SplitTrip {
   name: string;
   participants: SplitParticipant[];
   expenses: SplitExpense[];
+  includeInPersonalExpenses?: boolean;
+  personalParticipantId?: string;
   createdAt: string;
 }
 

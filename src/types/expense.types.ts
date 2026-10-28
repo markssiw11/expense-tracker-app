@@ -18,6 +18,7 @@ export interface Expense {
   date: string; // ISO date string
   note?: string;
   spender?: string; // Người chi tiêu (vợ, chồng, con, etc.)
+  splitExpenseSource?: { tripId: string; expenseId: string };
   createdAt: string;
   updatedAt: string;
 }

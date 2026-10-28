@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Expense, ExpenseCategory } from "../types";
 import {
   SplitBalance,
   SplitExpense,
@@ -48,6 +49,40 @@ export function calculateSplitBalances(
     ...balance,
     balance: Math.round((balance.paid - balance.share) * 100) / 100,
   }));
+}
+
+export function buildPersonalSplitExpenses(trips: SplitTrip[]): Expense[] {
+  return trips.flatMap((trip) => {
+    if (!trip.includeInPersonalExpenses || !trip.personalParticipantId) {
+      return [];
+    }
+
+    const participant = trip.participants.find(
+      (item) => item.id === trip.personalParticipantId,
+    );
+    if (!participant) return [];
+
+    return trip.expenses.flatMap((expense) => {
+      const share = expense.shares.find(
+        (item) => item.participantId === participant.id,
+      );
+      if (!share || share.amount <= 0) return [];
+
+      const timestamp = `${expense.date}T12:00:00.000Z`;
+      return [
+        {
+          id: `split:${trip.id}:${expense.id}`,
+          amount: share.amount,
+          category: ExpenseCategory.OTHER,
+          date: timestamp,
+          note: `${trip.name}: ${expense.title}`,
+          splitExpenseSource: { tripId: trip.id, expenseId: expense.id },
+          createdAt: timestamp,
+          updatedAt: timestamp,
+        },
+      ];
+    });
+  });
 }
 
 export async function loadSplitTrips(): Promise<SplitTrip[]> {

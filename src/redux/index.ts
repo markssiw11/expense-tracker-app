@@ -10,6 +10,7 @@ export {
   loadExpenses,
   setFilters,
   setSelectedMonth,
+  syncSplitExpenses,
   updateExpense,
 } from "./reducers/expenseSlice";
 
