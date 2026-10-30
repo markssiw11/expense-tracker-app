@@ -2,10 +2,14 @@ import { GoBackButton, LanguageSelector } from "@/src/components";
 import { LANGUAGES } from "@/src/constants/Languages";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { Ionicons } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
+  Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,6 +17,11 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const FEEDBACK_EMAIL = "longnguyen95.xn@gmail.com";
+const IOS_STORE_URL =
+  "https://apps.apple.com/us/app/famfinance-family-budget/id6755727046";
+const ANDROID_PACKAGE = "com.family.expensetracker";
 
 interface SettingItem {
   id: string;
@@ -66,6 +75,64 @@ export default function SettingsScreen() {
       icon: "wallet",
       iconColor: "#10b981",
       route: "/settings/spending-limits",
+    },
+  ];
+
+  const openUrl = async (url: string, fallback?: string) => {
+    try {
+      await Linking.openURL(url);
+    } catch {
+      try {
+        if (!fallback) throw new Error("no fallback");
+        await Linking.openURL(fallback);
+      } catch {
+        Alert.alert(t("settings.actionFailed"));
+      }
+    }
+  };
+
+  const handleRateApp = () => {
+    if (Platform.OS === "ios") {
+      openUrl(
+        `${IOS_STORE_URL.replace("https://", "itms-apps://")}?action=write-review`,
+        IOS_STORE_URL,
+      );
+    } else {
+      openUrl(
+        `market://details?id=${ANDROID_PACKAGE}`,
+        `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`,
+      );
+    }
+  };
+
+  const handleSendFeedback = () => {
+    const subject = t("settings.feedbackSubject");
+    const body = t("settings.feedbackBody", {
+      version: Constants.expoConfig?.version ?? "",
+      platform: `${Platform.OS} ${Platform.Version}`,
+      interpolation: { escapeValue: false },
+    });
+    openUrl(
+      `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
+    );
+  };
+
+  const SUPPORT_ITEMS: SettingItem[] = [
+    {
+      id: "rate-app",
+      title: t("settings.rateApp"),
+      subtitle: t("settings.rateAppDesc"),
+      icon: "star",
+      iconColor: "#FFB800",
+      action: handleRateApp,
+    },
+    {
+      id: "send-feedback",
+      title: t("settings.sendFeedback"),
+      subtitle: t("settings.sendFeedbackDesc"),
+      icon: "chatbubble-ellipses",
+      iconColor: "#06b6d4",
+      action: handleSendFeedback,
     },
   ];
 
@@ -126,6 +193,11 @@ export default function SettingsScreen() {
             {t("settings.generalSettings")}
           </Text>
           {SETTINGS_ITEMS.map(renderSettingItem)}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t("settings.support")}</Text>
+          {SUPPORT_ITEMS.map(renderSettingItem)}
         </View>
       </ScrollView>
 

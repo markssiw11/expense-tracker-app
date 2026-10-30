@@ -352,6 +352,14 @@
     }
   },
   "settings": {
+    "rateApp": "Rate the App",
+    "rateAppDesc": "Your rating helps the team stay motivated to maintain and develop the product",
+    "sendFeedback": "Send Feedback",
+    "sendFeedbackDesc": "Suggest features or report issues",
+    "support": "Support",
+    "feedbackSubject": "FamFinance Feedback",
+    "feedbackBody": "Hi FamFinance team,\n\nMy feedback / feature suggestion:\n\n\n---\nApp version: {{version}}\nPlatform: {{platform}}",
+    "actionFailed": "Unable to open. Please try again later.",
     "title": "Settings",
     "subtitle": "Manage app preferences",
     "language": "LANGUAGE",

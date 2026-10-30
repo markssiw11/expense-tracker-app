@@ -20,6 +20,7 @@ import {
   FlatList,
   Linking,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -39,6 +40,9 @@ interface SettingItem {
 }
 
 const SUPPORT_EMAIL = "longnguyen95.xn@gmail.com";
+const IOS_STORE_URL =
+  "https://apps.apple.com/us/app/famfinance-family-budget/id6755727046";
+const ANDROID_PACKAGE = "com.family.expensetracker";
 
 export default function SettingsTab() {
   const dispatch = useAppDispatch();
@@ -103,6 +107,26 @@ export default function SettingsTab() {
 
   const handleNavigate = (route: string) => {
     router.push(route as any);
+  };
+
+  const handleRateApp = async () => {
+    const urls =
+      Platform.OS === "ios"
+        ? [
+            `${IOS_STORE_URL.replace("https://", "itms-apps://")}?action=write-review`,
+            IOS_STORE_URL,
+          ]
+        : [
+            `market://details?id=${ANDROID_PACKAGE}`,
+            `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE}`,
+          ];
+    for (const url of urls) {
+      try {
+        await Linking.openURL(url);
+        return;
+      } catch {}
+    }
+    Alert.alert(t("settings.actionFailed"));
   };
 
   const openFeedbackEmail = async () => {
@@ -261,6 +285,20 @@ export default function SettingsTab() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <TouchableOpacity
+          style={styles.rateCard}
+          onPress={handleRateApp}
+          activeOpacity={0.85}
+        >
+          <View style={styles.rateStars}>
+            {[0, 1, 2, 3, 4].map((i) => (
+              <Ionicons key={i} name="star" size={26} color="#FFB800" />
+            ))}
+          </View>
+          <Text style={styles.rateTitle}>{t("settings.rateApp")}</Text>
+          <Text style={styles.rateDesc}>{t("settings.rateAppDesc")}</Text>
+        </TouchableOpacity>
+
         {/* Language Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("settings.language")}</Text>
@@ -379,6 +417,32 @@ export default function SettingsTab() {
 }
 
 const styles = StyleSheet.create({
+  rateCard: {
+    backgroundColor: "#FFF8E1",
+    borderRadius: 16,
+    padding: 18,
+    marginBottom: 24,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FFE082",
+  },
+  rateStars: {
+    flexDirection: "row",
+    gap: 6,
+    marginBottom: 10,
+  },
+  rateTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+  rateDesc: {
+    fontSize: 14,
+    color: "#666",
+    textAlign: "center",
+    lineHeight: 20,
+  },
   container: {
     flex: 1,
     backgroundColor: "#f5f6fa",

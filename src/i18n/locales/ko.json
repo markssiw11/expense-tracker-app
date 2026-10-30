@@ -352,6 +352,14 @@
     }
   },
   "settings": {
+    "rateApp": "앱 평가하기",
+    "rateAppDesc": "여러분의 평가는 팀이 제품을 꾸준히 유지하고 발전시키는 데 큰 힘이 됩니다",
+    "sendFeedback": "의견 보내기",
+    "sendFeedbackDesc": "기능 제안 또는 문제 신고",
+    "support": "지원",
+    "feedbackSubject": "FamFinance 의견",
+    "feedbackBody": "FamFinance 팀께,\n\n의견 / 기능 제안:\n\n\n---\n앱 버전: {{version}}\n플랫폼: {{platform}}",
+    "actionFailed": "열 수 없습니다. 나중에 다시 시도해 주세요.",
     "title": "설정",
     "subtitle": "앱 환경설정 관리",
     "language": "언어",

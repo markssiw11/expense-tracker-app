@@ -352,6 +352,14 @@
     }
   },
   "settings": {
+    "rateApp": "アプリを評価",
+    "rateAppDesc": "あなたの評価は、チームが製品を維持・開発し続ける励みになります",
+    "sendFeedback": "フィードバックを送る",
+    "sendFeedbackDesc": "機能の提案や不具合の報告",
+    "support": "サポート",
+    "feedbackSubject": "FamFinance フィードバック",
+    "feedbackBody": "FamFinance チーム様\n\nご意見 / 機能のご提案:\n\n\n---\nアプリバージョン: {{version}}\nプラットフォーム: {{platform}}",
+    "actionFailed": "開けませんでした。後でもう一度お試しください。",
     "title": "設定",
     "subtitle": "アプリの設定を管理",
     "language": "言語",

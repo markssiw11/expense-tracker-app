@@ -352,6 +352,14 @@
     }
   },
   "settings": {
+    "rateApp": "Đánh giá ứng dụng",
+    "rateAppDesc": "Đánh giá của bạn sẽ giúp team có động lực duy trì và phát triển sản phẩm",
+    "sendFeedback": "Gửi góp ý",
+    "sendFeedbackDesc": "Đề xuất tính năng hoặc báo lỗi",
+    "support": "Hỗ trợ",
+    "feedbackSubject": "Góp ý FamFinance",
+    "feedbackBody": "Chào đội ngũ FamFinance,\n\nGóp ý / đề xuất tính năng của tôi:\n\n\n---\nPhiên bản: {{version}}\nNền tảng: {{platform}}",
+    "actionFailed": "Không thể mở. Vui lòng thử lại sau.",
     "title": "Cài đặt",
     "subtitle": "Quản lý tùy chọn ứng dụng",
     "language": "NGÔN NGỮ",
