@@ -68,9 +68,7 @@ function computeNextVersion(current, bump) {
       patch += 1;
       break;
     default:
-      fail(
-        `Unknown bump type "${bump}". Use patch | minor | major | x.y.z`,
-      );
+      fail(`Unknown bump type "${bump}". Use patch | minor | major | x.y.z`);
   }
   return `${major}.${minor}.${patch}`;
 }
@@ -131,5 +129,7 @@ pbxOut = pbxOut
   );
 fs.writeFileSync(PBXPROJ, pbxOut);
 
-console.log("\n\x1b[32m✔ Version bumped across app.json, package.json, Android and iOS.\x1b[0m");
+console.log(
+  "\n\x1b[32m✔ Version bumped across app.json, package.json, Android and iOS.\x1b[0m",
+);
 console.log("Remember to Clean Build Folder in Xcode before archiving.");
