@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Bumps the app version consistently across every place it lives:
- *   - app.json           -> expo.version
+ *   - app.json           -> expo.version, ios.buildNumber, android.versionCode
  *   - package.json       -> version
  *   - android/app/build.gradle -> versionName + versionCode
  *   - ios .pbxproj       -> MARKETING_VERSION + CURRENT_PROJECT_VERSION
@@ -22,7 +22,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const ROOT = path.resolve(__dirname, "..");
+const ROOT = path.resolve(path.dirname(process.argv[1]), "..");
 const APP_JSON = path.join(ROOT, "app.json");
 const PACKAGE_JSON = path.join(ROOT, "package.json");
 const GRADLE = path.join(ROOT, "android/app/build.gradle");
@@ -103,6 +103,8 @@ if (dryRun) {
 
 // 1. app.json
 appJson.expo.version = nextVersion;
+appJson.expo.ios.buildNumber = String(nextBuild);
+appJson.expo.android.versionCode = nextBuild;
 fs.writeFileSync(APP_JSON, JSON.stringify(appJson, null, 2) + "\n");
 
 // 2. package.json (preserve formatting minimally by targeted replace)
