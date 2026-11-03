@@ -9,7 +9,15 @@ export interface Language {
 }
 
 // Country codes supported by the vector <FlagIcon /> component.
-export type FlagCountryCode = "US" | "VN" | "JP" | "KR" | "ID" | "IN" | "TH" | "PH";
+export type FlagCountryCode =
+  | "US"
+  | "VN"
+  | "JP"
+  | "KR"
+  | "ID"
+  | "IN"
+  | "TH"
+  | "PH";
 
 // Single source of truth for the languages the app supports.
 // Keep this in sync with the resources registered in src/i18n/index.ts.

@@ -517,7 +517,12 @@
     "namePlaceholder": "Ilagay ang pangalan...",
     "selectIcon": "Pumili ng icon",
     "selectColor": "Pumili ng kulay",
-    "defaultNames": { "wife": "Asawa (babae)", "husband": "Asawa (lalaki)", "child": "Anak", "shared": "Pinagsasaluhan" }
+    "defaultNames": {
+      "wife": "Asawa (babae)",
+      "husband": "Asawa (lalaki)",
+      "child": "Anak",
+      "shared": "Pinagsasaluhan"
+    }
   },
   "reports": {
     "title": "Ulat ng Gastos",

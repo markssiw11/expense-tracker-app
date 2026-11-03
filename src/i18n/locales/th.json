@@ -517,7 +517,12 @@
     "namePlaceholder": "ใส่ชื่อ...",
     "selectIcon": "เลือกไอคอน",
     "selectColor": "เลือกสี",
-    "defaultNames": { "wife": "ภรรยา", "husband": "สามี", "child": "บุตร", "shared": "ใช้ร่วมกัน" }
+    "defaultNames": {
+      "wife": "ภรรยา",
+      "husband": "สามี",
+      "child": "บุตร",
+      "shared": "ใช้ร่วมกัน"
+    }
   },
   "reports": {
     "title": "รายงานรายจ่าย",
