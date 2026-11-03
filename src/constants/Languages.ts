@@ -9,7 +9,7 @@ export interface Language {
 }
 
 // Country codes supported by the vector <FlagIcon /> component.
-export type FlagCountryCode = "US" | "VN" | "JP" | "KR";
+export type FlagCountryCode = "US" | "VN" | "JP" | "KR" | "ID" | "IN" | "TH" | "PH";
 
 // Single source of truth for the languages the app supports.
 // Keep this in sync with the resources registered in src/i18n/index.ts.
@@ -41,5 +41,33 @@ export const LANGUAGES: Language[] = [
     nativeName: "한국어",
     flag: "🇰🇷",
     countryCode: "KR",
+  },
+  {
+    code: "id",
+    name: "Indonesian",
+    nativeName: "Bahasa Indonesia",
+    flag: "🇮🇩",
+    countryCode: "ID",
+  },
+  {
+    code: "hi",
+    name: "Hindi",
+    nativeName: "हिन्दी",
+    flag: "🇮🇳",
+    countryCode: "IN",
+  },
+  {
+    code: "th",
+    name: "Thai",
+    nativeName: "ไทย",
+    flag: "🇹🇭",
+    countryCode: "TH",
+  },
+  {
+    code: "fil",
+    name: "Filipino",
+    nativeName: "Filipino",
+    flag: "🇵🇭",
+    countryCode: "PH",
   },
 ];

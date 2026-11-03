@@ -10,6 +10,10 @@ const APP_NAMES = {
   vi: "Sổ Tay Gia Đình",
   ja: "家計簿",
   ko: "가계부",
+  id: "Keuangan Keluarga",
+  hi: "पारिवारिक बजट",
+  th: "การเงินครอบครัว",
+  fil: "Pananalapi ng Pamilya",
 };
 
 // Non-base locales that need their own localization folder/variant.
@@ -63,30 +67,24 @@ function withAppNameLocalization(config) {
       project.addPbxGroup([], "Resources", "Resources");
     }
 
-    // Register the localized InfoPlist.strings files as a single variant
-    // group. If the group already exists (e.g. prebuild re-run without
-    // clean), skip to avoid the xcode lib throwing on a null resources path.
-    const alreadyLocalized = JSON.stringify(
-      project.hash.project.objects,
-    ).includes("InfoPlist.strings");
-
-    if (!alreadyLocalized) {
-      const groupKey = project.addLocalizationVariantGroup("InfoPlist.strings");
-      ["en", ...EXTRA_LOCALES].forEach((locale) => {
-        try {
-          project.addResourceFile(
-            `${locale}.lproj/InfoPlist.strings`,
-            { variantGroup: true },
-            groupKey,
-          );
-        } catch (e) {
-          console.warn(
-            `withAppNameLocalization: could not add ${locale}.lproj/InfoPlist.strings`,
-            e.message,
-          );
-        }
-      });
-    }
+    // Reuse an existing group on repeated prebuilds and add only missing files.
+    const groupKey =
+      project.findPBXVariantGroupKey({ name: "InfoPlist.strings" }) ||
+      project.addLocalizationVariantGroup("InfoPlist.strings");
+    ["en", ...EXTRA_LOCALES].forEach((locale) => {
+      try {
+        project.addResourceFile(
+          `${locale}.lproj/InfoPlist.strings`,
+          { variantGroup: true },
+          groupKey,
+        );
+      } catch (e) {
+        console.warn(
+          `withAppNameLocalization: could not add ${locale}.lproj/InfoPlist.strings`,
+          e.message,
+        );
+      }
+    });
 
     return config;
   });

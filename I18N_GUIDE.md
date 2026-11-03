@@ -7,7 +7,13 @@ This expense tracker app now supports multiple languages with English as the def
 ## Supported Languages
 
 - **English (en)** - Default language
-- **Vietnamese (vi)** - Secondary language
+- **Vietnamese (vi)**
+- **Japanese (ja)**
+- **Korean (ko)**
+- **Indonesian (id)**
+- **Hindi (hi)**
+- **Thai (th)**
+- **Filipino (fil)**
 
 ## Features
 
@@ -33,7 +39,7 @@ This expense tracker app now supports multiple languages with English as the def
 
 #### Adding New Translations
 
-1. Add new translation keys to both `src/i18n/locales/en.json` and `src/i18n/locales/vi.json`
+1. Add new translation keys to `src/i18n/locales/en.json` and each supported locale catalog
 2. Use the `useTranslation` hook in your components:
 
 ```typescript
@@ -50,7 +56,8 @@ function MyComponent() {
 
 1. Create a new JSON file in `src/i18n/locales/` (e.g., `fr.json`)
 2. Add the language to the resources in `src/i18n/index.ts`
-3. Update the `LANGUAGES` array in `src/components/LanguageSelector.tsx`
+3. Add it to `LANGUAGES` in `src/constants/Languages.ts` and add a vector flag in `src/components/FlagIcon.tsx`
+4. Add its localized app name in `plugins/withAppNameLocalization.js`
 
 #### Translation File Structure
 

@@ -4,8 +4,12 @@ import { initReactI18next } from "react-i18next";
 
 // Import translations
 import en from "./locales/en.json";
+import fil from "./locales/fil.json";
+import hi from "./locales/hi.json";
+import id from "./locales/id.json";
 import ja from "./locales/ja.json";
 import ko from "./locales/ko.json";
+import th from "./locales/th.json";
 import vi from "./locales/vi.json";
 
 const LANGUAGE_DETECTOR = {
@@ -44,6 +48,15 @@ i18n
       en: {
         translation: en,
       },
+      fil: {
+        translation: fil,
+      },
+      id: {
+        translation: id,
+      },
+      hi: {
+        translation: hi,
+      },
       vi: {
         translation: vi,
       },
@@ -52,6 +65,9 @@ i18n
       },
       ko: {
         translation: ko,
+      },
+      th: {
+        translation: th,
       },
     },
     fallbackLng: "en", // Default to English

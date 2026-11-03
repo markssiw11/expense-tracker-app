@@ -130,6 +130,33 @@ LocaleConfig.locales["ko"] = {
   today: "오늘",
 };
 
+LocaleConfig.locales["th"] = {
+  monthNames: [
+    "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+    "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
+  ],
+  monthNamesShort: [
+    "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+    "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+  ],
+  dayNames: ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"],
+  dayNamesShort: ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."],
+  today: "วันนี้",
+};
+
+LocaleConfig.locales["fil"] = {
+  monthNames: [
+    "Enero", "Pebrero", "Marso", "Abril", "Mayo", "Hunyo",
+    "Hulyo", "Agosto", "Setyembre", "Oktubre", "Nobyembre", "Disyembre",
+  ],
+  monthNamesShort: [
+    "Ene", "Peb", "Mar", "Abr", "May", "Hun", "Hul", "Ago", "Set", "Okt", "Nob", "Dis",
+  ],
+  dayNames: ["Linggo", "Lunes", "Martes", "Miyerkules", "Huwebes", "Biyernes", "Sabado"],
+  dayNamesShort: ["Lin", "Lun", "Mar", "Miy", "Huw", "Biy", "Sab"],
+  today: "Ngayon",
+};
+
 /**
  * Set the calendar locale. Falls back to English (default) for unknown
  * languages. Accepts a full tag like "ja-JP" and uses the base part.

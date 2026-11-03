@@ -21,6 +21,7 @@ export const CURRENCIES: CurrencyConfig[] = [
   { code: "KRW", symbol: "₩", name: "Korean Won", locale: "ko-KR" },
   { code: "CNY", symbol: "¥", name: "Chinese Yuan", locale: "zh-CN" },
   { code: "THB", symbol: "฿", name: "Thai Baht", locale: "th-TH" },
+  { code: "PHP", symbol: "₱", name: "Philippine Peso", locale: "fil-PH" },
 ];
 
 export const DEFAULT_CURRENCY = CURRENCIES[0]; // USD
@@ -31,6 +32,8 @@ const LANGUAGE_TO_CURRENCY: Record<string, string> = {
   en: "USD",
   ja: "JPY",
   ko: "KRW",
+  th: "THB",
+  fil: "PHP",
 };
 
 export const getCurrencyForLanguage = (language: string): CurrencyConfig => {

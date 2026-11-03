@@ -494,6 +494,10 @@
     "vietnamese": "Tiếng Việt",
     "japanese": "日本語",
     "korean": "한국어",
+    "indonesian": "Bahasa Indonesia",
+    "hindi": "Hindi",
+    "thai": "Thai",
+    "filipino": "Filipino",
     "selectLanguage": "Select Language",
     "changeLanguage": "Change Language"
   },

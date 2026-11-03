@@ -37,9 +37,7 @@ export function FlagIcon({ country, size = 28, borderRadius }: FlagIconProps) {
           <Rect x="0" y="0" width="60" height="40" rx={radius} ry={radius} />
         </ClipPath>
       </Defs>
-      <G clipPath={`url(#${clipId})`}>
-        {renderFlag(country)}
-      </G>
+      <G clipPath={`url(#${clipId})`}>{renderFlag(country)}</G>
       {/* Subtle border so light flags (JP/KR) stay visible on white cards. */}
       <Rect
         x="0.5"
@@ -66,6 +64,14 @@ function renderFlag(country: FlagCountryCode): React.ReactNode {
       return <Japan />;
     case "KR":
       return <Korea />;
+    case "ID":
+      return <Indonesia />;
+    case "IN":
+      return <India />;
+    case "TH":
+      return <Thailand />;
+    case "PH":
+      return <Philippines />;
     default:
       return null;
   }
@@ -165,6 +171,75 @@ function Korea() {
         <Path d="M 11 30 L 17 33" />
         <Path d="M 12 28 L 18 31" />
       </G>
+    </>
+  );
+}
+
+function Indonesia() {
+  return (
+    <>
+      <Rect x="0" y="0" width="60" height="20" fill="#CE1126" />
+      <Rect x="0" y="20" width="60" height="20" fill="#FFFFFF" />
+    </>
+  );
+}
+
+function India() {
+  const centerX = 30;
+  const centerY = 20;
+  const radius = 6;
+  const spokes = Array.from({ length: 24 }, (_, index) => {
+    const angle = (Math.PI * 2 * index) / 24;
+    return (
+      <Path
+        key={index}
+        d={`M ${centerX} ${centerY} L ${centerX + radius * Math.cos(angle)} ${centerY + radius * Math.sin(angle)}`}
+        stroke="#000080"
+        strokeWidth={0.45}
+      />
+    );
+  });
+
+  return (
+    <>
+      <Rect x="0" y="0" width="60" height="13.34" fill="#FF9933" />
+      <Rect x="0" y="13.33" width="60" height="13.34" fill="#FFFFFF" />
+      <Rect x="0" y="26.66" width="60" height="13.34" fill="#138808" />
+      <Circle
+        cx={centerX}
+        cy={centerY}
+        r={radius}
+        fill="none"
+        stroke="#000080"
+        strokeWidth={0.8}
+      />
+      {spokes}
+    </>
+  );
+}
+
+function Thailand() {
+  return (
+    <>
+      <Rect x="0" y="0" width="60" height="6.67" fill="#A51931" />
+      <Rect x="0" y="6.67" width="60" height="6.66" fill="#FFFFFF" />
+      <Rect x="0" y="13.33" width="60" height="13.34" fill="#2D2A4A" />
+      <Rect x="0" y="26.67" width="60" height="6.66" fill="#FFFFFF" />
+      <Rect x="0" y="33.33" width="60" height="6.67" fill="#A51931" />
+    </>
+  );
+}
+
+function Philippines() {
+  return (
+    <>
+      <Rect x="0" y="0" width="60" height="20" fill="#0038A8" />
+      <Rect x="0" y="20" width="60" height="20" fill="#CE1126" />
+      <Path d="M 0 0 L 27 20 L 0 40 Z" fill="#FFFFFF" />
+      <Circle cx="8" cy="20" r="2.2" fill="#FCD116" />
+      <Circle cx="2.8" cy="8.5" r="1" fill="#FCD116" />
+      <Circle cx="2.8" cy="31.5" r="1" fill="#FCD116" />
+      <Circle cx="22" cy="20" r="1" fill="#FCD116" />
     </>
   );
 }
