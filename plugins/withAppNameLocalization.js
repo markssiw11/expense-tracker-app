@@ -35,11 +35,7 @@ function withAppNameLocalization(config) {
   config = withXcodeProject(config, (config) => {
     const project = config.modResults;
     const projectRoot = config.modRequest.projectRoot;
-    const iosPath = path.join(
-      projectRoot,
-      "ios",
-      config.modRequest.projectName,
-    );
+    const iosPath = path.join(projectRoot, "ios");
 
     const writeInfoPlistStrings = (locale, name) => {
       const dir = path.join(iosPath, `${locale}.lproj`);
@@ -71,13 +67,27 @@ function withAppNameLocalization(config) {
     const groupKey =
       project.findPBXVariantGroupKey({ name: "InfoPlist.strings" }) ||
       project.addLocalizationVariantGroup("InfoPlist.strings");
+    const variantGroup = project.getPBXVariantGroupByKey(groupKey);
+    const fileReferences = project.hash.project.objects.PBXFileReference;
+    const registeredLocales = new Set(
+      (variantGroup?.children ?? [])
+        .map(({ value }) => {
+          const fileReference = fileReferences[value];
+          const filePath = fileReference?.path?.replace(/^"|"$/g, "");
+          return filePath?.match(/(?:^|\/)([^/]+)\.lproj\//)?.[1];
+        })
+        .filter(Boolean),
+    );
+
     ["en", ...EXTRA_LOCALES].forEach((locale) => {
+      if (registeredLocales.has(locale)) return;
       try {
         project.addResourceFile(
           `${locale}.lproj/InfoPlist.strings`,
           { variantGroup: true },
           groupKey,
         );
+        registeredLocales.add(locale);
       } catch (e) {
         console.warn(
           `withAppNameLocalization: could not add ${locale}.lproj/InfoPlist.strings`,

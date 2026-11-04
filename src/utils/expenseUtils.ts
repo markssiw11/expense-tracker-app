@@ -1,15 +1,15 @@
 import {
-  format,
-  startOfMonth,
   endOfMonth,
+  format,
   isWithinInterval,
   parseISO,
+  startOfMonth,
 } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
-  Expense,
-  ExpenseCategory,
   CategoryBreakdown,
+  Expense,
+  ExpenseCategoryValue,
   MonthlySummary,
 } from "../types";
 import {
@@ -25,7 +25,7 @@ import {
  */
 export const filterExpensesByMonth = (
   expenses: Expense[],
-  month: string
+  month: string,
 ): Expense[] => {
   try {
     const [year, monthNum] = month.split("-").map(Number);
@@ -58,9 +58,9 @@ export const calculateMonthlyTotal = (expenses: Expense[]): number => {
  * @returns Object with expenses grouped by category
  */
 export const groupExpensesByCategory = (
-  expenses: Expense[]
-): Record<ExpenseCategory, Expense[]> => {
-  const grouped = {} as Record<ExpenseCategory, Expense[]>;
+  expenses: Expense[],
+): Record<string, Expense[]> => {
+  const grouped: Record<string, Expense[]> = {};
 
   expenses.forEach((expense) => {
     if (!grouped[expense.category]) {
@@ -78,7 +78,7 @@ export const groupExpensesByCategory = (
  * @returns Array of category breakdowns sorted by amount descending
  */
 export const calculateCategoryBreakdown = (
-  expenses: Expense[]
+  expenses: Expense[],
 ): CategoryBreakdown[] => {
   const total = calculateMonthlyTotal(expenses);
   const grouped = groupExpensesByCategory(expenses);
@@ -87,12 +87,12 @@ export const calculateCategoryBreakdown = (
     ([category, categoryExpenses]) => {
       const amount = calculateMonthlyTotal(categoryExpenses);
       return {
-        category: category as ExpenseCategory,
+        category: category as ExpenseCategoryValue,
         amount,
         percentage: total > 0 ? (amount / total) * 100 : 0,
         count: categoryExpenses.length,
       };
-    }
+    },
   );
 
   // Sort by amount descending
@@ -107,7 +107,7 @@ export const calculateCategoryBreakdown = (
  */
 export const generateMonthlySummary = (
   expenses: Expense[],
-  month: string
+  month: string,
 ): MonthlySummary => {
   const monthlyExpenses = filterExpensesByMonth(expenses, month);
   const totalAmount = calculateMonthlyTotal(monthlyExpenses);

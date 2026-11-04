@@ -1,3 +1,4 @@
+import { AppTheme } from "@/constants/theme";
 import {
   getNoteCategories,
   getNoteCategoryConfig,
@@ -22,7 +23,6 @@ import {
   sortNotes,
 } from "@/src/utils/noteUtils";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
@@ -206,7 +206,7 @@ export default function NotesTab() {
   if (loading && notes.length === 0) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+        <ActivityIndicator size="large" color={AppTheme.green} />
       </View>
     );
   }
@@ -345,12 +345,7 @@ export default function NotesTab() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <LinearGradient
-        colors={["#667eea", "#764ba2"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.header, { paddingTop: insets.top + 20 }]}
-      >
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View style={styles.headerTop}>
           <Text style={styles.headerTitle}>{t("notes.title")}</Text>
           <TouchableOpacity
@@ -360,7 +355,7 @@ export default function NotesTab() {
             <Ionicons name="add" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Notes List */}
       {!hasNotes ? (
@@ -396,24 +391,20 @@ export default function NotesTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
+    backgroundColor: AppTheme.background,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F8F9FA",
+    backgroundColor: AppTheme.background,
   },
   header: {
     paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    backgroundColor: AppTheme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   headerTop: {
     flexDirection: "row",
@@ -423,14 +414,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#fff",
-    letterSpacing: -0.5,
+    color: AppTheme.ink,
   },
   addButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    backgroundColor: AppTheme.green,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -520,8 +510,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   tagFilterChipSelected: {
-    backgroundColor: "#007AFF",
-    borderColor: "#007AFF",
+    backgroundColor: AppTheme.green,
+    borderColor: AppTheme.green,
   },
   tagFilterText: {
     fontSize: 13,
@@ -549,17 +539,12 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   noteItem: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: "#F0F0F0",
+    backgroundColor: AppTheme.background,
+    paddingVertical: 16,
+    paddingHorizontal: 2,
+    marginBottom: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   noteHeader: {
     flexDirection: "row",
@@ -610,7 +595,7 @@ const styles = StyleSheet.create({
   noteAmount: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#007AFF",
+    color: AppTheme.green,
   },
   tagsContainer: {
     flexDirection: "row",
@@ -619,14 +604,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   tag: {
-    backgroundColor: "#E3F2FD",
+    backgroundColor: AppTheme.greenSoft,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
   },
   tagText: {
     fontSize: 11,
-    color: "#007AFF",
+    color: AppTheme.green,
     fontWeight: "500",
   },
   moreTagsText: {

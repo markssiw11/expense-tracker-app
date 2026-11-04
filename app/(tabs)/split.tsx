@@ -1,3 +1,4 @@
+import { AppTheme } from "@/constants/theme";
 import { useCurrencyFormat } from "@/src/hooks/useCurrency";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { syncSplitExpenses } from "@/src/redux";
@@ -453,7 +454,11 @@ export default function SplitTab() {
         ) : !selectedTrip ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyIcon}>
-              <Ionicons name="people-outline" size={30} color="#667eea" />
+              <Ionicons
+                name="people-outline"
+                size={30}
+                color={AppTheme.green}
+              />
             </View>
             <Text style={styles.emptyTitle}>{t("split.emptyTitle")}</Text>
             <Text style={styles.emptySubtitle}>{t("split.emptySubtitle")}</Text>
@@ -607,7 +612,7 @@ export default function SplitTab() {
                     <Ionicons
                       name="swap-horizontal"
                       size={20}
-                      color="#667eea"
+                      color={AppTheme.green}
                     />
                   </View>
                   <View style={styles.overviewBalanceList}>
@@ -685,7 +690,7 @@ export default function SplitTab() {
                       <Ionicons
                         name="chevron-forward"
                         size={15}
-                        color="#667eea"
+                        color={AppTheme.green}
                       />
                     </TouchableOpacity>
                   </View>
@@ -697,7 +702,7 @@ export default function SplitTab() {
                       <Ionicons
                         name="add-circle-outline"
                         size={20}
-                        color="#667eea"
+                        color={AppTheme.green}
                       />
                       <Text style={styles.overviewEmptyText}>
                         {t("split.addExpense")}
@@ -711,7 +716,7 @@ export default function SplitTab() {
                             <Ionicons
                               name="receipt-outline"
                               size={17}
-                              color="#667eea"
+                              color={AppTheme.green}
                             />
                           </View>
                           <View style={styles.overviewRecentDescription}>
@@ -751,7 +756,7 @@ export default function SplitTab() {
                     <Ionicons
                       name="receipt-outline"
                       size={23}
-                      color="#667eea"
+                      color={AppTheme.green}
                     />
                   </View>
                 </View>
@@ -934,7 +939,7 @@ export default function SplitTab() {
                     style={styles.addExpenseButton}
                     onPress={openExpenseForm}
                   >
-                    <Ionicons name="add" size={18} color="#667eea" />
+                    <Ionicons name="add" size={18} color={AppTheme.green} />
                     <Text style={styles.addExpenseText}>
                       {t("split.addExpense")}
                     </Text>
@@ -948,7 +953,7 @@ export default function SplitTab() {
                     <Ionicons
                       name="add-circle-outline"
                       size={22}
-                      color="#667eea"
+                      color={AppTheme.green}
                     />
                     <Text style={styles.firstExpenseText}>
                       {t("split.addExpense")}
@@ -962,7 +967,7 @@ export default function SplitTab() {
                           <Ionicons
                             name="receipt-outline"
                             size={19}
-                            color="#667eea"
+                            color={AppTheme.green}
                           />
                         </View>
                         <View style={styles.expenseDescription}>
@@ -1070,7 +1075,7 @@ export default function SplitTab() {
                       <Text style={styles.draftPersonText}>
                         {participant.name}
                       </Text>
-                      <Ionicons name="close" size={15} color="#667eea" />
+                      <Ionicons name="close" size={15} color={AppTheme.green} />
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -1211,7 +1216,7 @@ export default function SplitTab() {
                   <Ionicons
                     name={customSplit ? "radio-button-on" : "radio-button-off"}
                     size={20}
-                    color="#667eea"
+                    color={AppTheme.green}
                   />
                   <Text style={styles.customToggleText}>
                     {customSplit
@@ -1412,7 +1417,7 @@ export default function SplitTab() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f6fa" },
+  container: { flex: 1, backgroundColor: AppTheme.background },
   content: { paddingHorizontal: 20, paddingBottom: 36 },
   header: {
     flexDirection: "row",
@@ -1427,7 +1432,7 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 15,
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1439,7 +1444,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: "#fff",
   },
-  tripChipActive: { backgroundColor: "#667eea" },
+  tripChipActive: { backgroundColor: AppTheme.green },
   tripChipText: { color: "#555", fontSize: 14, fontWeight: "600" },
   tripChipTextActive: { color: "#fff" },
   loadingText: { textAlign: "center", color: "#68736F", paddingVertical: 44 },
@@ -1453,7 +1458,7 @@ const styles = StyleSheet.create({
     width: 66,
     height: 66,
     borderRadius: 22,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 18,
@@ -1477,7 +1482,7 @@ const styles = StyleSheet.create({
     gap: 7,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
     borderRadius: 12,
     paddingHorizontal: 18,
     marginTop: 20,
@@ -1498,7 +1503,7 @@ const styles = StyleSheet.create({
   totalBand: {
     minHeight: 112,
     borderRadius: 17,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
     paddingHorizontal: 20,
     paddingVertical: 18,
     flexDirection: "row",
@@ -1507,7 +1512,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
   totalLabel: { color: "#646B83", fontSize: 13, marginBottom: 7 },
-  totalAmount: { color: "#4F5FC2", fontSize: 27, fontWeight: "800" },
+  totalAmount: { color: AppTheme.greenDark, fontSize: 27, fontWeight: "800" },
   totalIcon: {
     width: 48,
     height: 48,
@@ -1533,7 +1538,7 @@ const styles = StyleSheet.create({
     gap: 7,
     borderRadius: 10,
   },
-  viewTabActive: { backgroundColor: "#263D38" },
+  viewTabActive: { backgroundColor: AppTheme.greenDark },
   viewTabText: { color: "#6E7974", fontSize: 13, fontWeight: "600" },
   viewTabTextActive: { color: "#fff" },
   overviewContent: { gap: 18, paddingBottom: 18 },
@@ -1544,13 +1549,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
     borderRadius: 12,
-    backgroundColor: "#263D38",
+    backgroundColor: AppTheme.greenDark,
   },
   shareSummaryButtonText: { color: "#fff", fontSize: 14, fontWeight: "700" },
   overviewHero: {
     borderRadius: 17,
     padding: 19,
-    backgroundColor: "#174A40",
+    backgroundColor: AppTheme.greenDark,
   },
   overviewHeroTop: {
     flexDirection: "row",
@@ -1623,7 +1628,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 12,
-    backgroundColor: "#E3EFEA",
+    backgroundColor: AppTheme.greenSoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1634,14 +1639,14 @@ const styles = StyleSheet.create({
   overviewBalanceAmount: { fontSize: 13, fontWeight: "700" },
   overviewBalanceStatus: { fontSize: 10, marginTop: 3 },
   seeAllButton: { flexDirection: "row", alignItems: "center", gap: 2 },
-  seeAllText: { color: "#667eea", fontSize: 12, fontWeight: "700" },
+  seeAllText: { color: AppTheme.green, fontSize: 12, fontWeight: "700" },
   overviewRecentList: { gap: 12 },
   overviewRecentRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   overviewRecentIcon: {
     width: 34,
     height: 34,
     borderRadius: 11,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1656,7 +1661,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 7,
   },
-  overviewEmptyText: { color: "#667eea", fontSize: 13, fontWeight: "600" },
+  overviewEmptyText: { color: AppTheme.green, fontSize: 13, fontWeight: "600" },
   sharePreviewBackdrop: {
     flex: 1,
     justifyContent: "flex-end",
@@ -1664,7 +1669,7 @@ const styles = StyleSheet.create({
   },
   sharePreviewSheet: {
     maxHeight: "94%",
-    backgroundColor: "#F5F6F2",
+    backgroundColor: AppTheme.background,
     borderTopLeftRadius: 23,
     borderTopRightRadius: 23,
     paddingTop: 10,
@@ -1676,12 +1681,12 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
     gap: 13,
     padding: 2,
-    backgroundColor: "#F5F6F2",
+    backgroundColor: AppTheme.background,
   },
   sharePreviewHero: {
     padding: 18,
     borderRadius: 16,
-    backgroundColor: "#174A40",
+    backgroundColor: AppTheme.greenDark,
   },
   sharePreviewTripName: {
     color: "#D3E5A9",
@@ -1781,7 +1786,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 11,
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1799,7 +1804,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 6,
     borderRadius: 20,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
   },
   avatar: {
     width: 27,
@@ -1836,7 +1841,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 12,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
   },
   summaryLabels: { flex: 1 },
   summaryName: { color: "#25322D", fontSize: 14, fontWeight: "600" },
@@ -1857,7 +1862,7 @@ const styles = StyleSheet.create({
     gap: 3,
     paddingVertical: 5,
   },
-  addExpenseText: { color: "#667eea", fontSize: 13, fontWeight: "700" },
+  addExpenseText: { color: AppTheme.green, fontSize: 13, fontWeight: "700" },
   firstExpense: {
     minHeight: 58,
     flexDirection: "row",
@@ -1867,7 +1872,7 @@ const styles = StyleSheet.create({
     borderRadius: 13,
     paddingHorizontal: 15,
   },
-  firstExpenseText: { color: "#667eea", fontSize: 14, fontWeight: "600" },
+  firstExpenseText: { color: AppTheme.green, fontSize: 14, fontWeight: "600" },
   expenseList: {
     backgroundColor: "#fff",
     borderRadius: 15,
@@ -1886,7 +1891,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 12,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1902,7 +1907,7 @@ const styles = StyleSheet.create({
   },
   modalSheet: {
     maxHeight: "92%",
-    backgroundColor: "#f5f6fa",
+    backgroundColor: AppTheme.background,
     borderTopLeftRadius: 22,
     borderTopRightRadius: 22,
     paddingTop: 10,
@@ -1978,7 +1983,7 @@ const styles = StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 11,
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -1995,9 +2000,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 7,
     borderRadius: 15,
-    backgroundColor: "#EEF0FF",
+    backgroundColor: AppTheme.greenSoft,
   },
-  draftPersonText: { color: "#4F5FC2", fontSize: 13, fontWeight: "600" },
+  draftPersonText: {
+    color: AppTheme.greenDark,
+    fontSize: 13,
+    fontWeight: "600",
+  },
   expenseForm: { paddingBottom: 10 },
   optionList: {
     backgroundColor: "#fff",
@@ -2021,12 +2030,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  radioSelected: { borderColor: "#667eea" },
+  radioSelected: { borderColor: AppTheme.green },
   radioDot: {
     width: 9,
     height: 9,
     borderRadius: 5,
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
   },
   shareOptionRow: {
     minHeight: 43,
@@ -2043,7 +2052,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  checkboxSelected: { backgroundColor: "#667eea", borderColor: "#667eea" },
+  checkboxSelected: {
+    backgroundColor: AppTheme.green,
+    borderColor: AppTheme.green,
+  },
   shareInput: {
     width: 96,
     height: 35,
@@ -2062,6 +2074,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   customToggleText: { color: "#25322D", fontSize: 13, fontWeight: "600" },
-  customModeHint: { color: "#667eea", fontSize: 12, marginLeft: 8 },
+  customModeHint: { color: AppTheme.green, fontSize: 12, marginLeft: 8 },
   shareHint: { color: "#78847F", fontSize: 12, lineHeight: 17, marginTop: 1 },
 });

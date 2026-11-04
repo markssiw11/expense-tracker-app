@@ -1,4 +1,9 @@
-import { CategoryConfig, ExpenseCategory } from "../types";
+import {
+  CategoryConfig,
+  CustomExpenseCategory,
+  ExpenseCategory,
+  ExpenseCategoryValue,
+} from "../types";
 
 export const EXPENSE_CATEGORIES_BASE: Omit<CategoryConfig, "label">[] = [
   {
@@ -45,19 +50,29 @@ export const EXPENSE_CATEGORIES_BASE: Omit<CategoryConfig, "label">[] = [
 
 // Function to get categories with translated labels
 export const getExpenseCategories = (
-  t: (key: string) => string
+  t: (key: string) => string,
+  customCategories: CustomExpenseCategory[] = [],
 ): CategoryConfig[] => {
-  return EXPENSE_CATEGORIES_BASE.map((category) => ({
-    ...category,
-    label: t(`categories.${category.key.toLowerCase()}`),
-  }));
+  return [
+    ...EXPENSE_CATEGORIES_BASE.map((category) => ({
+      ...category,
+      label: t(`categories.${category.key.toLowerCase()}`),
+    })),
+    ...customCategories.map((category) => ({
+      key: category.id,
+      label: category.name,
+      icon: category.icon,
+      color: category.color,
+    })),
+  ];
 };
 
 export const getCategoryConfig = (
-  category: ExpenseCategory,
-  t: (key: string) => string
+  category: ExpenseCategoryValue,
+  t: (key: string) => string,
+  customCategories: CustomExpenseCategory[] = [],
 ): CategoryConfig => {
-  const categories = getExpenseCategories(t);
+  const categories = getExpenseCategories(t, customCategories);
   return (
     categories.find((c) => c.key === category) ||
     categories[categories.length - 1]

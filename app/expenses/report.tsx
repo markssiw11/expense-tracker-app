@@ -1,9 +1,11 @@
+import { AppTheme } from "@/constants/theme";
 import { GoBackButton } from "@/src/components";
 import BarChart from "@/src/components/BarChart";
 import PieChart from "@/src/components/PieChart";
 import { getExpenseCategories } from "@/src/constants/ExpenseCategories";
 import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
 import { useCurrencyFormat } from "@/src/hooks/useCurrency";
+import { useCustomExpenseCategories } from "@/src/hooks/useCustomExpenseCategories";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import { loadFamilyMembers } from "@/src/redux";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
@@ -16,7 +18,6 @@ import {
   getPreviousMonth,
 } from "@/src/utils/expenseUtils";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ScrollView,
@@ -37,7 +38,11 @@ export default function MonthlyReportScreen() {
   const { t } = useTranslation();
   const formatCurrency = useCurrencyFormat();
 
-  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
+  const customCategories = useCustomExpenseCategories();
+  const EXPENSE_CATEGORIES = useMemo(
+    () => getExpenseCategories(t, customCategories),
+    [t, customCategories],
+  );
 
   useEffect(() => {
     dispatch(loadFamilyMembers());
@@ -47,6 +52,22 @@ export default function MonthlyReportScreen() {
     () => generateMonthlySummary(expenses, selectedMonth),
     [expenses, selectedMonth],
   );
+
+  const previousMonthSummary = useMemo(
+    () => generateMonthlySummary(expenses, getPreviousMonth(selectedMonth)),
+    [expenses, selectedMonth],
+  );
+
+  const dailyAverage = useMemo(() => {
+    const [year, month] = selectedMonth.split("-").map(Number);
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const daysElapsed =
+      selectedMonth === getCurrentMonth() ? new Date().getDate() : daysInMonth;
+    return monthlySummary.totalAmount / Math.max(daysElapsed, 1);
+  }, [monthlySummary.totalAmount, selectedMonth]);
+
+  const monthlyChange =
+    monthlySummary.totalAmount - previousMonthSummary.totalAmount;
 
   const monthlyExpenses = useMemo(
     () => filterExpensesByMonth(expenses, selectedMonth),
@@ -97,15 +118,14 @@ export default function MonthlyReportScreen() {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
-        <LinearGradient
-          colors={["#667eea", "#764ba2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.header, { paddingTop: insets.top + 12 }]}
-        >
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <View style={styles.headerContent}>
             <View style={styles.headerRow}>
-              <GoBackButton />
+              <GoBackButton
+                color={AppTheme.green}
+                backgroundColor={AppTheme.surface}
+                style={styles.backButton}
+              />
               <Text style={styles.headerTitle}>{t("reports.headerTitle")}</Text>
               <View style={{ width: 40 }} />
             </View>
@@ -115,14 +135,18 @@ export default function MonthlyReportScreen() {
                 style={styles.monthButton}
                 onPress={handlePreviousMonth}
               >
-                <Ionicons name="chevron-back" size={20} color="#fff" />
+                <Ionicons name="chevron-back" size={20} color={AppTheme.ink} />
               </TouchableOpacity>
               <Text style={styles.monthText}>{selectedMonth}</Text>
               <TouchableOpacity
                 style={styles.monthButton}
                 onPress={handleNextMonth}
               >
-                <Ionicons name="chevron-forward" size={20} color="#fff" />
+                <Ionicons
+                  name="chevron-forward"
+                  size={20}
+                  color={AppTheme.ink}
+                />
               </TouchableOpacity>
             </View>
 
@@ -137,8 +161,64 @@ export default function MonthlyReportScreen() {
                 {monthlySummary.expenseCount} {t("reports.transactions")}
               </Text>
             </View>
+
+            <View style={styles.insightList}>
+              <View style={styles.insightRow}>
+                <View style={styles.insightCopy}>
+                  <Text style={styles.insightLabel}>
+                    {t("reports.compareToLastMonth")}
+                  </Text>
+                  <Text style={styles.insightHint}>
+                    {monthlyChange > 0
+                      ? t("reports.increased")
+                      : monthlyChange < 0
+                        ? t("reports.decreased")
+                        : t("reports.unchanged")}
+                  </Text>
+                </View>
+                <View style={styles.insightValueBlock}>
+                  <Text
+                    style={[
+                      styles.insightValue,
+                      {
+                        color:
+                          monthlyChange > 0 ? AppTheme.danger : AppTheme.green,
+                      },
+                    ]}
+                  >
+                    {monthlyChange > 0 ? "+" : monthlyChange < 0 ? "-" : ""}
+                    {formatCurrency(Math.abs(monthlyChange))}
+                  </Text>
+                  {previousMonthSummary.totalAmount > 0 && (
+                    <Text style={styles.insightHint}>
+                      {`${monthlyChange > 0 ? "+" : ""}${((monthlyChange / previousMonthSummary.totalAmount) * 100).toFixed(0)}%`}
+                    </Text>
+                  )}
+                </View>
+              </View>
+              <View style={styles.insightDivider} />
+              <View style={styles.insightRow}>
+                <Text style={styles.insightLabel}>
+                  {t("reports.averageDaily")}
+                </Text>
+                <Text style={styles.insightValue}>
+                  {formatCurrency(dailyAverage)}
+                </Text>
+              </View>
+              <View style={styles.insightDivider} />
+              <View style={styles.insightRow}>
+                <Text style={styles.insightLabel}>
+                  {t("reports.topCategories")}
+                </Text>
+                <Text style={styles.insightValue} numberOfLines={1}>
+                  {monthlySummary.categoryBreakdown[0]
+                    ? `${getCategoryConfig(monthlySummary.categoryBreakdown[0].category)?.label ?? monthlySummary.categoryBreakdown[0].category} · ${formatCurrency(monthlySummary.categoryBreakdown[0].amount)}`
+                    : t("reports.noExpensesThisMonth")}
+                </Text>
+              </View>
+            </View>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* View Mode Toggle */}
         <View style={styles.toggleContainer}>
@@ -152,7 +232,7 @@ export default function MonthlyReportScreen() {
             <Ionicons
               name="people"
               size={18}
-              color={viewMode === "spender" ? "#fff" : "#666"}
+              color={viewMode === "spender" ? "#fff" : AppTheme.inkMuted}
             />
             <Text
               style={[
@@ -173,7 +253,7 @@ export default function MonthlyReportScreen() {
             <Ionicons
               name="grid"
               size={18}
-              color={viewMode === "category" ? "#fff" : "#666"}
+              color={viewMode === "category" ? "#fff" : AppTheme.inkMuted}
             />
             <Text
               style={[
@@ -373,21 +453,17 @@ export default function MonthlyReportScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f6fa",
+    backgroundColor: AppTheme.background,
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    paddingBottom: 24,
+    paddingBottom: 18,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    backgroundColor: AppTheme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   headerContent: {
     gap: 16,
@@ -397,10 +473,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  backButton: {
+    borderWidth: 1,
+    borderColor: AppTheme.border,
+  },
   headerTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#fff",
+    color: AppTheme.ink,
     flex: 1,
     textAlign: "center",
   },
@@ -415,52 +495,94 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: AppTheme.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
     justifyContent: "center",
     alignItems: "center",
   },
   monthText: {
     fontSize: 16,
     fontWeight: "700",
-    color: "#fff",
+    color: AppTheme.ink,
     minWidth: 80,
     textAlign: "center",
   },
   summaryBox: {
     alignItems: "center",
-    paddingTop: 8,
+    padding: 16,
+    backgroundColor: AppTheme.greenSoft,
+    borderRadius: 8,
+  },
+  insightList: {
+    marginTop: 10,
+    paddingHorizontal: 14,
+    backgroundColor: AppTheme.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
+  },
+  insightRow: {
+    minHeight: 52,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  insightCopy: {
+    flex: 1,
+  },
+  insightValueBlock: {
+    alignItems: "flex-end",
+  },
+  insightLabel: {
+    flex: 1,
+    fontSize: 13,
+    fontWeight: "600",
+    color: AppTheme.ink,
+  },
+  insightHint: {
+    marginTop: 2,
+    fontSize: 12,
+    color: AppTheme.inkMuted,
+  },
+  insightValue: {
+    maxWidth: "62%",
+    fontSize: 13,
+    fontWeight: "700",
+    color: AppTheme.ink,
+    textAlign: "right",
+  },
+  insightDivider: {
+    height: 1,
+    backgroundColor: AppTheme.border,
   },
   summaryLabel: {
     fontSize: 13,
-    color: "#fff",
-    opacity: 0.85,
+    color: AppTheme.inkMuted,
     fontWeight: "500",
     marginBottom: 6,
   },
   summaryAmount: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#fff",
+    color: AppTheme.ink,
     marginBottom: 4,
     letterSpacing: -0.5,
   },
   summaryCount: {
     fontSize: 13,
-    color: "#fff",
-    opacity: 0.9,
+    color: AppTheme.inkMuted,
     fontWeight: "500",
   },
   toggleContainer: {
     flexDirection: "row",
     margin: 16,
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: AppTheme.background,
+    borderRadius: 8,
     padding: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
   },
   toggleButton: {
     flex: 1,
@@ -473,7 +595,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   toggleButtonActive: {
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
   },
   toggleText: {
     fontSize: 14,
@@ -490,24 +612,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#333",
+    color: AppTheme.ink,
     marginBottom: 16,
   },
   chartCard: {
-    backgroundColor: "#fff",
-    padding: 20,
-    borderRadius: 16,
+    backgroundColor: AppTheme.surface,
+    padding: 18,
+    borderRadius: 8,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
   },
   chartTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#333",
+    color: AppTheme.ink,
     marginBottom: 16,
   },
   legendContainer: {
@@ -528,19 +647,21 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: "600",
-    color: "#333",
+    color: AppTheme.ink,
   },
   legendValue: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#666",
+    color: AppTheme.inkMuted,
   },
 
   emptyState: {
     alignItems: "center",
     padding: 48,
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: AppTheme.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
   },
   emptyText: {
     fontSize: 14,

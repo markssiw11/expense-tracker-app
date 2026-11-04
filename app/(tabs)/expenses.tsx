@@ -1,3 +1,4 @@
+import { AppTheme } from "@/constants/theme";
 import BudgetStatusCard from "@/src/components/BudgetStatusCard";
 import BudgetWarningBanner from "@/src/components/BudgetWarningBanner";
 import {
@@ -6,6 +7,7 @@ import {
 } from "@/src/constants/ExpenseCategories";
 import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
 import { useCurrencyFormat } from "@/src/hooks/useCurrency";
+import { useCustomExpenseCategories } from "@/src/hooks/useCustomExpenseCategories";
 import { useTranslation } from "@/src/hooks/useTranslation";
 import {
   deleteExpense,
@@ -17,7 +19,7 @@ import {
   setSelectedMonth,
 } from "@/src/redux";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { Expense, ExpenseCategory } from "@/src/types";
+import { Expense, ExpenseCategoryValue } from "@/src/types";
 import { formatMonthYear } from "@/src/utils/dateUtils";
 import {
   calculateMonthlyTotal,
@@ -27,7 +29,6 @@ import {
   getPreviousMonth,
 } from "@/src/utils/expenseUtils";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useMemo } from "react";
 import {
@@ -67,7 +68,11 @@ export default function ExpensesTab() {
   const familyMembers = useAppSelector((state) => state.family.members);
 
   // Get expense categories with translations
-  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
+  const customCategories = useCustomExpenseCategories();
+  const EXPENSE_CATEGORIES = useMemo(
+    () => getExpenseCategories(t, customCategories),
+    [t, customCategories],
+  );
 
   // Format month display with translated month names
   const formattedMonth = formatMonthYear(selectedMonth, t);
@@ -138,7 +143,7 @@ export default function ExpensesTab() {
     ]);
   };
 
-  const toggleCategoryFilter = (category: ExpenseCategory) => {
+  const toggleCategoryFilter = (category: ExpenseCategoryValue) => {
     const newCategories = filters.categories.includes(category)
       ? filters.categories.filter((c) => c !== category)
       : [...filters.categories, category];
@@ -151,7 +156,11 @@ export default function ExpensesTab() {
   };
 
   const renderExpenseItem = ({ item }: { item: Expense }) => {
-    const categoryConfig = getCategoryConfig(item.category, t);
+    const categoryConfig = getCategoryConfig(
+      item.category,
+      t,
+      customCategories,
+    );
 
     if (viewMode === "grid") {
       // Grid view - compact card
@@ -234,12 +243,7 @@ export default function ExpensesTab() {
   return (
     <View style={[styles.container]}>
       {/* Single Row Modern Header */}
-      <LinearGradient
-        colors={["#667eea", "#764ba2"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.modernHeader, { paddingTop: insets.top + 8 }]}
-      >
+      <View style={[styles.modernHeader, { paddingTop: insets.top + 12 }]}>
         <View style={styles.singleRowHeader}>
           {/* Month Selector */}
           <View style={styles.monthSelector}>
@@ -248,7 +252,7 @@ export default function ExpensesTab() {
               style={styles.monthNavButton}
               activeOpacity={0.7}
             >
-              <Ionicons name="chevron-back" size={18} color="#fff" />
+              <Ionicons name="chevron-back" size={18} color={AppTheme.ink} />
             </TouchableOpacity>
 
             <View style={styles.monthInfo}>
@@ -261,7 +265,7 @@ export default function ExpensesTab() {
               style={styles.monthNavButton}
               activeOpacity={0.7}
             >
-              <Ionicons name="chevron-forward" size={18} color="#fff" />
+              <Ionicons name="chevron-forward" size={18} color={AppTheme.ink} />
             </TouchableOpacity>
           </View>
 
@@ -281,10 +285,14 @@ export default function ExpensesTab() {
             onPress={() => router.push("/expenses/report")}
             activeOpacity={0.8}
           >
-            <Ionicons name="stats-chart-outline" size={20} color="#fff" />
+            <Ionicons
+              name="stats-chart-outline"
+              size={20}
+              color={AppTheme.green}
+            />
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Search + Spender Filter */}
       <View style={styles.searchContainer}>
@@ -418,7 +426,7 @@ export default function ExpensesTab() {
               <Ionicons
                 name="list"
                 size={18}
-                color={viewMode === "list" ? "#667eea" : "#999"}
+                color={viewMode === "list" ? AppTheme.green : "#999"}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -432,7 +440,7 @@ export default function ExpensesTab() {
               <Ionicons
                 name="grid"
                 size={18}
-                color={viewMode === "grid" ? "#667eea" : "#999"}
+                color={viewMode === "grid" ? AppTheme.green : "#999"}
               />
             </TouchableOpacity>
           </View>
@@ -451,7 +459,7 @@ export default function ExpensesTab() {
               <Ionicons
                 name="wallet-outline"
                 size={20}
-                color="#667eea"
+                color={AppTheme.green}
                 style={{ marginRight: 8 }}
               />
               <Text style={styles.budgetHeaderText}>
@@ -461,7 +469,7 @@ export default function ExpensesTab() {
             <Ionicons
               name={isBudgetExpanded ? "chevron-up" : "chevron-down"}
               size={20}
-              color="#667eea"
+              color={AppTheme.green}
             />
           </TouchableOpacity>
 
@@ -522,21 +530,13 @@ export default function ExpensesTab() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f6fa",
-  },
+  container: { flex: 1, backgroundColor: AppTheme.background },
   modernHeader: {
-    paddingTop: 8,
-    paddingBottom: 12,
-    paddingHorizontal: 16,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
+    paddingBottom: 14,
+    paddingHorizontal: 22,
+    backgroundColor: AppTheme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   singleRowHeader: {
     flexDirection: "row",
@@ -555,7 +555,9 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: AppTheme.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -567,14 +569,12 @@ const styles = StyleSheet.create({
   monthName: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#fff",
-    letterSpacing: 0.3,
+    color: AppTheme.ink,
   },
   yearText: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#fff",
-    opacity: 0.8,
+    color: AppTheme.inkMuted,
     marginTop: 1,
   },
   totalSection: {
@@ -584,13 +584,11 @@ const styles = StyleSheet.create({
   totalAmount: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#fff",
-    letterSpacing: -0.3,
+    color: AppTheme.ink,
   },
   transactionCount: {
     fontSize: 10,
-    color: "#fff",
-    opacity: 0.85,
+    color: AppTheme.inkMuted,
     fontWeight: "600",
     marginTop: 2,
   },
@@ -598,11 +596,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: AppTheme.surface,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.25)",
+    borderColor: AppTheme.border,
   },
   searchContainer: {
     marginTop: 12,
@@ -612,16 +610,13 @@ const styles = StyleSheet.create({
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: AppTheme.surface,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
     paddingHorizontal: 12,
     paddingVertical: 10,
     gap: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   searchInput: {
     flex: 1,
@@ -636,14 +631,14 @@ const styles = StyleSheet.create({
   spenderFilterChip: {
     paddingVertical: 6,
     paddingHorizontal: 14,
-    borderRadius: 16,
-    backgroundColor: "#fff",
+    borderRadius: 8,
+    backgroundColor: AppTheme.surface,
     borderWidth: 1,
     borderColor: "#e0e0e0",
   },
   spenderFilterChipActive: {
-    backgroundColor: "#667eea",
-    borderColor: "transparent",
+    backgroundColor: AppTheme.green,
+    borderColor: AppTheme.green,
   },
   spenderFilterText: {
     fontSize: 13,
@@ -654,15 +649,12 @@ const styles = StyleSheet.create({
     color: "#fff",
   },
   filterContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.background,
     marginTop: 12,
     marginHorizontal: 16,
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: AppTheme.border,
   },
   filterHeader: {
     flexDirection: "row",
@@ -671,8 +663,8 @@ const styles = StyleSheet.create({
   },
   viewToggle: {
     flexDirection: "row",
-    backgroundColor: "#F5F5F5",
-    borderRadius: 10,
+    backgroundColor: AppTheme.background,
+    borderRadius: 8,
     padding: 4,
     marginRight: 12,
   },
@@ -684,23 +676,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   viewButtonActive: {
-    backgroundColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: AppTheme.surface,
   },
   budgetSection: {
     marginTop: 12,
     marginHorizontal: 16,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
+    backgroundColor: AppTheme.background,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: AppTheme.border,
     overflow: "hidden",
   },
   budgetHeader: {
@@ -709,9 +693,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 14,
-    backgroundColor: "#F8F9FF",
+    backgroundColor: AppTheme.greenSoft,
     borderBottomWidth: 1,
-    borderBottomColor: "#E8EAFF",
+    borderBottomColor: AppTheme.border,
   },
   budgetHeaderLeft: {
     flexDirection: "row",
@@ -720,7 +704,7 @@ const styles = StyleSheet.create({
   budgetHeaderText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#667eea",
+    color: AppTheme.green,
   },
   warningContainer: {
     marginTop: 12,
@@ -910,10 +894,10 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#667eea",
+    shadowColor: AppTheme.greenDark,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.45,
     shadowRadius: 12,

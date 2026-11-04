@@ -1,12 +1,13 @@
+import { AppTheme } from "@/constants/theme";
 import {
-  createSlice,
   createAsyncThunk,
-  PayloadAction,
   createSelector,
+  createSlice,
+  PayloadAction,
 } from "@reduxjs/toolkit";
+import eventStorage from "../../services/storage/eventStorage";
 import { Event, EventCategory } from "../../types";
 import { RootState } from "../store";
-import eventStorage from "../../services/storage/eventStorage";
 
 interface EventState {
   events: Event[];
@@ -35,10 +36,10 @@ export const loadEvents = createAsyncThunk(
       return events;
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to load events"
+        error instanceof Error ? error.message : "Failed to load events",
       );
     }
-  }
+  },
 );
 
 export const addEvent = createAsyncThunk(
@@ -53,17 +54,17 @@ export const addEvent = createAsyncThunk(
       return event;
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to add event"
+        error instanceof Error ? error.message : "Failed to add event",
       );
     }
-  }
+  },
 );
 
 export const updateEvent = createAsyncThunk(
   "events/updateEvent",
   async (
     { id, data }: { id: string; data: Partial<Event> },
-    { getState, rejectWithValue }
+    { getState, rejectWithValue },
   ) => {
     try {
       const state = getState() as RootState;
@@ -82,17 +83,17 @@ export const updateEvent = createAsyncThunk(
       };
 
       const updatedEvents = state.events.events.map((e: Event) =>
-        e.id === id ? updatedEvent : e
+        e.id === id ? updatedEvent : e,
       );
       await eventStorage.saveEvents(updatedEvents);
 
       return { id, data: updatedEvent };
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to update event"
+        error instanceof Error ? error.message : "Failed to update event",
       );
     }
-  }
+  },
 );
 
 export const deleteEvent = createAsyncThunk(
@@ -101,16 +102,16 @@ export const deleteEvent = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const updatedEvents = state.events.events.filter(
-        (e: Event) => e.id !== id
+        (e: Event) => e.id !== id,
       );
       await eventStorage.saveEvents(updatedEvents);
       return id;
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : "Failed to delete event"
+        error instanceof Error ? error.message : "Failed to delete event",
       );
     }
-  }
+  },
 );
 
 const eventSlice = createSlice({
@@ -125,7 +126,7 @@ const eventSlice = createSlice({
     },
     setSelectedCategory: (
       state,
-      action: PayloadAction<EventCategory | null>
+      action: PayloadAction<EventCategory | null>,
     ) => {
       state.selectedCategory = action.payload;
     },
@@ -218,14 +219,14 @@ export const selectFilteredEvents = createSelector(
       return events;
     }
     return events.filter((event: Event) => event.category === selectedCategory);
-  }
+  },
 );
 
 export const selectEventsByDate = createSelector(
   [selectFilteredEvents, (_state: RootState, date: string) => date],
   (events, date) => {
     return events.filter((event: Event) => event.date === date);
-  }
+  },
 );
 
 export const selectTodayEvents = createSelector(
@@ -235,7 +236,7 @@ export const selectTodayEvents = createSelector(
     return events
       .filter((event: Event) => event.date === today)
       .sort((a: Event, b: Event) => a.time.localeCompare(b.time));
-  }
+  },
 );
 
 export const selectUpcomingEvents = createSelector(
@@ -249,14 +250,14 @@ export const selectUpcomingEvents = createSelector(
         if (dateCompare !== 0) return dateCompare;
         return a.time.localeCompare(b.time);
       });
-  }
+  },
 );
 
 export const selectEventsByCategory = createSelector(
   [selectAllEvents, (_state: RootState, category: EventCategory) => category],
   (events, category) => {
     return events.filter((event: Event) => event.category === category);
-  }
+  },
 );
 
 export const selectMarkedDates = createSelector(
@@ -294,17 +295,17 @@ export const selectMarkedDates = createSelector(
     if (selectedDate) {
       if (markedDates[selectedDate]) {
         markedDates[selectedDate].selected = true;
-        markedDates[selectedDate].selectedColor = "#007AFF";
+        markedDates[selectedDate].selectedColor = AppTheme.green;
       } else {
         markedDates[selectedDate] = {
           marked: false,
           dotColor: "",
           selected: true,
-          selectedColor: "#007AFF",
+          selectedColor: AppTheme.green,
         };
       }
     }
 
     return markedDates;
-  }
+  },
 );

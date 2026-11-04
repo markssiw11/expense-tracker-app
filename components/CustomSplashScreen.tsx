@@ -1,7 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Animated } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import { Animated, Image, StyleSheet, Text, View } from "react-native";
 
 export default function CustomSplashScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -21,15 +19,10 @@ export default function CustomSplashScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, scaleAnim]);
 
   return (
-    <LinearGradient
-      colors={["#667eea", "#764ba2"]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Animated.View
         style={[
           styles.content,
@@ -39,13 +32,15 @@ export default function CustomSplashScreen() {
           },
         ]}
       >
-        <View style={styles.iconContainer}>
-          <Ionicons name="wallet" size={80} color="#fff" />
-        </View>
-        <Text style={styles.title}>Sổ Tay Gia Đình</Text>
-        <Text style={styles.subtitle}>Gia đình nhà mình 💝</Text>
+        <Image
+          source={require("../assets/images/splash-icon.png")}
+          style={styles.brandMark}
+          resizeMode="contain"
+        />
+        <Text style={styles.title}>FamFinance</Text>
+        <Text style={styles.subtitle}>Family Budget</Text>
       </Animated.View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -54,35 +49,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#FBFCFA",
   },
   content: {
     alignItems: "center",
   },
-  iconContainer: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 10,
-  },
+  brandMark: { width: 176, height: 176, marginBottom: 18 },
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#fff",
-    marginBottom: 8,
-    letterSpacing: 0.5,
+    color: "#1D2923",
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff",
-    opacity: 0.9,
+    color: "#6E7972",
   },
 });

@@ -1,18 +1,18 @@
+import { AppTheme } from "@/constants/theme";
 import { FlagIcon } from "@/src/components/FlagIcon";
 import { Language, LANGUAGES } from "@/src/constants/Languages";
 import { useTranslation } from "@/src/hooks/useTranslation";
-import { clearSampleData, seedSampleData } from "@/src/services/devSeed";
-import { loadEvents } from "@/src/redux/reducers/eventSlice";
 import {
+  loadConfig,
   loadExpenses,
   loadFamilyMembers,
   loadIncomes,
   loadNotes,
-  loadConfig,
   useAppDispatch,
 } from "@/src/redux";
+import { loadEvents } from "@/src/redux/reducers/eventSlice";
+import { clearSampleData, seedSampleData } from "@/src/services/devSeed";
 import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -60,7 +60,7 @@ export default function SettingsTab() {
       title: t("settings.security"),
       subtitle: t("settings.securityDesc"),
       icon: "shield-checkmark",
-      iconColor: "#667eea",
+      iconColor: AppTheme.green,
       route: "/settings/authentication",
     },
     {
@@ -192,10 +192,7 @@ export default function SettingsTab() {
     try {
       await clearSampleData();
       await refreshSeededData();
-      Alert.alert(
-        "Seed data",
-        "Sample data cleared.",
-      );
+      Alert.alert("Seed data", "Sample data cleared.");
     } catch (e) {
       Alert.alert("Seed data", `Error: ${e instanceof Error ? e.message : e}`);
     }
@@ -231,7 +228,7 @@ export default function SettingsTab() {
           </View>
         </View>
         {isSelected && (
-          <Ionicons name="checkmark-circle" size={24} color="#667eea" />
+          <Ionicons name="checkmark-circle" size={24} color={AppTheme.green} />
         )}
       </TouchableOpacity>
     );
@@ -250,10 +247,8 @@ export default function SettingsTab() {
       }}
     >
       <View style={styles.settingLeft}>
-        <View
-          style={[styles.iconContainer, { backgroundColor: item.iconColor }]}
-        >
-          <Ionicons name={item.icon} size={24} color="#fff" />
+        <View style={styles.iconContainer}>
+          <Ionicons name={item.icon} size={22} color={AppTheme.green} />
         </View>
         <View style={styles.settingInfo}>
           <Text style={styles.settingTitle}>{item.title}</Text>
@@ -266,20 +261,15 @@ export default function SettingsTab() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#667eea", "#764ba2"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.header, { paddingTop: insets.top + 20 }]}
-      >
+      <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
         <View>
           <View style={styles.headerTitleRow}>
             <Text style={styles.headerTitle}>{t("settings.title")}</Text>
-            <Ionicons name="settings-sharp" size={22} color="#fff" />
+            <Ionicons name="settings-sharp" size={22} color={AppTheme.green} />
           </View>
           <Text style={styles.headerSubtitle}>{t("settings.subtitle")}</Text>
         </View>
-      </LinearGradient>
+      </View>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -307,10 +297,8 @@ export default function SettingsTab() {
             onPress={() => setShowLanguageModal(true)}
           >
             <View style={styles.settingLeft}>
-              <View
-                style={[styles.iconContainer, { backgroundColor: "#FF9500" }]}
-              >
-                <Ionicons name="language" size={24} color="#fff" />
+              <View style={styles.iconContainer}>
+                <Ionicons name="language" size={22} color={AppTheme.green} />
               </View>
               <View style={styles.settingInfo}>
                 <Text style={styles.settingTitle}>
@@ -402,7 +390,6 @@ export default function SettingsTab() {
             </Text>
             <View style={styles.placeholder} />
           </View>
-
           <FlatList
             data={LANGUAGES}
             renderItem={renderLanguageItem}
@@ -418,13 +405,13 @@ export default function SettingsTab() {
 
 const styles = StyleSheet.create({
   rateCard: {
-    backgroundColor: "#FFF8E1",
-    borderRadius: 16,
+    backgroundColor: AppTheme.surface,
+    borderRadius: 8,
     padding: 18,
     marginBottom: 24,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#FFE082",
+    borderColor: AppTheme.border,
   },
   rateStars: {
     flexDirection: "row",
@@ -445,14 +432,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: "#f5f6fa",
+    backgroundColor: AppTheme.background,
   },
   header: {
     paddingTop: 20,
     paddingBottom: 24,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    backgroundColor: AppTheme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   headerTitleRow: {
     flexDirection: "row",
@@ -463,12 +451,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "800",
-    color: "#fff",
+    color: AppTheme.ink,
   },
   headerSubtitle: {
     fontSize: 14,
-    color: "#fff",
-    opacity: 0.9,
+    color: AppTheme.inkMuted,
   },
   scrollContent: {
     padding: 16,
@@ -490,15 +477,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: AppTheme.background,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   settingLeft: {
     flexDirection: "row",
@@ -531,19 +514,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
+    backgroundColor: AppTheme.background,
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: "#f5f6fa",
+    backgroundColor: AppTheme.background,
   },
   modalHeader: {
     flexDirection: "row",
@@ -551,7 +530,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingVertical: 16,
-    backgroundColor: "#fff",
+    backgroundColor: AppTheme.background,
     borderBottomWidth: 1,
     borderBottomColor: "#E5E5E5",
   },
@@ -589,9 +568,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedLanguageItem: {
-    backgroundColor: "#F8F9FF",
+    backgroundColor: AppTheme.greenSoft,
     borderWidth: 2,
-    borderColor: "#667eea",
+    borderColor: AppTheme.green,
   },
   languageLeft: {
     flexDirection: "row",
@@ -616,14 +595,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   selectedText: {
-    color: "#667eea",
+    color: AppTheme.green,
   },
   languageSubname: {
     fontSize: 14,
     color: "#666",
   },
   selectedSubtext: {
-    color: "#667eea",
+    color: AppTheme.green,
     opacity: 0.8,
   },
 });

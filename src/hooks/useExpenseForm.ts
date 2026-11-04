@@ -1,4 +1,4 @@
-import { ExpenseCategory } from "@/src/types";
+import { ExpenseCategoryValue } from "@/src/types";
 import { useState } from "react";
 
 interface FormErrors {
@@ -9,13 +9,13 @@ interface FormErrors {
 
 export function useExpenseForm(initialData?: {
   amount?: string;
-  category?: ExpenseCategory | null;
+  category?: ExpenseCategoryValue | null;
   spender?: string | null;
   date?: Date;
   note?: string;
 }) {
   const [amount, setAmount] = useState(initialData?.amount || "");
-  const [category, setCategory] = useState<ExpenseCategory | null>(
+  const [category, setCategory] = useState<ExpenseCategoryValue | null>(
     initialData?.category || null,
   );
   const [spender, setSpender] = useState<string | null>(

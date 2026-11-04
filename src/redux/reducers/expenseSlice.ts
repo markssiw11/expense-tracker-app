@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import expenseStorage from "../../services/storage/expenseStorage";
-import { BudgetPeriodType, Expense, ExpenseCategory } from "../../types";
+import { BudgetPeriodType, Expense, ExpenseCategoryValue } from "../../types";
 import { calculateBudgetStatus } from "../../utils/budgetCalculator";
 import { getCurrentMonth } from "../../utils/expenseUtils";
 import { updateBudgetStatus } from "./spendingLimitSlice";
@@ -11,7 +11,7 @@ interface ExpenseState {
   error: string | null;
   selectedMonth: string;
   filters: {
-    categories: ExpenseCategory[];
+    categories: ExpenseCategoryValue[];
   };
 }
 
@@ -255,7 +255,7 @@ const expenseSlice = createSlice({
     },
     setFilters: (
       state,
-      action: PayloadAction<{ categories: ExpenseCategory[] }>,
+      action: PayloadAction<{ categories: ExpenseCategoryValue[] }>,
     ) => {
       state.filters = action.payload;
     },

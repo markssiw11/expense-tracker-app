@@ -4,7 +4,7 @@
 // entries on a schedule (weekly or monthly). Generated expenses are ordinary
 // Expense records, so budgets, reports and backups keep working unchanged.
 
-import { ExpenseCategory } from "./expense.types";
+import { ExpenseCategoryValue } from "./expense.types";
 
 export enum RecurrenceFrequency {
   WEEKLY = "weekly",
@@ -14,7 +14,7 @@ export enum RecurrenceFrequency {
 export interface RecurringExpense {
   id: string;
   amount: number;
-  category: ExpenseCategory;
+  category: ExpenseCategoryValue;
   note?: string;
   spender?: string;
   frequency: RecurrenceFrequency;
@@ -31,7 +31,7 @@ export interface RecurringExpense {
 
 export interface RecurringExpenseFormData {
   amount: string;
-  category: ExpenseCategory | null;
+  category: ExpenseCategoryValue | null;
   note: string;
   spender: string | null;
   frequency: RecurrenceFrequency;

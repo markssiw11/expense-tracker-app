@@ -24,6 +24,7 @@ const STORAGE_KEYS = [
   SPLIT_TRIPS_KEY,
   "@expense_tracker:incomes",
   "@expense_tracker:spending_limits",
+  "@expense_tracker:custom_categories",
   "@recurring_expenses",
   "user-language",
   "user-currency",

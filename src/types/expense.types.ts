@@ -11,10 +11,19 @@ export enum ExpenseCategory {
   OTHER = "other",
 }
 
+export type ExpenseCategoryValue = string;
+
+export interface CustomExpenseCategory {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+}
+
 export interface Expense {
   id: string;
   amount: number;
-  category: ExpenseCategory;
+  category: ExpenseCategoryValue;
   date: string; // ISO date string
   note?: string;
   spender?: string; // Người chi tiêu (vợ, chồng, con, etc.)
@@ -24,7 +33,7 @@ export interface Expense {
 }
 
 export interface CategoryConfig {
-  key: ExpenseCategory;
+  key: ExpenseCategoryValue;
   label: string;
   icon: string;
   color: string;
@@ -38,7 +47,7 @@ export interface MonthlySummary {
 }
 
 export interface CategoryBreakdown {
-  category: ExpenseCategory;
+  category: ExpenseCategoryValue;
   amount: number;
   percentage: number;
   count: number;

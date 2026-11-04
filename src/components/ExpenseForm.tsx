@@ -7,10 +7,15 @@ import {
 } from "@/src/hooks/useCurrency";
 import useTranslation from "@/src/hooks/useTranslation";
 import { FamilyMember } from "@/src/redux";
-import { BudgetStatus, ExpenseCategory } from "@/src/types";
+import {
+  addCustomExpenseCategory,
+  loadCustomExpenseCategories,
+} from "@/src/services/expenseCategoryStorage";
+import { BudgetStatus, ExpenseCategoryValue } from "@/src/types";
 import { formatDateObject } from "@/src/utils/formatUtils";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { router } from "expo-router";
 import React, { useMemo, useRef, useState } from "react";
 import {
   Alert,
@@ -37,8 +42,8 @@ interface FormErrors {
 interface ExpenseFormProps {
   amount: string;
   setAmount: (value: string) => void;
-  category: ExpenseCategory | null;
-  setCategory: (value: ExpenseCategory) => void;
+  category: ExpenseCategoryValue | null;
+  setCategory: (value: ExpenseCategoryValue) => void;
   spender: string | null;
   setSpender: (value: string | null) => void;
   date: Date;
@@ -88,7 +93,41 @@ export default function ExpenseForm({
   const { t } = useTranslation();
   const { currency, setCurrency, formatAmount } = useCurrency();
   const [showCurrencyModal, setShowCurrencyModal] = useState(false);
-  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
+  const [customCategories, setCustomCategories] = useState<
+    Awaited<ReturnType<typeof loadCustomExpenseCategories>>
+  >([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const EXPENSE_CATEGORIES = useMemo(
+    () => getExpenseCategories(t, customCategories),
+    [t, customCategories],
+  );
+
+  React.useEffect(() => {
+    loadCustomExpenseCategories()
+      .then(setCustomCategories)
+      .catch(() => undefined);
+  }, []);
+
+  const saveCustomCategory = async () => {
+    try {
+      const newCategory = await addCustomExpenseCategory(
+        newCategoryName,
+        "pricetag",
+        "#2A8C75",
+      );
+      setCustomCategories((current) => [...current, newCategory]);
+      setCategory(newCategory.id);
+      setNewCategoryName("");
+      setShowCategoryModal(false);
+      if (errors.category) clearError("category");
+    } catch (error) {
+      Alert.alert(
+        t("common.error"),
+        error instanceof Error ? error.message : t("common.saveFailed"),
+      );
+    }
+  };
 
   const handleDateChange = (_: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === "ios");
@@ -268,7 +307,16 @@ export default function ExpenseForm({
 
         {/* Category Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>{t("expenses.category")} *</Text>
+          <View style={styles.sectionHeading}>
+            <Text style={styles.label}>{t("expenses.category")} *</Text>
+            <TouchableOpacity
+              style={styles.addCategoryButton}
+              onPress={() => setShowCategoryModal(true)}
+            >
+              <Ionicons name="add-circle-outline" size={18} color="#24745B" />
+              <Text style={styles.addCategoryText}>{t("common.add")}</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.categoryGrid}>
             {EXPENSE_CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -308,7 +356,16 @@ export default function ExpenseForm({
 
         {/* Spender Picker */}
         <View style={styles.section}>
-          <Text style={styles.label}>{t("expenses.spender")}</Text>
+          <View style={styles.sectionHeading}>
+            <Text style={styles.label}>{t("expenses.spender")}</Text>
+            <TouchableOpacity
+              style={styles.addCategoryButton}
+              onPress={() => router.push("/settings/family-members")}
+            >
+              <Ionicons name="person-add-outline" size={17} color="#24745B" />
+              <Text style={styles.addCategoryText}>{t("common.add")}</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.spenderGrid}>
             {familyMembers.map((member) => (
               <TouchableOpacity
@@ -418,6 +475,47 @@ export default function ExpenseForm({
 
       {/* Currency Selector Modal */}
       <Modal
+        visible={showCategoryModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowCategoryModal(false)}
+      >
+        <View style={styles.categoryModalOverlay}>
+          <View style={styles.categoryModal}>
+            <Text style={styles.categoryModalTitle}>
+              {t("expenses.addCustomCategory")}
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder={t("expenses.customCategoryPlaceholder")}
+              value={newCategoryName}
+              onChangeText={setNewCategoryName}
+              maxLength={32}
+              autoFocus
+            />
+            <View style={styles.categoryModalActions}>
+              <TouchableOpacity
+                style={styles.categoryModalButton}
+                onPress={() => setShowCategoryModal(false)}
+              >
+                <Text style={styles.cancelButtonText}>
+                  {t("common.cancel")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.categoryModalButton, styles.categoryModalSave]}
+                onPress={saveCustomCategory}
+                disabled={!newCategoryName.trim()}
+              >
+                <Text style={styles.saveButtonText}>{t("common.save")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Currency Selector Modal */}
+      <Modal
         visible={showCurrencyModal}
         animationType="slide"
         presentationStyle="pageSheet"
@@ -500,6 +598,57 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 24,
+  },
+  sectionHeading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  addCategoryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+  },
+  addCategoryText: {
+    color: "#24745B",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  categoryModalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+  categoryModal: {
+    padding: 20,
+    borderRadius: 12,
+    backgroundColor: "#fff",
+    gap: 16,
+  },
+  categoryModalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#17231F",
+  },
+  categoryModalActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 10,
+  },
+  categoryModalButton: {
+    minWidth: 88,
+    alignItems: "center",
+    paddingVertical: 11,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    backgroundColor: "#f0f0f0",
+  },
+  categoryModalSave: {
+    backgroundColor: "#24745B",
   },
   label: {
     fontSize: 16,

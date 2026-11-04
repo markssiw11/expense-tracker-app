@@ -2,6 +2,7 @@ import { GoBackButton } from "@/src/components";
 import { getExpenseCategories } from "@/src/constants/ExpenseCategories";
 import { getFamilyMemberName } from "@/src/constants/FamilyMembers";
 import { useCurrencyFormat } from "@/src/hooks/useCurrency";
+import { useCustomExpenseCategories } from "@/src/hooks/useCustomExpenseCategories";
 import useTranslation from "@/src/hooks/useTranslation";
 import {
   addRecurringExpense,
@@ -12,7 +13,6 @@ import {
   updateRecurringExpense,
 } from "@/src/redux";
 import { useAppDispatch, useAppSelector } from "@/src/redux/store";
-import { ExpenseCategory } from "@/src/types";
 import {
   RecurrenceFrequency,
   RecurringExpense,
@@ -45,14 +45,18 @@ export default function RecurringExpensesScreen() {
 
   const rules = useAppSelector((state) => state.recurringExpenses.rules);
   const familyMembers = useAppSelector((state) => state.family.members);
-  const EXPENSE_CATEGORIES = useMemo(() => getExpenseCategories(t), [t]);
+  const customCategories = useCustomExpenseCategories();
+  const EXPENSE_CATEGORIES = useMemo(
+    () => getExpenseCategories(t, customCategories),
+    [t, customCategories],
+  );
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingRule, setEditingRule] = useState<RecurringExpense | null>(null);
 
   // Form state
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState<ExpenseCategory | null>(null);
+  const [category, setCategory] = useState<string | null>(null);
   const [spender, setSpender] = useState<string | null>(null);
   const [frequency, setFrequency] = useState<RecurrenceFrequency>(
     RecurrenceFrequency.MONTHLY,
@@ -150,18 +154,14 @@ export default function RecurringExpensesScreen() {
   };
 
   const handleDelete = (rule: RecurringExpense) => {
-    Alert.alert(
-      t("common.confirmDelete"),
-      t("recurring.deleteConfirm"),
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: t("common.delete"),
-          style: "destructive",
-          onPress: () => dispatch(deleteRecurringExpense(rule.id)),
-        },
-      ],
-    );
+    Alert.alert(t("common.confirmDelete"), t("recurring.deleteConfirm"), [
+      { text: t("common.cancel"), style: "cancel" },
+      {
+        text: t("common.delete"),
+        style: "destructive",
+        onPress: () => dispatch(deleteRecurringExpense(rule.id)),
+      },
+    ]);
   };
 
   const frequencyLabel = (freq: RecurrenceFrequency) =>
@@ -274,9 +274,7 @@ export default function RecurringExpensesScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>
-              {editingRule
-                ? t("recurring.editRule")
-                : t("recurring.addRule")}
+              {editingRule ? t("recurring.editRule") : t("recurring.addRule")}
             </Text>
 
             <ScrollView showsVerticalScrollIndicator={false}>
@@ -361,7 +359,9 @@ export default function RecurringExpensesScreen() {
 
               {/* Frequency */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>{t("recurring.frequency")}</Text>
+                <Text style={styles.inputLabel}>
+                  {t("recurring.frequency")}
+                </Text>
                 <View style={styles.frequencyRow}>
                   {[
                     RecurrenceFrequency.WEEKLY,
@@ -390,7 +390,9 @@ export default function RecurringExpensesScreen() {
 
               {/* Start date */}
               <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>{t("recurring.startDate")}</Text>
+                <Text style={styles.inputLabel}>
+                  {t("recurring.startDate")}
+                </Text>
                 <TouchableOpacity
                   style={styles.dateButton}
                   onPress={() => setShowDatePicker(true)}
@@ -491,7 +493,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  emptyState: { alignItems: "center", justifyContent: "center", paddingTop: 80 },
+  emptyState: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 80,
+  },
   emptyText: {
     fontSize: 16,
     fontWeight: "600",

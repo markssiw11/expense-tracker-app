@@ -1,4 +1,4 @@
-import { Colors } from "@/constants/theme";
+import { AppTheme, Colors } from "@/constants/theme";
 import { CalendarView } from "@/src/components/CalendarView";
 import ErrorBoundary from "@/src/components/ErrorBoundary";
 import { EventList } from "@/src/components/EventList";
@@ -21,7 +21,6 @@ import { useAppDispatch, useAppSelector } from "@/src/redux/store";
 import { Event, EventCategory } from "@/src/types/event.types";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect } from "react";
 import {
@@ -295,12 +294,7 @@ export default function CalendarTab() {
     <ErrorBoundary>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         {/* Header */}
-        <LinearGradient
-          colors={["#667eea", "#764ba2"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.header, { paddingTop: insets.top + 20 }]}
-        >
+        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
           <View style={styles.headerTop}>
             <Text style={styles.headerTitle}>{t("calendar.title")}</Text>
             <TouchableOpacity
@@ -310,11 +304,11 @@ export default function CalendarTab() {
               <Ionicons
                 name={viewMode === "calendar" ? "list" : "calendar"}
                 size={20}
-                color="#fff"
+                color={AppTheme.green}
               />
             </TouchableOpacity>
           </View>
-        </LinearGradient>
+        </View>
 
         {/* Category Filter Chips */}
         <ScrollView
@@ -331,7 +325,7 @@ export default function CalendarTab() {
             style={[
               styles.categoryChip,
               !selectedCategory && styles.categoryChipActive,
-              !selectedCategory && { backgroundColor: "#667eea" },
+              !selectedCategory && { backgroundColor: AppTheme.green },
             ]}
             onPress={() => handleCategoryFilter(null)}
           >
@@ -360,20 +354,20 @@ export default function CalendarTab() {
                 style={[
                   styles.categoryChip,
                   isActive && styles.categoryChipActive,
-                  isActive && { backgroundColor: categoryInfo.color },
+                  isActive && { backgroundColor: AppTheme.green },
                 ]}
                 onPress={() => handleCategoryFilter(category)}
               >
                 <Ionicons
                   name={categoryInfo.icon}
                   size={16}
-                  color={isActive ? "#fff" : categoryInfo.color}
+                  color={isActive ? "#fff" : AppTheme.inkMuted}
                   style={styles.categoryChipIcon}
                 />
                 <Text
                   style={[
                     styles.categoryChipText,
-                    { color: isActive ? "#fff" : categoryInfo.color },
+                    { color: isActive ? "#fff" : AppTheme.inkMuted },
                   ]}
                 >
                   {categoryInfo.label}
@@ -385,7 +379,7 @@ export default function CalendarTab() {
 
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#667eea" />
+            <ActivityIndicator size="large" color={AppTheme.green} />
             <Text style={[styles.loadingText, { color: colors.text }]}>
               {t("common.loading")}
             </Text>
@@ -431,13 +425,9 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: 20,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    backgroundColor: AppTheme.background,
+    borderBottomWidth: 1,
+    borderBottomColor: AppTheme.border,
   },
   headerTop: {
     flexDirection: "row",
@@ -447,14 +437,15 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#fff",
-    letterSpacing: 0.5,
+    color: AppTheme.ink,
   },
   viewModeButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: AppTheme.surface,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -499,14 +490,11 @@ const styles = StyleSheet.create({
   calendarContainer: {
     marginTop: 20,
     marginHorizontal: 16,
-    backgroundColor: "#fff",
-    borderRadius: 16,
+    backgroundColor: AppTheme.surface,
+    borderRadius: 8,
     padding: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 1,
+    borderColor: AppTheme.border,
   },
   selectedDateSection: {
     marginTop: 24,
@@ -535,10 +523,10 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#667eea",
+    backgroundColor: AppTheme.green,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#667eea",
+    shadowColor: AppTheme.greenDark,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.45,
     shadowRadius: 12,
@@ -567,11 +555,6 @@ const styles = StyleSheet.create({
   },
   categoryChipActive: {
     borderColor: "transparent",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   categoryChipIcon: {
     marginRight: 6,
