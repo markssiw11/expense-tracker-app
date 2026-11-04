@@ -2,7 +2,7 @@
   "expo": {
     "name": "FamFinance Family Budget",
     "slug": "ExpenseTrackerApp",
-    "version": "1.0.10",
+    "version": "1.0.11",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -13,7 +13,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "10",
+      "buildNumber": "11",
       "bundleIdentifier": "com.family.expensetracker",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -36,7 +36,7 @@
     },
     "android": {
       "package": "com.family.expensetracker",
-      "versionCode": 10,
+      "versionCode": 11,
       "adaptiveIcon": {
         "backgroundColor": "#174A40",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
