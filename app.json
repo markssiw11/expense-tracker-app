@@ -2,7 +2,7 @@
   "expo": {
     "name": "FamFinance Family Budget",
     "slug": "ExpenseTrackerApp",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -19,7 +19,12 @@
         "ITSAppUsesNonExemptEncryption": false,
         "NSFaceIDUsageDescription": "Use Face ID to unlock the app quickly and securely",
         "CFBundleAllowMixedLocalizations": true,
-        "CFBundleLocalizations": ["en", "vi", "ja", "ko"]
+        "CFBundleLocalizations": [
+          "en",
+          "vi",
+          "ja",
+          "ko"
+        ]
       }
     },
     "notification": {
@@ -31,7 +36,7 @@
     },
     "android": {
       "package": "com.family.expensetracker",
-      "versionCode": 9,
+      "versionCode": 10,
       "adaptiveIcon": {
         "backgroundColor": "#174A40",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
