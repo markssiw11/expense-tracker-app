@@ -165,6 +165,14 @@ export default function DashboardTab() {
             <Text style={styles.quickText}>{t("income.addIncome")}</Text>
             <Ionicons name="arrow-forward" size={15} color="#8A948E" />
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quickAction}
+            onPress={() => router.push("/random-picker")}
+          >
+            <Ionicons name="sync-outline" size={20} color="#24745B" />
+            <Text style={styles.quickText}>{t("randomPicker.shortTitle")}</Text>
+            <Ionicons name="arrow-forward" size={15} color="#8A948E" />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.cashFlowSection}>
@@ -457,6 +465,7 @@ const styles = StyleSheet.create({
     fontSize: 48,
     lineHeight: 58,
     fontWeight: "400",
+    fontVariant: ["lining-nums", "tabular-nums"],
     marginTop: 4,
   },
   balanceRow: {

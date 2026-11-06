@@ -88,6 +88,14 @@ export default function SettingsTab() {
       route: "/settings/recurring-expenses",
     },
     {
+      id: "random-picker",
+      title: t("randomPicker.title"),
+      subtitle: t("randomPicker.subtitle"),
+      icon: "sync-outline",
+      iconColor: "#2A8C75",
+      route: "/random-picker",
+    },
+    {
       id: "backup",
       title: t("settings.backup"),
       subtitle: t("backup.headerSubtitle"),
